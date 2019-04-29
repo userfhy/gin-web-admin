@@ -16,7 +16,7 @@ func main() {
         })
     })
 
-    r.GET("/", index_controller.Test)
+    r.GET("/font", index_controller.Test)
 
     log.Println("Server startup...")
     r.Run()
