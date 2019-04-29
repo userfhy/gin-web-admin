@@ -8,6 +8,7 @@ import (
     "github.com/gin-gonic/gin"
 )
 
+// base64 解码
 func Base64Decode(raw string) ([] byte, error) {
     ecodeBytes, err := base64.StdEncoding.DecodeString(raw)
     if err != nil {
@@ -16,12 +17,14 @@ func Base64Decode(raw string) ([] byte, error) {
     return ecodeBytes, nil
 }
 
+// 打印堆栈信息 方便 debug
 func PrintStack() {
     var buf [4096]byte
     n := runtime.Stack(buf[:], false)
     log.Printf("==> %s\n", string(buf[:n]))
 }
 
+// 统一错误处理
 func HandleError(c *gin.Context, err error, http_code int) bool {
     if err != nil {
         _, file, line, ok := runtime.Caller(1)
