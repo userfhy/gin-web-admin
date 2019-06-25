@@ -1,12 +1,12 @@
 package index_controller
 
 import (
-    "strings"
     "encoding/json"
+    "strings"
 
-    "github.com/gin-gonic/gin"
     "github.com/fanhengyuan/gin-test/common"
     "github.com/fanhengyuan/gin-test/utils"
+    "github.com/gin-gonic/gin"
 )
 
 func Test(c *gin.Context) {

@@ -1,15 +1,15 @@
 package utils
 
 import (
+    "encoding/base64"
     "log"
     "runtime"
-    "encoding/base64"
 
     "github.com/gin-gonic/gin"
 )
 
 // base64 解码
-func Base64Decode(raw string) ([] byte, error) {
+func Base64Decode(raw string) ([]byte, error) {
     ecodeBytes, err := base64.StdEncoding.DecodeString(raw)
     if err != nil {
         return nil, err
