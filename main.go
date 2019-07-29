@@ -1,10 +1,9 @@
 package main
 
 import (
-    "log"
-
-    "github.com/fanhengyuan/gin-test/app/controllers/index"
+    indexController "gin-test/app/controllers/index"
     "github.com/gin-gonic/gin"
+    "log"
 )
 
 func main() {
@@ -16,7 +15,7 @@ func main() {
         })
     })
 
-    r.GET("/font", index_controller.Test)
+    r.GET("/font", indexController.Test)
 
     log.Println("Server startup...")
     r.Run()
