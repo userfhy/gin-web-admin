@@ -1,0 +1,26 @@
+[app]
+JwtSecret = 233
+PrefixUrl = http://127.0.0.1:8080
+TimeFormat = 20060102
+
+[server]
+#debug or release
+RunMode = debug
+HttpPort = 8080
+ReadTimeout = 60
+WriteTimeout = 60
+
+[database]
+Type = mysql
+User = root
+Password = root
+Host = 127.0.0.1:3306
+Name = blog
+TablePrefix = blog_
+
+[redis]
+Host = 127.0.0.1:6379
+Password =
+MaxIdle = 30
+MaxActive = 30
+IdleTimeout = 200

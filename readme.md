@@ -1,6 +1,7 @@
 ## Gin Web Test
 
 ```bash
+mv conf/app.ini.example conf/app.ini
 go run main.go
 ```
 

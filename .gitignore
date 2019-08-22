@@ -1,3 +1,4 @@
 .vscode
 .idea/
 go.sum
+conf/app.ini

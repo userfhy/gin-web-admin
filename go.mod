@@ -5,4 +5,5 @@ go 1.12
 require (
 	github.com/fanhengyuan/gin-test v0.0.0-20190625075550-8ad688aacd72
 	github.com/gin-gonic/gin v1.4.0
+	github.com/go-ini/ini v1.46.0
 )

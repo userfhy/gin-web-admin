@@ -1,22 +1,41 @@
 package main
 
 import (
-    indexController "gin-test/app/controllers/index"
+    "fmt"
+    "gin-test/routers"
+    "gin-test/utils/setting"
     "github.com/gin-gonic/gin"
     "log"
+    "net/http"
 )
 
+func init() {
+    setting.Setup()
+}
+
 func main() {
-    r := gin.Default()
+    gin.SetMode(setting.ServerSetting.RunMode)
 
-    r.GET("/ping", func(c *gin.Context) {
-        c.JSON(200, gin.H{
-            "message": "pong \\(^o^)/~ 测试",
-        })
-    })
+    routersInit := routers.InitRouter()
 
-    r.GET("/font", indexController.Test)
+    readTimeout := setting.ServerSetting.ReadTimeout
+    writeTimeout := setting.ServerSetting.WriteTimeout
+    endPoint := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
+    maxHeaderBytes := 1 << 20
 
-    log.Println("Server startup...")
-    r.Run()
+    server := &http.Server{
+        Addr:           endPoint,
+        Handler:        routersInit,
+        ReadTimeout:    readTimeout,
+        WriteTimeout:   writeTimeout,
+        MaxHeaderBytes: maxHeaderBytes,
+    }
+
+    log.Printf("[info] start http server listening %s", endPoint)
+
+    err := server.ListenAndServe()
+    if err != nil {
+        log.Println(err)
+        return
+    }
 }
