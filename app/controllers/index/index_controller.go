@@ -9,6 +9,10 @@ import (
     "github.com/gin-gonic/gin"
 )
 
+// @Summary Base64 Decode
+// @Produce  json
+// @Param base64 query string true "base64 string"
+// @Router /font [get]
 func Test(c *gin.Context) {
     base64 := c.DefaultQuery("base64", "")
 

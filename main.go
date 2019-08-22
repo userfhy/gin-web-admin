@@ -13,6 +13,12 @@ func init() {
     setting.Setup()
 }
 
+// @title Gin Web Test
+// @version 1.0
+// @description An example of gin
+// @termsOfService https://github.com/fanhengyuan/gin-test
+// @license.name MIT
+// @license.url https://github.com/fanhengyuan/gin-test/blob/master/LICENSE
 func main() {
     gin.SetMode(setting.ServerSetting.RunMode)
 

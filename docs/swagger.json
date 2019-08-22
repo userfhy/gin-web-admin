@@ -1,0 +1,35 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "An example of gin",
+        "title": "Gin Web Test",
+        "termsOfService": "https://github.com/fanhengyuan/gin-test",
+        "contact": {},
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/fanhengyuan/gin-test/blob/master/LICENSE"
+        },
+        "version": "1.0"
+    },
+    "host": "{{.Host}}",
+    "basePath": "{{.BasePath}}",
+    "paths": {
+        "/font": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Base64 Decode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "base64 string",
+                        "name": "base64",
+                        "in": "query",
+                        "required": true
+                    }
+                ]
+            }
+        }
+    }
+}

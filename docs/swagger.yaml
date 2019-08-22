@@ -1,0 +1,24 @@
+basePath: '{{.BasePath}}'
+host: '{{.Host}}'
+info:
+  contact: {}
+  description: An example of gin
+  license:
+    name: MIT
+    url: https://github.com/fanhengyuan/gin-test/blob/master/LICENSE
+  termsOfService: https://github.com/fanhengyuan/gin-test
+  title: Gin Web Test
+  version: "1.0"
+paths:
+  /font:
+    get:
+      parameters:
+      - description: base64 string
+        in: query
+        name: base64
+        required: true
+        type: string
+      produces:
+      - application/json
+      summary: Base64 Decode
+swagger: "2.0"
