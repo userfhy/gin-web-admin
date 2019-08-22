@@ -1,10 +1,28 @@
 ## Gin Web Test
 
+### Run
+
 ```bash
 mv conf/app.ini.example conf/app.ini
 go run main.go
 ```
 
+### Swagger Docs
+
+Please check the instructions for use.
+[gin-swagger](https://github.com/swaggo/gin-swagger)
+
+#### Generate
+```bash
+$ swag init
+2019/08/22 16:17:11 Generate swagger docs....
+2019/08/22 16:17:11 Generate general API Info, search dir:./
+2019/08/22 16:17:11 create docs.go at  docs/docs.go
+2019/08/22 16:17:11 create swagger.json at  docs/swagger.json
+2019/08/22 16:17:11 create swagger.yaml at  docs/swagger.yaml
+```
+
+## Test Route
 ```
 [GET]
 http://localhost:8080/font?base64=W3sidGV4dCI6InN0cmluZzExMSIsIngiOjQxMCwieSI6OTAsImZvbnRTaXplIjoyMCwiY29sb3IiOjJ9LHsidGV4dCI6IuaWh+WtlzIiLCJ4Ijo0MTAsInkiOjE5MCwiZm9udFNpemUiOjIwLCJjb2xvciI6Mn0seyJ0ZXh0Ijoi5paH5a2X5LiJIiwieCI6NDEwLCJ5IjoyOTAsImZvbnRTaXplIjoyMCwiY29sb3IiOjF9LHsidGV4dCI6IuaWh+Wtl+WbmyIsIngiOjQxMCwieSI6MzkwLCJmb250U2l6ZSI6MjAsImNvbG9yIjoxfV0=
