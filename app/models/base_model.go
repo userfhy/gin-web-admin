@@ -36,10 +36,8 @@ func Setup() {
     // 设置连接的最大可复用时间。
     db.DB().SetConnMaxLifetime(time.Hour)
 
-    TestDB()
-
+    //TestDB()
     gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-        log.Println(defaultTableName)
         return setting.DatabaseSetting.TablePrefix + defaultTableName
     }
 }
