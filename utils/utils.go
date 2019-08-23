@@ -25,15 +25,16 @@ func PrintStack() {
 }
 
 // 统一错误处理
-func HandleError(c *gin.Context, err error, http_code int) bool {
+func HandleError(c *gin.Context, httpCode int, err error) bool {
     if err != nil {
         _, file, line, ok := runtime.Caller(1)
 
         log.Printf("Error: %s\nFile: %s Line: %d  %t", err, file, line, ok)
 
         PrintStack()
-        c.JSON(http_code, gin.H{"error": err.Error()})
+        c.JSON(httpCode, gin.H{"data": nil, "code": httpCode, "msg": err.Error()})
         return true
     }
+
     return false
 }

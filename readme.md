@@ -44,35 +44,34 @@ Json array:
 | color            | True           | 1-White 2-Black   |
 
 ```json
-[
-    {
-        "text":"string111",
-        "x":410,
-        "y":90,
-        "fontSize":20,
-        "color":2
-    },
-    {
-        "text":"文字2",
-        "x":410,
-        "y":190,
-        "fontSize":20,
-        "color":2
-    },
-    {
-        "text":"文字三",
-        "x":410,
-        "y":290,
-        "fontSize":20,
-        "color":1
-    },
-    {
-        "text":"文字四",
-        "x":410,
-        "y":390,
-        "fontSize":20,
-        "color":1
-    }
-]
+{
+    "code": 200,
+    "msg": "文字解析成功",
+    "data": [{
+        "text": "string111",
+        "x": 410,
+        "y": 90,
+        "fontSize": 20,
+        "color": 2
+    }, {
+        "text": "文字2",
+        "x": 410,
+        "y": 190,
+        "fontSize": 20,
+        "color": 2
+    }, {
+        "text": "文字三",
+        "x": 410,
+        "y": 290,
+        "fontSize": 20,
+        "color": 1
+    }, {
+        "text": "文字四",
+        "x": 410,
+        "y": 390,
+        "fontSize": 20,
+        "color": 1
+    }]
+}
 ```
 

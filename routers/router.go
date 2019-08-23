@@ -2,10 +2,13 @@ package routers
 
 import (
     indexController "gin-test/app/controllers/index"
+    "gin-test/common"
     _ "gin-test/docs"
+    "gin-test/utils/code"
     "github.com/gin-gonic/gin"
     "github.com/swaggo/gin-swagger"
     "github.com/swaggo/gin-swagger/swaggerFiles"
+    "net/http"
 )
 
 func InitRouter() *gin.Engine {
@@ -18,9 +21,8 @@ func InitRouter() *gin.Engine {
     testApi := r.Group("/test")
     {
         testApi.GET("/ping", func(c *gin.Context) {
-            c.JSON(200, gin.H{
-                "message": "pong \\(^o^)/~ 测试",
-            })
+            appG := common.Gin{C: c}
+            appG.Response(http.StatusOK, code.SUCCESS, "pong", nil)
         })
     }
 
