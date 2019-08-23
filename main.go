@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    model "gin-test/app/models"
     "gin-test/routers"
     "gin-test/utils/setting"
     "github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 
 func init() {
     setting.Setup()
+    model.Setup()
 }
 
 // @title Gin Web Test

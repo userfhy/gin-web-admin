@@ -27,6 +27,7 @@ func InitRouter() *gin.Engine {
         {
             test.GET("/ping", indexController.Ping)
             test.GET("/font", indexController.Test)
+            test.GET("/test_users", indexController.GetTestUsers)
         }
     }
 

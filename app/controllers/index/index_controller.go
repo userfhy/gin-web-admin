@@ -2,6 +2,7 @@ package indexController
 
 import (
     "encoding/json"
+    model "gin-test/app/models"
     "gin-test/utils/code"
     "net/http"
     "strings"
@@ -57,4 +58,22 @@ func Test(c *gin.Context) {
     }
 
     appG.Response(http.StatusOK, code.SUCCESS, "文字解析成功", imgTextArray)
+}
+
+func GetTestUsers(c *gin.Context) {
+    var (
+        testUsers [] *model.Test
+    )
+
+    appG := common.Gin{C: c}
+    
+    //data := make(map[string]interface{})
+    
+    testUsers, error := model.GetTestUsers(0, 15)
+    if error != nil {
+        appG.Response(http.StatusOK, code.INVALID_PARAMS, error.Error(), nil)
+        return
+    }
+
+    appG.Response(http.StatusOK, code.SUCCESS, "ok", testUsers)
 }
