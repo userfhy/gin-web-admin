@@ -1,4 +1,14 @@
 basePath: '{{.BasePath}}'
+definitions:
+  common.Response:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      msg:
+        type: string
+    type: object
 host: '{{.Host}}'
 info:
   contact: {}
@@ -10,8 +20,10 @@ info:
   title: Gin Web Test
   version: "1.0"
 paths:
-  /font:
+  /test/font:
     get:
+      consumes:
+      - application/json
       parameters:
       - description: base64 string
         in: query
@@ -20,5 +32,34 @@ paths:
         type: string
       produces:
       - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
       summary: Base64 Decode
+      tags:
+      - Test
+  /test/ping:
+    get:
+      consumes:
+      - application/json
+      description: Test Ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      summary: Ping
+      tags:
+      - Test
 swagger: "2.0"

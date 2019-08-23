@@ -11,10 +11,28 @@ import (
     "github.com/gin-gonic/gin"
 )
 
-// @Summary Base64 Decode
+// Ping godoc
+// @Summary Ping
+// @Description Test Ping
+// @Accept  json
 // @Produce  json
+// @Tags Test
+// @Success 200 {object} common.Response
+// @Router /test/ping [get]
+func Ping(c *gin.Context) {
+    appG := common.Gin{C: c}
+    appG.Response(http.StatusOK, code.SUCCESS, "pong", nil)
+}
+
+// Test godoc
+// @Summary Base64 Decode
+// @Accept  json
+// @Produce  json
+// @Tags Test
 // @Param base64 query string true "base64 string"
-// @Router /font [get]
+// @Success 200 {object} common.Response
+// @Failure 500 {object} common.Response
+// @Router /test/font [get]
 func Test(c *gin.Context) {
     appG := common.Gin{C: c}
 

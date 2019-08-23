@@ -2,31 +2,35 @@ package routers
 
 import (
     indexController "gin-test/app/controllers/index"
-    "gin-test/common"
-    _ "gin-test/docs"
-    "gin-test/utils/code"
+    "gin-test/docs"
     "github.com/gin-gonic/gin"
-    "github.com/swaggo/gin-swagger"
+    ginSwagger "github.com/swaggo/gin-swagger"
     "github.com/swaggo/gin-swagger/swaggerFiles"
-    "net/http"
 )
 
 func InitRouter() *gin.Engine {
+    // programatically set swagger info
+    docs.SwaggerInfo.Title = "Swagger Example API"
+    docs.SwaggerInfo.Description = "This is a sample server Petstore server."
+    docs.SwaggerInfo.Version = "1.0"
+    docs.SwaggerInfo.Host = "192.168.5.21:8080"
+    docs.SwaggerInfo.BasePath = "/v1/api/"
+    docs.SwaggerInfo.Schemes = []string{"http", "https"}
+
     r := gin.New()
     r.Use(gin.Logger())
     r.Use(gin.Recovery())
 
-    r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-    testApi := r.Group("/test")
+    v1 := r.Group("/v1/api")
     {
-        testApi.GET("/ping", func(c *gin.Context) {
-            appG := common.Gin{C: c}
-            appG.Response(http.StatusOK, code.SUCCESS, "pong", nil)
-        })
+        test := v1.Group("/test")
+        {
+            test.GET("/ping", indexController.Ping)
+            test.GET("/font", indexController.Test)
+        }
     }
 
-    r.GET("/font", indexController.Test)
+    r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
     return r
 }
