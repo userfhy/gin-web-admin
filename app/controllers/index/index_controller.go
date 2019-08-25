@@ -43,15 +43,15 @@ func Test(c *gin.Context) {
     base64String := strings.Replace(base64, " ", "+", -1)
 
     // base64 解码
-    arrByte, error := utils.Base64Decode(base64String)
-    if error != nil {
-        appG.Response(http.StatusOK, code.INVALID_PARAMS, "base64解码失败" + error.Error(), nil)
+    arrByte, err := utils.Base64Decode(base64String)
+    if err != nil {
+        appG.Response(http.StatusOK, code.INVALID_PARAMS, "base64解码失败" + err.Error(), nil)
         return
     }
 
     // 结构体
     var imgTextArray []common.ImgText
-    err := json.Unmarshal(arrByte, &imgTextArray)
+    err = json.Unmarshal(arrByte, &imgTextArray)
 
     if utils.HandleError(c, http.StatusInternalServerError, err) {
         return
@@ -69,9 +69,9 @@ func GetTestUsers(c *gin.Context) {
     
     //data := make(map[string]interface{})
     
-    testUsers, error := model.GetTestUsers(0, 15)
-    if error != nil {
-        appG.Response(http.StatusOK, code.INVALID_PARAMS, error.Error(), nil)
+    testUsers, err := model.GetTestUsers(0, 15)
+    if err != nil {
+        appG.Response(http.StatusOK, code.INVALID_PARAMS, err.Error(), nil)
         return
     }
 
