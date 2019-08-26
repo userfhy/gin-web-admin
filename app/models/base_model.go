@@ -36,7 +36,8 @@ func Setup() {
     // 设置连接的最大可复用时间。
     db.DB().SetConnMaxLifetime(time.Hour)
 
-    //TestDB()
+    db.SingularTable(true)
+
     gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
         return setting.DatabaseSetting.TablePrefix + defaultTableName
     }
@@ -55,7 +56,7 @@ func TestDB() {
         Name string
     }
 
-    rows, err := db.Raw("SELECT id,name FROM t_test").Rows()
+    rows, err := db.Raw("SELECT id,name FROM t_user").Rows()
     defer rows.Close()
     
     var result Result

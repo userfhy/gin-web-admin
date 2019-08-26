@@ -2,7 +2,7 @@ package indexController
 
 import (
     "encoding/json"
-    model "gin-test/app/models"
+    userService "gin-test/app/service/user"
     "gin-test/utils/code"
     "net/http"
     "strings"
@@ -61,19 +61,28 @@ func Test(c *gin.Context) {
 }
 
 func GetTestUsers(c *gin.Context) {
-    var (
-        testUsers [] *model.Test
-    )
-
     appG := common.Gin{C: c}
     
-    //data := make(map[string]interface{})
+    userServiceObj := userService.UserStruct{
+        PageNum: 0,
+        PageSize: 15,
+    }
     
-    testUsers, err := model.GetTestUsers(0, 15)
+    total, err := userServiceObj.Count()
     if err != nil {
-        appG.Response(http.StatusOK, code.INVALID_PARAMS, err.Error(), nil)
+        appG.Response(http.StatusInternalServerError, code.ERROR, "获取页数失败" + err.Error(), nil)
         return
     }
 
-    appG.Response(http.StatusOK, code.SUCCESS, "ok", testUsers)
+    userArr, err := userServiceObj.GetAll()
+    if err != nil {
+        appG.Response(http.StatusInternalServerError, code.ERROR, "服务器错误" + err.Error(), nil)
+        return
+    }
+
+    data := make(map[string]interface{})
+    data["lists"] = userArr
+    data["total"] = total
+
+    appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
 }
