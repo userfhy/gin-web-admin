@@ -36,6 +36,7 @@ var DatabaseSetting = &Database{}
 
 type Redis struct {
     Host        string
+    DB          int
     Password    string
     MaxIdle     int
     MaxActive   int

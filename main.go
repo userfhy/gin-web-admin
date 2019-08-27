@@ -5,6 +5,7 @@ import (
     "fmt"
     model "gin-test/app/models"
     "gin-test/routers"
+    "gin-test/utils/gredis"
     "gin-test/utils/setting"
     "github.com/gin-gonic/gin"
     "log"
@@ -18,6 +19,10 @@ import (
 func init() {
     setting.Setup()
     model.Setup()
+
+    if setting.RedisSetting.Host != "" {
+        gredis.Setup()
+    }
 }
 
 // @title Gin Web Test

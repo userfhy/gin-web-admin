@@ -19,7 +19,9 @@ Name = blog
 TablePrefix = blog_
 
 [redis]
+# Host not "" enable
 Host = 127.0.0.1:6379
+DB = 0
 Password =
 MaxIdle = 30
 MaxActive = 30
