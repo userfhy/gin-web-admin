@@ -2,10 +2,16 @@ package utils
 
 import (
     "encoding/base64"
+    "github.com/gin-gonic/gin"
     "log"
     "runtime"
-    "github.com/gin-gonic/gin"
+    "time"
 )
+
+// get datetime now
+func GetDateTimes() string {
+    return time.Now().Format("2006-01-02 15:04:05")
+}
 
 // base64 解码
 func Base64Decode(raw string) ([]byte, error) {
