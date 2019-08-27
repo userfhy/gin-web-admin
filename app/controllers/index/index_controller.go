@@ -27,7 +27,6 @@ func Ping(c *gin.Context) {
 
 // Test godoc
 // @Summary Base64 Decode
-// @Accept  json
 // @Produce  json
 // @Tags Test
 // @Param base64 query string true "base64 string"
@@ -60,14 +59,21 @@ func Test(c *gin.Context) {
     appG.Response(http.StatusOK, code.SUCCESS, "文字解析成功", imgTextArray)
 }
 
+// @Summary Get Users
+// @Accept  json
+// @Produce  json
+// @Tags Test
+// @Success 200 {object} common.Response
+// @Failure 500 {object} common.Response
+// @Router /test/test_users [get]
 func GetTestUsers(c *gin.Context) {
     appG := common.Gin{C: c}
-    
+
     userServiceObj := userService.UserStruct{
         PageNum: 0,
         PageSize: 15,
     }
-    
+
     total, err := userServiceObj.Count()
     if err != nil {
         appG.Response(http.StatusInternalServerError, code.ERROR, "获取页数失败" + err.Error(), nil)

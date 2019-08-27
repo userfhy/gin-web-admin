@@ -3,9 +3,11 @@ package routers
 import (
     indexController "gin-test/app/controllers/index"
     "gin-test/docs"
+    "gin-test/utils/setting"
     "github.com/gin-gonic/gin"
     ginSwagger "github.com/swaggo/gin-swagger"
     "github.com/swaggo/gin-swagger/swaggerFiles"
+    "strings"
 )
 
 func InitRouter() *gin.Engine {
@@ -13,7 +15,15 @@ func InitRouter() *gin.Engine {
     docs.SwaggerInfo.Title = "Swagger Example API"
     docs.SwaggerInfo.Description = "This is a sample server Petstore server."
     docs.SwaggerInfo.Version = "1.0"
-    docs.SwaggerInfo.Host = "127.0.0.1:8080"
+
+    configHost := ""
+    prefixUrl := setting.AppSetting.PrefixUrl
+    if strings.HasPrefix(prefixUrl, "http://") {
+        configHost = strings.Replace(prefixUrl, "http://", "", -1)
+    }else if strings.HasPrefix(prefixUrl, "https://") {
+        configHost = strings.Replace(prefixUrl, "https://", "", -1)
+    }
+    docs.SwaggerInfo.Host = configHost
     docs.SwaggerInfo.BasePath = "/v1/api/"
     docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
