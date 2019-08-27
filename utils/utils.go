@@ -4,17 +4,16 @@ import (
     "encoding/base64"
     "log"
     "runtime"
-
     "github.com/gin-gonic/gin"
 )
 
 // base64 解码
 func Base64Decode(raw string) ([]byte, error) {
-    ecodeBytes, err := base64.StdEncoding.DecodeString(raw)
+    encodeBytes, err := base64.StdEncoding.DecodeString(raw)
     if err != nil {
         return nil, err
     }
-    return ecodeBytes, nil
+    return encodeBytes, nil
 }
 
 // 打印堆栈信息 方便 debug
