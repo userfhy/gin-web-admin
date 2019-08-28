@@ -11,6 +11,8 @@ require (
 	github.com/jinzhu/gorm v1.9.10
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+	github.com/modern-go/reflect2 v1.0.1
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.2
