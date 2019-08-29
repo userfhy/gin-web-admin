@@ -2,6 +2,7 @@ package routers
 
 import (
     indexController "gin-test/app/controllers/index"
+    "gin-test/app/middleware"
     "gin-test/docs"
     "gin-test/utils/setting"
     "github.com/gin-gonic/gin"
@@ -34,7 +35,7 @@ func InitRouter() *gin.Engine {
 
     v1 := r.Group("/v1/api")
     {
-        test := v1.Group("/test")
+        test := v1.Group("/test").Use(middleware.TranslationMiddleware())
         {
             test.GET("/ping", indexController.Ping)
             test.GET("/font", indexController.Test)

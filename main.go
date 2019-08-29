@@ -4,6 +4,7 @@ import (
     "context"
     "fmt"
     model "gin-test/app/models"
+    "gin-test/common"
     "gin-test/routers"
     "gin-test/utils/gredis"
     "gin-test/utils/setting"
@@ -19,7 +20,7 @@ import (
 func init() {
     setting.Setup()
     model.Setup()
-
+    common.InitValidate()
     if setting.RedisSetting.Host != "" {
         gredis.Setup()
     }

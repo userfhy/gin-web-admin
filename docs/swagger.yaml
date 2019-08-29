@@ -64,6 +64,15 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: page number
+        in: query
+        name: p
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:

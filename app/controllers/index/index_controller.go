@@ -63,12 +63,16 @@ func Test(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Tags Test
+// @Param p query int false "page number"
+// @Param limit query int false "limit"
 // @Success 200 {object} common.Response
 // @Failure 500 {object} common.Response
 // @Router /test/test_users [get]
 func GetTestUsers(c *gin.Context) {
     appG := common.Gin{C: c}
 
+    utils.GetPage(c)
+    
     userServiceObj := userService.UserStruct{
         PageNum: 0,
         PageSize: 15,
