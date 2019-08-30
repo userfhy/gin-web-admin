@@ -71,11 +71,15 @@ func Test(c *gin.Context) {
 func GetTestUsers(c *gin.Context) {
     appG := common.Gin{C: c}
 
-    utils.GetPage(c)
-    
+    _, errStr, p, n := utils.GetPage(c)
+    if errStr != "" {
+        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, errStr, nil)
+        return
+    }
+
     userServiceObj := userService.UserStruct{
-        PageNum: 0,
-        PageSize: 15,
+        PageNum: p,
+        PageSize: n,
     }
 
     total, err := userServiceObj.Count()

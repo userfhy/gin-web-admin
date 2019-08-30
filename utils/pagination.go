@@ -2,52 +2,37 @@ package utils
 
 import (
     "gin-test/common"
+    "gin-test/utils/com"
     "github.com/gin-gonic/gin"
-    ut "github.com/go-playground/universal-translator"
-    "gopkg.in/go-playground/validator.v9"
-    "log"
 )
 
 type Page struct {
-    P uint `json:"p" validate:"required,min=1"`
-    N uint `json:"n" validate:"required,min=1"`
+    P uint `json:"p" form:"p" validate:"required,numeric,min=1"`
+    N uint `json:"n" form:"n" validate:"required,numeric,min=1"`
 }
 
 // GetPage get page parameters
-func GetPage(c *gin.Context) (int, int) {
+func GetPage(c *gin.Context) (error, string, int, int) {
     currentPage := 0
 
-    v, _ := c.Get("trans")
-
-    trans, ok := v.(ut.Translator)
-    if !ok {
-        trans, _ = common.Uni.GetTranslator("zh")
-    }
-
+    // 绑定 query 参数到结构体
     var p Page
     if err := c.ShouldBindQuery(&p); err != nil {
-       log.Println(err)
+        return err, "参数绑定失败,请检查传递参数类型！", 0, 0
     }
-    
-    err := common.Validate.Struct(p)
+
+    // 验证绑定结构体参数
+    err, parameterErrorStr := common.CheckBindStructParameter(p, c)
     if err != nil {
-       errs := err.(validator.ValidationErrors)
-       var sliceErrs [] string
-       for _, e := range errs {
-           sliceErrs = append(sliceErrs, e.Translate(trans))
-       }
-       log.Println(sliceErrs)
+        return err, parameterErrorStr, 0, 0
     }
 
-    page := c.DefaultQuery("p", "0")
-    limit := c.DefaultQuery("limit", "15")
+    page := com.StrTo(c.DefaultQuery("p", "0")).MustInt()
+    limit := com.StrTo(c.DefaultQuery("n", "15")).MustInt()
+    
+    if page > 0 {
+       currentPage = (page - 1) * limit
+    }
 
-    log.Println(page)
-    log.Println(limit)
-    
-    //if page > 0 {
-    //    currentPage = (page - 1) * limit
-    //}
-    
-    return currentPage, 0
+    return nil, "", currentPage, limit
 }
