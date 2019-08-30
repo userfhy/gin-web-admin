@@ -24,6 +24,70 @@ $ swag init
 2019/08/22 16:17:11 create swagger.yaml at  docs/swagger.yaml
 ```
 
+## Parameter Verification
+
+### 1.Defining structure
+
+use `validator.v9` Docs: [validator.v9](https://godoc.org/gopkg.in/go-playground/validator.v9)
+
+```golang
+type Page struct {
+    P uint `json:"p" form:"p" validate:"required,numeric,min=1"`
+    N uint `json:"n" form:"n" validate:"required,numeric,min=1"`
+}
+```
+
+### 2.Binding Request Parameters
+
+```golang
+    var p Page
+    if err := c.ShouldBindQuery(&p); err != nil {
+        return err, "参数绑定失败,请检查传递参数类型！", 0, 0
+    }
+```
+
+### 3.Verify Binding Parameters
+
+```golang
+    err, parameterErrorStr := common.CheckBindStructParameter(p, c)
+```
+
+### Complete example
+
+```golang
+
+type Page struct {
+    P uint `json:"p" form:"p" validate:"required,numeric,min=1"`
+    N uint `json:"n" form:"n" validate:"required,numeric,min=1"`
+}
+
+// GetPage get page parameters
+func GetPage(c *gin.Context) (error, string, int, int) {
+    currentPage := 0
+
+    // 绑定 query 参数到结构体
+    var p Page
+    if err := c.ShouldBindQuery(&p); err != nil {
+        return err, "参数绑定失败,请检查传递参数类型！", 0, 0
+    }
+
+    // 验证绑定结构体参数
+    err, parameterErrorStr := common.CheckBindStructParameter(p, c)
+    if err != nil {
+        return err, parameterErrorStr, 0, 0
+    }
+
+    page := com.StrTo(c.DefaultQuery("p", "0")).MustInt()
+    limit := com.StrTo(c.DefaultQuery("n", "15")).MustInt()
+    
+    if page > 0 {
+       currentPage = (page - 1) * limit
+    }
+
+    return nil, "", currentPage, limit
+}
+```
+
 ## Test Route
 ```
 [GET]
