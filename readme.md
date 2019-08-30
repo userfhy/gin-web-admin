@@ -7,7 +7,7 @@ mv conf/app.ini.example conf/app.ini
 go run main.go
 ```
 
-### Hot Reload
+### Hot Reload(Optional)
 Use Fresh docs: [Fresh](https://github.com/gravityblast/fresh)
 
 Recommended only for development environments.
@@ -33,21 +33,7 @@ Loading settings from fresh.conf
 16:11:57 runner      | mkdir ./tmp: file exists
 16:11:57 watcher     | Watching .
 16:11:57 watcher     | Watching app
-16:11:57 watcher     | Watching app/controllers
-16:11:57 watcher     | Watching app/controllers/index
-16:11:57 watcher     | Watching app/middleware
-16:11:57 watcher     | Watching app/models
-16:11:57 watcher     | Watching app/service
-16:11:57 watcher     | Watching app/service/user
-16:11:57 watcher     | Watching common
-16:11:57 watcher     | Watching conf
-16:11:57 watcher     | Watching docs
-16:11:57 watcher     | Watching routers
-16:11:57 watcher     | Watching utils
-16:11:57 watcher     | Watching utils/code
-16:11:57 watcher     | Watching utils/com
-16:11:57 watcher     | Watching utils/gredis
-16:11:57 watcher     | Watching utils/setting
+......
 16:11:57 watcher     | Ignoring vendor
 16:11:57 main        | Waiting (loop 1)...
 16:11:57 main        | receiving first event /
