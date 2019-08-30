@@ -33,6 +33,10 @@ func InitRouter() *gin.Engine {
     r.Use(gin.Logger())
     r.Use(gin.Recovery())
 
+    if setting.AppSetting.EnabledCORS {
+        r.Use(middleware.CORS())
+    }
+
     v1 := r.Group("/v1/api")
     {
         test := v1.Group("/test").Use(middleware.TranslationMiddleware())

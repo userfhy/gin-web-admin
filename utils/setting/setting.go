@@ -10,6 +10,7 @@ type App struct {
     JwtSecret string
     PrefixUrl string
     TimeFormat  string
+    EnabledCORS bool
 }
 
 var AppSetting = &App{}
