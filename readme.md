@@ -1,20 +1,20 @@
 ## Gin Web Test
 
-### Run
+## Run
 
 ```bash
 mv conf/app.ini.example conf/app.ini
 go run main.go
 ```
 
-### Swagger Docs
+## Swagger Docs
 
 Access ```BASE_URL/swagger/index.html``` view docs.
 
 Please check the instructions for use.
 [gin-swagger](https://github.com/swaggo/gin-swagger)
 
-#### Generate
+### Generate
 ```bash
 $ swag init
 2019/08/22 16:17:11 Generate swagger docs....
