@@ -18,8 +18,6 @@ Recommended only for development environments.
 
 #### Usage
 
-```cd /path/to/myapp```
-
 Start fresh:
 
 ```fresh -c fresh.conf```
