@@ -3,3 +3,4 @@
 go.sum
 conf/app.ini
 vendor/
+tmp/

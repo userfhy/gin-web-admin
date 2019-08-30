@@ -7,6 +7,72 @@ mv conf/app.ini.example conf/app.ini
 go run main.go
 ```
 
+### Hot Reload
+Use Fresh docs: [Fresh](https://github.com/gravityblast/fresh)
+
+Recommended only for development environments.
+
+#### Installation
+
+```go get github.com/pilu/fresh```
+
+#### Usage
+
+```cd /path/to/myapp```
+
+Start fresh:
+
+```fresh -c fresh.conf```
+
+#### Logs
+```bash
+$ fresh -c fresh.conf
+Loading settings from fresh.conf
+16:11:57 runner      | InitFolders
+16:11:57 runner      | mkdir ./tmp
+16:11:57 runner      | mkdir ./tmp: file exists
+16:11:57 watcher     | Watching .
+16:11:57 watcher     | Watching app
+16:11:57 watcher     | Watching app/controllers
+16:11:57 watcher     | Watching app/controllers/index
+16:11:57 watcher     | Watching app/middleware
+16:11:57 watcher     | Watching app/models
+16:11:57 watcher     | Watching app/service
+16:11:57 watcher     | Watching app/service/user
+16:11:57 watcher     | Watching common
+16:11:57 watcher     | Watching conf
+16:11:57 watcher     | Watching docs
+16:11:57 watcher     | Watching routers
+16:11:57 watcher     | Watching utils
+16:11:57 watcher     | Watching utils/code
+16:11:57 watcher     | Watching utils/com
+16:11:57 watcher     | Watching utils/gredis
+16:11:57 watcher     | Watching utils/setting
+16:11:57 watcher     | Ignoring vendor
+16:11:57 main        | Waiting (loop 1)...
+16:11:57 main        | receiving first event /
+16:11:57 main        | sleeping for 600 milliseconds
+16:11:58 main        | flushing events
+16:11:58 main        | Started! (53 Goroutines)
+16:11:58 main        | remove tmp/runner-build-errors.log: no such file or directory
+16:11:58 build       | Building...
+16:11:58 runner      | Running...
+16:11:58 main        | --------------------
+16:11:58 main        | Waiting (loop 2)...
+16:11:58 app         | [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+16:11:58 app         | [GIN-debug] GET    /v1/api/test/ping         --> gin-test/app/controllers/index.Ping (4 handlers)
+[GIN-debug] GET    /v1/api/test/font         --> gin-test/app/controllers/index.Test (4 handlers)
+[GIN-debug] GET    /v1/api/test/test_users   --> gin-test/app/controllers/index.GetTestUsers (4 handlers)
+[GIN-debug] GET    /swagger                  --> gin-test/routers.InitRouter.func1 (3 handlers)
+16:11:58 app         | [GIN-debug] GET    /swagger/*any             --> github.com/swaggo/gin-swagger.CustomWrapHandler.func1 (3 handlers)
+16:11:58 app         | 2019/08/30 16:11:58 [info] start http server listening :8080
+16:11:58 app         | 2019/08/30 16:11:58 [info] Actual pid is 2451
+
+```
+
 ## Swagger Docs
 
 Access ```BASE_URL/swagger/index.html``` view docs.
@@ -88,7 +154,7 @@ func GetPage(c *gin.Context) (error, string, int, int) {
 }
 ```
 
-## Test Route
+## Test Access Router 
 ```
 [GET]
 http://localhost:8080/v1/api/test/font?base64=W3sidGV4dCI6InN0cmluZzExMSIsIngiOjQxMCwieSI6OTAsImZvbnRTaXplIjoyMCwiY29sb3IiOjJ9LHsidGV4dCI6IuaWh+WtlzIiLCJ4Ijo0MTAsInkiOjE5MCwiZm9udFNpemUiOjIwLCJjb2xvciI6Mn0seyJ0ZXh0Ijoi5paH5a2X5LiJIiwieCI6NDEwLCJ5IjoyOTAsImZvbnRTaXplIjoyMCwiY29sb3IiOjF9LHsidGV4dCI6IuaWh+Wtl+WbmyIsIngiOjQxMCwieSI6MzkwLCJmb250U2l6ZSI6MjAsImNvbG9yIjoxfV0=
