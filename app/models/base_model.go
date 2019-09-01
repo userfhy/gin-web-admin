@@ -15,7 +15,7 @@ func Setup() {
     var err error
     db, err = gorm.Open(
         setting.DatabaseSetting.Type,
-        fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+        fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=20s",
             setting.DatabaseSetting.User,
             setting.DatabaseSetting.Password,
             setting.DatabaseSetting.Host,
