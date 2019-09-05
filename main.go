@@ -32,6 +32,10 @@ func init() {
 // @termsOfService https://github.com/fanhengyuan/gin-test
 // @license.name MIT
 // @license.url https://github.com/fanhengyuan/gin-test/blob/master/LICENSE
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
     gin.SetMode(setting.ServerSetting.RunMode)
 

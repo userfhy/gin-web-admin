@@ -1,7 +1,7 @@
 package routers
 
 import (
-    indexController "gin-test/app/controllers/index"
+    indexController "gin-test/app/controllers/v1/index"
     "gin-test/app/middleware"
     "gin-test/docs"
     "gin-test/utils/setting"

@@ -64,14 +64,17 @@ paths:
     get:
       consumes:
       - application/json
+      description: Test db Connections.
       parameters:
       - description: page number
         in: query
         name: p
+        required: true
         type: integer
-      - description: limit
+      - description: page limit
         in: query
-        name: limit
+        name: "n"
+        required: true
         type: integer
       produces:
       - application/json
@@ -86,7 +89,14 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get Users
       tags:
       - Test
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
