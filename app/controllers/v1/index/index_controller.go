@@ -99,3 +99,31 @@ func GetTestUsers(c *gin.Context) {
 
     appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
 }
+
+// @Summary User Login
+// @Description Test db Connections.
+// @Accept json
+// @Produce json
+// @Tags Test
+// @Param payload body userService.UserLoginStruct true "user login"
+// @Success 200 {object} common.Response
+// @Router /test/login [post]
+func UserLogin(c *gin.Context) {
+    appG := common.Gin{C: c}
+
+    // 绑定 query 参数到结构体
+    var userLogin userService.UserLoginStruct
+    if err := c.ShouldBindJSON(&userLogin); err != nil {
+        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, err.Error(), nil)
+        return
+    }
+
+    // 验证绑定结构体参数
+    err, parameterErrorStr := common.CheckBindStructParameter(userLogin, c)
+    if err != nil {
+        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, parameterErrorStr, nil)
+        return
+    }
+
+    appG.Response(http.StatusOK, code.SUCCESS, "ok", userLogin)
+}
