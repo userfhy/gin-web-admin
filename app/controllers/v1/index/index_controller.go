@@ -111,7 +111,7 @@ func GetTestUsers(c *gin.Context) {
 func UserLogin(c *gin.Context) {
     appG := common.Gin{C: c}
 
-    // 绑定 query 参数到结构体
+    // 绑定 payload 到结构体
     var userLogin userService.UserLoginStruct
     if err := c.ShouldBindJSON(&userLogin); err != nil {
         appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, err.Error(), nil)
