@@ -2,17 +2,15 @@ package indexController
 
 import (
     "encoding/json"
-    userService "gin-test/app/service/user"
-    "gin-test/utils/code"
-    "net/http"
-    "strings"
-    
+    userService "gin-test/app/service/v1/user"
     "gin-test/common"
     "gin-test/utils"
+    "gin-test/utils/code"
     "github.com/gin-gonic/gin"
+    "net/http"
+    "strings"
 )
 
-// Ping godoc
 // @Summary Ping
 // @Description Test Ping
 // @Accept  json
@@ -25,7 +23,6 @@ func Ping(c *gin.Context) {
     appG.Response(http.StatusOK, code.SUCCESS, "pong", nil)
 }
 
-// Test godoc
 // @Summary Base64 Decode
 // @Produce  json
 // @Tags Test
@@ -60,11 +57,13 @@ func Test(c *gin.Context) {
 }
 
 // @Summary Get Users
-// @Accept  json
-// @Produce  json
+// @Description Test db Connections.
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
 // @Tags Test
-// @Param p query int false "page number"
-// @Param limit query int false "limit"
+// @Param p query int true "page number"
+// @Param n query int true "page limit"
 // @Success 200 {object} common.Response
 // @Failure 500 {object} common.Response
 // @Router /test/test_users [get]
