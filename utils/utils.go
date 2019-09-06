@@ -6,7 +6,25 @@ import (
     "log"
     "runtime"
     "time"
+    "unicode"
 )
+
+
+func UcFirst(str string) string {
+    for _, v := range str {
+        u := string(unicode.ToUpper(v))
+        return u + str[len(u):]
+    }
+    return ""
+}
+
+func LcFirst(str string) string {
+    for _, v := range str {
+        u := string(unicode.ToLower(v))
+        return u + str[len(u):]
+    }
+    return ""
+}
 
 // get datetime now
 func GetDateTimes() string {

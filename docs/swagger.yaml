@@ -9,6 +9,20 @@ definitions:
       msg:
         type: string
     type: object
+  userService.UserLoginStruct:
+    properties:
+      password:
+        description: 密码
+        minLength: 6
+        type: string
+      username:
+        description: 用户名
+        minLength: 4
+        type: string
+    required:
+    - password
+    - username
+    type: object
 host: '{{.Host}}'
 info:
   contact: {}
@@ -42,6 +56,30 @@ paths:
             $ref: '#/definitions/common.Response'
             type: object
       summary: Base64 Decode
+      tags:
+      - Test
+  /test/login:
+    post:
+      consumes:
+      - application/json
+      description: Test db Connections.
+      parameters:
+      - description: user login
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/userService.UserLoginStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      summary: User Login
       tags:
       - Test
   /test/ping:

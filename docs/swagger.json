@@ -50,6 +50,42 @@
                 }
             }
         },
+        "/test/login": {
+            "post": {
+                "description": "Test db Connections.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "User Login",
+                "parameters": [
+                    {
+                        "description": "user login",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/userService.UserLoginStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/test/ping": {
             "get": {
                 "description": "Test Ping",
@@ -139,6 +175,25 @@
                 },
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "userService.UserLoginStruct": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "密码",
+                    "type": "string",
+                    "minLength": 6
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string",
+                    "minLength": 4
                 }
             }
         }
