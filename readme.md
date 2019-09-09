@@ -191,3 +191,11 @@ Json array:
 }
 ```
 
+## Features
+
+- Gorm
+- Swagger(swag)
+- Gin-gonic
+- App configurable
+- Redis
+- Fresh
