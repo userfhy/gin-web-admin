@@ -59,6 +59,10 @@ Loading settings from fresh.conf
 
 ## Swagger Docs
 
+### Preview
+
+![swagger_preview](./img/swagger_preview.png)
+
 Access ```BASE_URL/swagger/index.html``` view docs.
 
 Please check the instructions for use.
