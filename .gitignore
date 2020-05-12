@@ -1,6 +1,7 @@
 .vscode
 .idea/
 go.sum
+main
 conf/app.ini
 vendor/
 tmp/
