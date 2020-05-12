@@ -9,4 +9,4 @@ export GOPROXY=https://goproxy.cn
 
 go mod vendor
 
-go ls -al && run main.go
+go ls -al && go run main.go
