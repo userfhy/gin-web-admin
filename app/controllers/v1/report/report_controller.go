@@ -36,11 +36,11 @@ func Report(c *gin.Context) {
 
     // 信息入库
     var reportResult = reportService.ReportInformation(report)
-    //return
-    //if report_result {
-    //    appG.Response(http.StatusInternalServerError, code.ERROR, "录入失败，请稍后再试。", nil)
-    //    return
-    //}
+
+    if reportResult.ID == 0 {
+       appG.Response(http.StatusInternalServerError, code.ERROR, "录入失败，请稍后再试。", nil)
+       return
+    }
 
     m := make(map[string]interface{})
     m["id"] = reportResult.ID
