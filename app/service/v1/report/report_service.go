@@ -11,9 +11,10 @@ type ReportStruct struct {
 }
 
 // 录入信息
-func ReportInformation(report ReportStruct) model.Report {
+func ReportInformation(report ReportStruct, ip string) model.Report {
     return model.CreateReportNewRecord(model.Report{
         Name: report.Name,
         Phone: report.Phone,
+        Ip: ip,
     })
 }

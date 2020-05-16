@@ -35,7 +35,7 @@ func Report(c *gin.Context) {
     }
 
     // 信息入库
-    var reportResult = reportService.ReportInformation(report)
+    var reportResult = reportService.ReportInformation(report, c.ClientIP())
 
     if reportResult.ID == 0 {
        appG.Response(http.StatusInternalServerError, code.ERROR, "录入失败，请稍后再试。", nil)
