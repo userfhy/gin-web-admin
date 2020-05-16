@@ -38,6 +38,15 @@ func Setup() {
 
     db.SingularTable(true)
 
+    // 不存在 创建表
+    //if ! db.HasTable(&Report{}) {
+    //   log.Println("不存在上报表，开始创建！")
+    //   db.CreateTable(&Report{})
+    //}
+
+    // 自动迁移表
+    db.AutoMigrate(&Report{})
+
     gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
         return setting.DatabaseSetting.TablePrefix + defaultTableName
     }

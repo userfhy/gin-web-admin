@@ -1,0 +1,18 @@
+version: '3'
+services:
+  web:
+    image: 'report-api-gin:1.0'
+    build:
+      context: .
+      dockerfile: docker/go/Dockerfile
+    ports:
+      - '8080:8080'
+    volumes:
+      - .:/code/
+#    restart: always
+    environment:
+      - APP_ENV=live
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2G"

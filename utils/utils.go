@@ -31,6 +31,10 @@ func GetDateTimes() string {
     return time.Now().Format("2006-01-02 15:04:05")
 }
 
+func TimeToDateTimesString(t time.Time) string{
+    return t.Format("2006-01-02 15:04:05")
+}
+
 // base64 解码
 func Base64Decode(raw string) ([]byte, error) {
     encodeBytes, err := base64.StdEncoding.DecodeString(raw)

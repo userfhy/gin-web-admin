@@ -9,6 +9,18 @@ definitions:
       msg:
         type: string
     type: object
+  reportService.ReportStruct:
+    properties:
+      name:
+        minLength: 1
+        type: string
+      phone:
+        minLength: 4
+        type: string
+    required:
+    - name
+    - phone
+    type: object
   userService.UserLoginStruct:
     properties:
       password:
@@ -34,6 +46,30 @@ info:
   title: Gin Web Test
   version: "1.0"
 paths:
+  /report:
+    post:
+      consumes:
+      - application/json
+      description: User Report Information
+      parameters:
+      - description: 上报信息
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/reportService.ReportStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      summary: Report Information
+      tags:
+      - Report
   /test/font:
     get:
       parameters:

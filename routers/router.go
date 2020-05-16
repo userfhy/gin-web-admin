@@ -2,6 +2,7 @@ package routers
 
 import (
     indexController "gin-test/app/controllers/v1/index"
+    reportController "gin-test/app/controllers/v1/report"
     "gin-test/app/middleware"
     "gin-test/docs"
     "gin-test/utils/setting"
@@ -46,6 +47,11 @@ func InitRouter() *gin.Engine {
             test.GET("/font", indexController.Test)
             test.GET("/test_users", indexController.GetTestUsers)
             test.POST("/login", indexController.UserLogin)
+        }
+
+        report := v1.Group("/report").Use(middleware.TranslationMiddleware())
+        {
+            report.POST("", reportController.Report)
         }
     }
 

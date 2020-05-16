@@ -8,9 +8,9 @@ type User struct {
 }
 
 // 通过 TableName 方法将 TestUser 表命名为 `t_user`
-//func (User) TableName() string {
-//    return "t_user"
-//}
+func (User) TableName() string {
+   return "t_user"
+}
 
 func GetUserTotal(maps interface{}) (int, error) {
     var count int
