@@ -7,8 +7,8 @@ services:
       dockerfile: docker/go/Dockerfile
     ports:
       - '8080:8080'
-#    volumes:
-#      - .:/code/
+    volumes:
+      - .:/code/
 #    restart: always
     environment:
       - APP_ENV=live

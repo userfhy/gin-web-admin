@@ -34,6 +34,17 @@ func Report(c *gin.Context) {
         return
     }
 
+    // 是否存在
+    var count = reportService.GetReportUserCountByPhoneAndActivityID(report.Phone, report.ActivityId)
+    if count >= 1 {
+        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, "已经存在数据，请勿重复报名！", nil)
+        return
+    }
+
+    if report.ActivityId == 0 {
+        report.ActivityId = 1
+    }
+
     // 信息入库
     var reportResult = reportService.ReportInformation(report, c.ClientIP())
 

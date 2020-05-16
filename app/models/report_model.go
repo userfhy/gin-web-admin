@@ -12,6 +12,12 @@ type Report struct {
     Ip string `gorm:"Size:80" json:"ip"`
 }
 
+func GetReportUserCount(r Report) int {
+    var count = 0
+    db.Model(&Report{}).Where(&r).Count(&count)
+    return count
+}
+
 func CreateReportNewRecord(r Report) Report {
     //db.NewRecord(r)
     db.Create(&r)
