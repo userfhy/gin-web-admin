@@ -197,9 +197,14 @@ Json array:
 
 ## Features
 
-- Gorm
-- Swagger(swag)
-- Gin-gonic
-- App configurable
-- Redis
-- Fresh
+- [Gorm](https://github.com/jinzhu/gorm)
+- [Swagger(swag)](https://github.com/swaggo/swag)
+- [Gin-gonic](https://github.com/gin-gonic/gin)
+- [Go-ini](https://github.com/go-ini/ini)
+- [Redis](https://github.com/gomodule/redigo)
+- [Fresh](https://github.com/gravityblast/fresh)
+- [JWT](https://github.com/dgrijalva/jwt-go)
+
+## License
+
+MIT
