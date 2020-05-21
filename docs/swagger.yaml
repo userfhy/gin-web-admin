@@ -1,5 +1,17 @@
 basePath: '{{.BasePath}}'
 definitions:
+  authController.AuthStruct:
+    properties:
+      password:
+        minLength: 4
+        type: string
+      user_name:
+        minLength: 1
+        type: string
+    required:
+    - password
+    - user_name
+    type: object
   common.Response:
     properties:
       code:
@@ -11,6 +23,8 @@ definitions:
     type: object
   reportService.ReportStruct:
     properties:
+      activity_id:
+        type: integer
       name:
         minLength: 1
         type: string
@@ -46,6 +60,30 @@ info:
   title: Gin Web Test
   version: "1.0"
 paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Test db Connections.
+      parameters:
+      - description: user login
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/authController.AuthStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      summary: User Login
+      tags:
+      - Auth
   /report:
     post:
       consumes:
@@ -91,6 +129,8 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Base64 Decode
       tags:
       - Test
@@ -115,6 +155,8 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: User Login
       tags:
       - Test
@@ -131,6 +173,8 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Ping
       tags:
       - Test

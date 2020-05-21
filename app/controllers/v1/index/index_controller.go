@@ -15,6 +15,7 @@ import (
 // @Description Test Ping
 // @Accept  json
 // @Produce  json
+// @Security ApiKeyAuth
 // @Tags Test
 // @Success 200 {object} common.Response
 // @Router /test/ping [get]
@@ -25,6 +26,7 @@ func Ping(c *gin.Context) {
 
 // @Summary Base64 Decode
 // @Produce  json
+// @Security ApiKeyAuth
 // @Tags Test
 // @Param base64 query string true "base64 string"
 // @Success 200 {object} common.Response
@@ -41,7 +43,7 @@ func Test(c *gin.Context) {
     // base64 解码
     arrByte, err := utils.Base64Decode(base64String)
     if err != nil {
-        appG.Response(http.StatusOK, code.INVALID_PARAMS, "base64解码失败" + err.Error(), nil)
+        appG.Response(http.StatusOK, code.InvalidParams, "base64解码失败" + err.Error(), nil)
         return
     }
 
@@ -72,7 +74,7 @@ func GetTestUsers(c *gin.Context) {
 
     _, errStr, p, n := utils.GetPage(c)
     if errStr != "" {
-        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, errStr, nil)
+        appG.Response(http.StatusBadRequest, code.InvalidParams, errStr, nil)
         return
     }
 
@@ -104,6 +106,7 @@ func GetTestUsers(c *gin.Context) {
 // @Description Test db Connections.
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Tags Test
 // @Param payload body userService.UserLoginStruct true "user login"
 // @Success 200 {object} common.Response
@@ -114,14 +117,14 @@ func UserLogin(c *gin.Context) {
     // 绑定 payload 到结构体
     var userLogin userService.UserLoginStruct
     if err := c.ShouldBindJSON(&userLogin); err != nil {
-        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, err.Error(), nil)
+        appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
         return
     }
 
     // 验证绑定结构体参数
     err, parameterErrorStr := common.CheckBindStructParameter(userLogin, c)
     if err != nil {
-        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, parameterErrorStr, nil)
+        appG.Response(http.StatusBadRequest, code.InvalidParams, parameterErrorStr, nil)
         return
     }
 

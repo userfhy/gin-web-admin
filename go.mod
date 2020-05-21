@@ -5,6 +5,7 @@ go 1.13
 require (
 	cloud.google.com/go v0.37.4 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ini/ini v1.55.0
 	github.com/go-openapi/jsonreference v0.19.3 // indirect

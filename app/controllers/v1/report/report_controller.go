@@ -23,21 +23,21 @@ func Report(c *gin.Context) {
     // 绑定 payload 到结构体
     var report reportService.ReportStruct
     if err := c.ShouldBindJSON(&report); err != nil {
-        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, err.Error(), nil)
+        appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
         return
     }
 
     // 验证绑定结构体参数
     err, parameterErrorStr := common.CheckBindStructParameter(report, c)
     if err != nil {
-        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, parameterErrorStr, nil)
+        appG.Response(http.StatusBadRequest, code.InvalidParams, parameterErrorStr, nil)
         return
     }
 
     // 是否存在
     var count = reportService.GetReportUserCountByPhoneAndActivityID(report.Phone, report.ActivityId)
     if count >= 1 {
-        appG.Response(http.StatusBadRequest, code.INVALID_PARAMS, "已经存在数据，请勿重复报名！", nil)
+        appG.Response(http.StatusBadRequest, code.InvalidParams, "已经存在数据，请勿重复报名！", nil)
         return
     }
 
