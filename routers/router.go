@@ -1,6 +1,7 @@
 package routers
 
 import (
+    authController "gin-test/app/controllers/v1/auth"
     indexController "gin-test/app/controllers/v1/index"
     reportController "gin-test/app/controllers/v1/report"
     "gin-test/app/middleware"
@@ -41,18 +42,21 @@ func InitRouter() *gin.Engine {
 
     v1 := r.Group("/v1/api")
     {
-        test := v1.Group("/test").Use(middleware.TranslationMiddleware())
+        v1.POST("/login", authController.GetAuth)
+        report := v1.Group("/report").Use(middleware.TranslationMiddleware())
         {
+            report.POST("", reportController.Report)
+        }
+
+        test := v1.Group("/test").Use(middleware.TranslationMiddleware(), middleware.JWT())
+        {
+            test.POST("/ping", indexController.Ping)
             test.GET("/ping", indexController.Ping)
             test.GET("/font", indexController.Test)
             test.GET("/test_users", indexController.GetTestUsers)
             test.POST("/login", indexController.UserLogin)
         }
 
-        report := v1.Group("/report").Use(middleware.TranslationMiddleware())
-        {
-            report.POST("", reportController.Report)
-        }
     }
 
     // swagger docs

@@ -45,7 +45,7 @@ func Setup() {
     //}
 
     // 自动迁移表
-    db.AutoMigrate(&Report{})
+    db.AutoMigrate(&Report{}, &Auth{})
 
     gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
         return setting.DatabaseSetting.TablePrefix + defaultTableName

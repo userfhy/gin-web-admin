@@ -14,6 +14,42 @@
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/login": {
+            "post": {
+                "description": "Test db Connections.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User Login",
+                "parameters": [
+                    {
+                        "description": "user login",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/authController.AuthStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/report": {
             "post": {
                 "description": "User Report Information",
@@ -52,6 +88,11 @@
         },
         "/test/font": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -88,6 +129,11 @@
         },
         "/test/login": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Test db Connections.",
                 "consumes": [
                     "application/json"
@@ -124,6 +170,11 @@
         },
         "/test/ping": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Test Ping",
                 "consumes": [
                     "application/json"
@@ -200,6 +251,23 @@
         }
     },
     "definitions": {
+        "authController.AuthStruct": {
+            "type": "object",
+            "required": [
+                "password",
+                "user_name"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "minLength": 4
+                },
+                "user_name": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
         "common.Response": {
             "type": "object",
             "properties": {
@@ -221,6 +289,9 @@
                 "phone"
             ],
             "properties": {
+                "activity_id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string",
                     "minLength": 1
