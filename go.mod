@@ -5,6 +5,10 @@ go 1.13
 require (
 	cloud.google.com/go v0.37.4 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/casbin/casbin v1.9.1 // indirect
+	github.com/casbin/casbin/v2 v2.6.2
+	github.com/casbin/gorm-adapter v1.0.0 // indirect
+	github.com/casbin/gorm-adapter/v2 v2.1.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ini/ini v1.55.0
@@ -13,7 +17,7 @@ require (
 	github.com/go-openapi/swag v0.19.9 // indirect
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
-	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.4.1 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/howeyc/fsnotify v0.9.0 // indirect

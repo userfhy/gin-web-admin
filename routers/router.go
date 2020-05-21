@@ -6,6 +6,7 @@ import (
     reportController "gin-test/app/controllers/v1/report"
     "gin-test/app/middleware"
     "gin-test/docs"
+    "gin-test/utils/casbin"
     "gin-test/utils/setting"
     "github.com/gin-gonic/gin"
     ginSwagger "github.com/swaggo/gin-swagger"
@@ -40,15 +41,22 @@ func InitRouter() *gin.Engine {
         r.Use(middleware.CORS())
     }
 
+    // 初始化路由权限 在这初始化的目的： 避免每次访问路由查询数据库
+    // 如果更改路由权限 需要重新调用一下这个方法
+    casbin.SetupCasbin()
+
     v1 := r.Group("/v1/api")
     {
         v1.POST("/login", authController.GetAuth)
-        report := v1.Group("/report").Use(middleware.TranslationMiddleware())
+        report := v1.Group("/report").Use(middleware.TranslationHandler())
         {
             report.POST("", reportController.Report)
         }
 
-        test := v1.Group("/test").Use(middleware.TranslationMiddleware(), middleware.JWT())
+        test := v1.Group("/test").Use(
+            middleware.TranslationHandler(),
+            middleware.JWTHandler(),
+            middleware.CasbinHandler())
         {
             test.POST("/ping", indexController.Ping)
             test.GET("/ping", indexController.Ping)

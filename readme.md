@@ -204,6 +204,8 @@ Json array:
 - [Redis](https://github.com/gomodule/redigo)
 - [Fresh](https://github.com/gravityblast/fresh)
 - [JWT](https://github.com/dgrijalva/jwt-go)
+- [Casbin](https://github.com/casbin/casbin)
+- [Gorm-adapter](https://github.com/casbin/gorm-adapter)
 
 ## License
 
