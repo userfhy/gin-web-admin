@@ -15,6 +15,8 @@ import (
     "strings"
 )
 
+var Routers gin.RoutesInfo
+
 func InitRouter() *gin.Engine {
     // programatically set swagger info
     docs.SwaggerInfo.Title = "Swagger Example API"
@@ -60,6 +62,19 @@ func InitRouter() *gin.Engine {
             middleware.JWTHandler(),
             middleware.CasbinHandler())
         {
+            // 参数测试
+            test.GET("/article/:id", func(c *gin.Context) {
+              id := c.Param("id")
+              c.JSON(200, gin.H{"id": id})
+            })
+
+            test.GET("/article/:id/user/:user", func(c *gin.Context) {
+              id := c.Param("id")
+              user := c.Param("user")
+              c.JSON(200, gin.H{"id": id, "user": user})
+            })
+
+            test.GET("/routers", GetRouterList)
             test.POST("/ping", indexController.Ping)
             test.GET("/ping", indexController.Ping)
             test.GET("/font", indexController.Test)
@@ -75,5 +90,41 @@ func InitRouter() *gin.Engine {
     })
     r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+    Routers = r.Routes()
+    //for index := range Routers{
+    //    log.Println(routes[index].Path, routes[index].Method, routes[index].HandlerFunc)
+    //}
+
     return r
+}
+
+// @Summary Routers
+// @Description get router list
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Tags Test
+// @Success 200 {object} common.Response
+// @Router /test/routers [get]
+func GetRouterList(c *gin.Context) {
+    type Router struct {
+        Path   string `json:"path"`
+        Method string `json:"method"`
+    }
+
+    data := make([]Router, 0)
+
+    Routers := Routers
+    for index := range Routers{
+        var router Router
+        router.Method = Routers[index].Method
+        router.Path = Routers[index].Path
+        data = append(data, router)
+    }
+
+    c.JSON(200, gin.H{
+        "code": 200,
+        "msg": "ok",
+        "data": data,
+    })
 }

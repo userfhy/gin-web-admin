@@ -4,7 +4,6 @@ import (
     "fmt"
     "gin-test/utils"
     "gin-test/utils/casbin"
-    "gin-test/utils/setting"
     "github.com/gin-gonic/gin"
     "net/http"
 )
@@ -15,17 +14,12 @@ func CasbinHandler() gin.HandlerFunc {
         user := claims.(*utils.Claims)
 
         username := user.Username
-        //obj := c.Request.URL.RequestURI()
         obj := c.Request.URL.EscapedPath()
         act := c.Request.Method
 
         // 验证路由权限
         check, _ := casbin.CasbinEnforcer.Enforce(username, obj, act)
         if !check {
-            if setting.ServerSetting.RunMode == "debug" {
-                c.Next()
-                return
-            }
              //log.Println("权限没有通过")
             c.JSON(http.StatusUnauthorized, gin.H{
                 "code": http.StatusUnauthorized,

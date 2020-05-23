@@ -178,6 +178,24 @@ paths:
       summary: Ping
       tags:
       - Test
+  /test/routers:
+    get:
+      consumes:
+      - application/json
+      description: get router list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Routers
+      tags:
+      - Test
   /test/test_users:
     get:
       consumes:
