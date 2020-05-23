@@ -14,6 +14,7 @@ ReadTimeout = 60
 WriteTimeout = 60
 
 [database]
+EchoSql = false
 Type = mysql
 User = root
 Password = root
