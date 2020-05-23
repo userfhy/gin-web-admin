@@ -4,8 +4,10 @@ import (
     "fmt"
     "gin-test/utils/setting"
     "github.com/casbin/casbin/v2"
+    //"github.com/casbin/casbin/v2/util"
     gormadapter "github.com/casbin/gorm-adapter/v2"
     _ "github.com/go-sql-driver/mysql"
+    //"strings"
 )
 
 var (
@@ -22,6 +24,7 @@ func SetupCasbin() *casbin.Enforcer {
         true,
     )
     e, _ := casbin.NewEnforcer("conf/rbac_model.conf", a)
+    //e.AddFunction("ParamsMatch", ParamsMatchFunc)
 
     // Or you can use an existing DB "abc" like this:
     // The adapter will use the table named "casbin_rule".
@@ -49,3 +52,17 @@ func SetupCasbin() *casbin.Enforcer {
     // Save the policy back to DB.
     //e.SavePolicy()
 }
+
+// 处理路由参数类似 ?n=1&p=10
+//func ParamsMatch(fullNameKey1 string, key2 string) bool {
+//    key1 := strings.Split(fullNameKey1, "?")[0]
+//    //剥离路径
+//    return util.KeyMatch2(key1, key2)
+//}
+//
+//func ParamsMatchFunc(args ...interface{}) (interface{}, error) {
+//    name1 := args[0].(string)
+//    name2 := args[1].(string)
+//
+//    return (bool)(ParamsMatch(name1, name2)), nil
+//}

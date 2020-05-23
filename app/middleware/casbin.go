@@ -15,7 +15,8 @@ func CasbinHandler() gin.HandlerFunc {
         user := claims.(*utils.Claims)
 
         username := user.Username
-        obj := c.Request.URL.RequestURI()
+        //obj := c.Request.URL.RequestURI()
+        obj := c.Request.URL.EscapedPath()
         act := c.Request.Method
 
         // 验证路由权限
