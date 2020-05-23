@@ -47,8 +47,10 @@ func InitRouter() *gin.Engine {
 
     v1 := r.Group("/v1/api")
     {
-        v1.POST("/login", authController.GetAuth)
-        report := v1.Group("/report").Use(middleware.TranslationHandler())
+        v1.POST("/login", authController.GetAuth) // 登录
+
+        report := v1.Group("/report").Use(
+            middleware.TranslationHandler())
         {
             report.POST("", reportController.Report)
         }

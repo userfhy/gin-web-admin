@@ -8,6 +8,7 @@ import (
 
 type Auth struct {
     gorm.Model
+    RoleType int `gorm:"Size:4" json:"role_type"`
     LoggedInAt time.Time
     Username string `gorm:"Size:20" json:"user_name"`
     Password string `gorm:"Size:50" json:"password"`

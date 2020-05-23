@@ -27,6 +27,10 @@ func Setup() {
         log.Fatalf("Base models.Setup err: %v", err)
     }
 
+    if setting.DatabaseSetting.EchoSql {
+        db.LogMode(true)
+    }
+
     // 设置连接池中的最大闲置连接数。
     db.DB().SetMaxIdleConns(10)
     
