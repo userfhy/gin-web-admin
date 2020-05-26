@@ -86,6 +86,35 @@
                 }
             }
         },
+        "/sys/routers": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get router list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SYS"
+                ],
+                "summary": "Routers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/test/font": {
             "get": {
                 "security": [
@@ -186,35 +215,6 @@
                     "Test"
                 ],
                 "summary": "Ping",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/common.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/test/routers": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "get router list",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Test"
-                ],
-                "summary": "Routers",
                 "responses": {
                     "200": {
                         "description": "OK",

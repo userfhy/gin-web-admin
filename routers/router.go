@@ -4,6 +4,7 @@ import (
     authController "gin-test/app/controllers/v1/auth"
     indexController "gin-test/app/controllers/v1/index"
     reportController "gin-test/app/controllers/v1/report"
+    sysController "gin-test/app/controllers/v1/sys"
     "gin-test/app/middleware"
     "gin-test/docs"
     "gin-test/utils/casbin"
@@ -15,10 +16,8 @@ import (
     "strings"
 )
 
-var Routers gin.RoutesInfo
-
 func InitRouter() *gin.Engine {
-    // programatically set swagger info
+    // programmatically set swagger info
     docs.SwaggerInfo.Title = "Swagger Example API"
     docs.SwaggerInfo.Description = "This is a sample server Petstore server."
     docs.SwaggerInfo.Version = "1.0"
@@ -57,6 +56,16 @@ func InitRouter() *gin.Engine {
             report.POST("", reportController.Report)
         }
 
+        // 系统设置
+        sys := v1.Group("/sys").Use(
+            middleware.TranslationHandler(),
+            middleware.JWTHandler(),
+            middleware.CasbinHandler())
+        {
+            sys.GET("/routers", sysController.GetRouterList)
+        }
+
+        // 测试
         test := v1.Group("/test").Use(
             middleware.TranslationHandler(),
             middleware.JWTHandler(),
@@ -74,7 +83,6 @@ func InitRouter() *gin.Engine {
               c.JSON(200, gin.H{"id": id, "user": user})
             })
 
-            test.GET("/routers", GetRouterList)
             test.POST("/ping", indexController.Ping)
             test.GET("/ping", indexController.Ping)
             test.GET("/font", indexController.Test)
@@ -90,41 +98,8 @@ func InitRouter() *gin.Engine {
     })
     r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-    Routers = r.Routes()
-    //for index := range Routers{
-    //    log.Println(routes[index].Path, routes[index].Method, routes[index].HandlerFunc)
-    //}
+    // 路由列表
+    sysController.Routers = r.Routes()
 
     return r
-}
-
-// @Summary Routers
-// @Description get router list
-// @Accept  json
-// @Produce  json
-// @Security ApiKeyAuth
-// @Tags Test
-// @Success 200 {object} common.Response
-// @Router /test/routers [get]
-func GetRouterList(c *gin.Context) {
-    type Router struct {
-        Path   string `json:"path"`
-        Method string `json:"method"`
-    }
-
-    data := make([]Router, 0)
-
-    Routers := Routers
-    for index := range Routers{
-        var router Router
-        router.Method = Routers[index].Method
-        router.Path = Routers[index].Path
-        data = append(data, router)
-    }
-
-    c.JSON(200, gin.H{
-        "code": 200,
-        "msg": "ok",
-        "data": data,
-    })
 }
