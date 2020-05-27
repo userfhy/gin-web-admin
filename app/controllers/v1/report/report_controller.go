@@ -3,7 +3,6 @@ package reportController
 import (
     reportService "gin-test/app/service/v1/report"
     "gin-test/common"
-    "gin-test/utils"
     "gin-test/utils/code"
     "github.com/gin-gonic/gin"
     "net/http"
@@ -56,6 +55,6 @@ func Report(c *gin.Context) {
     m := make(map[string]interface{})
     m["id"] = reportResult.ID
     m["name"] = report.Name
-    m["created_at"] = utils.TimeToDateTimesString(reportResult.CreatedAt)
+    //m["created_at"] = utils.TimeToDateTimesString(reportResult.CreatedAt)
     appG.Response(http.StatusOK, code.SUCCESS, "信息录入成功！", m)
 }

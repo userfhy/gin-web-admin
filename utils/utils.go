@@ -9,6 +9,7 @@ import (
     "unicode"
 )
 
+var FormatTime = "2006-01-02 15:04:05"
 
 func UcFirst(str string) string {
     for _, v := range str {
@@ -28,11 +29,11 @@ func LcFirst(str string) string {
 
 // get datetime now
 func GetDateTimes() string {
-    return time.Now().Format("2006-01-02 15:04:05")
+    return time.Now().Format(FormatTime)
 }
 
 func TimeToDateTimesString(t time.Time) string{
-    return t.Format("2006-01-02 15:04:05")
+    return t.Format(FormatTime)
 }
 
 // base64 解码

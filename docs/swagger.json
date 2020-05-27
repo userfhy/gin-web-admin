@@ -16,7 +16,7 @@
     "paths": {
         "/login": {
             "post": {
-                "description": "Test db Connections.",
+                "description": "用户登录",
                 "consumes": [
                     "application/json"
                 ],
@@ -35,7 +35,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/authController.AuthStruct"
+                            "$ref": "#/definitions/userService.AuthStruct"
                         }
                     }
                 ],
@@ -156,47 +156,6 @@
                 }
             }
         },
-        "/test/login": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Test db Connections.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Test"
-                ],
-                "summary": "User Login",
-                "parameters": [
-                    {
-                        "description": "user login",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/userService.UserLoginStruct"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/common.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/test/ping": {
             "get": {
                 "security": [
@@ -226,14 +185,14 @@
                 }
             }
         },
-        "/test/test_users": {
+        "/user": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Test db Connections.",
+                "description": "获取用户列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -241,9 +200,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Test"
+                    "User"
                 ],
-                "summary": "Get Users",
+                "summary": "用户列表",
                 "parameters": [
                     {
                         "type": "integer",
@@ -277,26 +236,33 @@
                     }
                 }
             }
+        },
+        "/user/logged_in": {
+            "get": {
+                "description": "当前登录用户信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "当前登录用户信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "authController.AuthStruct": {
-            "type": "object",
-            "required": [
-                "password",
-                "user_name"
-            ],
-            "properties": {
-                "password": {
-                    "type": "string",
-                    "minLength": 4
-                },
-                "user_name": {
-                    "type": "string",
-                    "minLength": 1
-                }
-            }
-        },
         "common.Response": {
             "type": "object",
             "properties": {
@@ -331,22 +297,20 @@
                 }
             }
         },
-        "userService.UserLoginStruct": {
+        "userService.AuthStruct": {
             "type": "object",
             "required": [
                 "password",
-                "username"
+                "user_name"
             ],
             "properties": {
                 "password": {
-                    "description": "密码",
-                    "type": "string",
-                    "minLength": 6
-                },
-                "username": {
-                    "description": "用户名",
                     "type": "string",
                     "minLength": 4
+                },
+                "user_name": {
+                    "type": "string",
+                    "minLength": 1
                 }
             }
         }

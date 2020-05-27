@@ -5,6 +5,7 @@ import (
     indexController "gin-test/app/controllers/v1/index"
     reportController "gin-test/app/controllers/v1/report"
     sysController "gin-test/app/controllers/v1/sys"
+    userController "gin-test/app/controllers/v1/user"
     "gin-test/app/middleware"
     "gin-test/docs"
     "gin-test/utils/casbin"
@@ -48,7 +49,16 @@ func InitRouter() *gin.Engine {
 
     v1 := r.Group("/v1/api")
     {
-        v1.POST("/login", authController.GetAuth) // 登录
+        v1.POST("/login", authController.UserLogin) // 登录
+
+        user := v1.Group("/user").Use(
+            middleware.TranslationHandler(),
+            middleware.JWTHandler(),
+            middleware.CasbinHandler())
+        {
+             user.GET("", userController.GetUsers)
+             v1.GET("/logged_in", authController.GetLoggedInUser) // 当前登录用户信息
+        }
 
         report := v1.Group("/report").Use(
             middleware.TranslationHandler())
@@ -86,8 +96,6 @@ func InitRouter() *gin.Engine {
             test.POST("/ping", indexController.Ping)
             test.GET("/ping", indexController.Ping)
             test.GET("/font", indexController.Test)
-            test.GET("/test_users", indexController.GetTestUsers)
-            test.POST("/login", indexController.UserLogin)
         }
 
     }

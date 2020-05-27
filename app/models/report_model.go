@@ -1,11 +1,7 @@
 package model
 
-import (
-    "github.com/jinzhu/gorm"
-)
-
 type Report struct {
-    gorm.Model
+    BaseModel
     ActivityId int `json:"activity_id"`
     Name string `gorm:"Size:20" json:"name"`
     Phone string `gorm:"Size:30;index:idx_phone" json:"phone"`
