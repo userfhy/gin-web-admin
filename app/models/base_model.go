@@ -1,6 +1,7 @@
 package model
 
 import (
+    "database/sql/driver"
     "fmt"
     "gin-test/utils/setting"
     "github.com/jinzhu/gorm"
@@ -10,6 +11,18 @@ import (
 )
 
 var db *gorm.DB
+
+// JSONTime format json time field by myself
+type JSONTime struct {
+    time.Time
+}
+
+type BaseModel struct {
+    ID        uint `gorm:"primary_key" json:"id"`
+    CreatedAt JSONTime `gorm:"column:created_at" json:"created_at"`
+    UpdatedAt JSONTime `gorm:"column:updated_at" json:"updated_at"`
+    DeletedAt *JSONTime `sql:"index" json:"deleted_at"`
+}
 
 func Setup() {
     var err error
@@ -25,6 +38,10 @@ func Setup() {
 
     if err != nil {
         log.Fatalf("Base models.Setup err: %v", err)
+    }
+
+    if setting.DatabaseSetting.EchoSql {
+        db.LogMode(true)
     }
 
     // 设置连接池中的最大闲置连接数。
@@ -79,4 +96,32 @@ func TestDB() {
 // CloseDB closes database connection (unnecessary)
 func CloseDB() {
     defer db.Close()
+}
+
+// MarshalJSON on JSONTime format Time field with %Y-%m-%d %H:%M:%S
+func (t JSONTime) MarshalJSON() ([]byte, error) {
+    if t.IsZero() {
+        return []byte(`null`), nil
+    }
+    formatted := fmt.Sprintf("\"%s\"", t.Format("2006-01-02 15:04:05"))
+    return []byte(formatted), nil
+}
+
+// Value insert timestamp into mysql need this function.
+func (t JSONTime) Value() (driver.Value, error) {
+    var zeroTime time.Time
+    if t.Time.UnixNano() == zeroTime.UnixNano() {
+        return nil, nil
+    }
+    return t.Time, nil
+}
+
+// Scan valueof time.Time
+func (t *JSONTime) Scan(v interface{}) error {
+    value, ok := v.(time.Time)
+    if ok {
+        *t = JSONTime{Time: value}
+        return nil
+    }
+    return fmt.Errorf("can not convert %v to timestamp", v)
 }

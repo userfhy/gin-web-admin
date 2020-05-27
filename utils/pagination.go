@@ -6,6 +6,13 @@ import (
     "github.com/gin-gonic/gin"
 )
 
+type PageResult struct {
+    List     interface{} `json:"list"`
+    Total    int         `json:"total"`
+    //Page     int         `json:"page"`
+    PageSize int         `json:"page_size"`
+}
+
 type Page struct {
     P uint `json:"p" form:"p" validate:"required,numeric,min=1"`
     N uint `json:"n" form:"n" validate:"required,numeric,min=1"`

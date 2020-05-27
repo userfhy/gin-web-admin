@@ -4,8 +4,11 @@ import (
     authController "gin-test/app/controllers/v1/auth"
     indexController "gin-test/app/controllers/v1/index"
     reportController "gin-test/app/controllers/v1/report"
+    sysController "gin-test/app/controllers/v1/sys"
+    userController "gin-test/app/controllers/v1/user"
     "gin-test/app/middleware"
     "gin-test/docs"
+    "gin-test/utils/casbin"
     "gin-test/utils/setting"
     "github.com/gin-gonic/gin"
     ginSwagger "github.com/swaggo/gin-swagger"
@@ -15,7 +18,7 @@ import (
 )
 
 func InitRouter() *gin.Engine {
-    // programatically set swagger info
+    // programmatically set swagger info
     docs.SwaggerInfo.Title = "Swagger Example API"
     docs.SwaggerInfo.Description = "This is a sample server Petstore server."
     docs.SwaggerInfo.Version = "1.0"
@@ -40,21 +43,59 @@ func InitRouter() *gin.Engine {
         r.Use(middleware.CORS())
     }
 
+    // 初始化路由权限 在这初始化的目的： 避免每次访问路由查询数据库
+    // 如果更改路由权限 需要重新调用一下这个方法
+    casbin.SetupCasbin()
+
     v1 := r.Group("/v1/api")
     {
-        v1.POST("/login", authController.GetAuth)
-        report := v1.Group("/report").Use(middleware.TranslationMiddleware())
+        v1.POST("/login", authController.UserLogin) // 登录
+
+        user := v1.Group("/user").Use(
+            middleware.TranslationHandler(),
+            middleware.JWTHandler(),
+            middleware.CasbinHandler())
+        {
+             user.GET("", userController.GetUsers)
+             v1.GET("/logged_in", authController.GetLoggedInUser) // 当前登录用户信息
+        }
+
+        report := v1.Group("/report").Use(
+            middleware.TranslationHandler())
         {
             report.POST("", reportController.Report)
         }
 
-        test := v1.Group("/test").Use(middleware.TranslationMiddleware(), middleware.JWT())
+        // 系统设置
+        sys := v1.Group("/sys").Use(
+            middleware.TranslationHandler(),
+            middleware.JWTHandler(),
+            middleware.CasbinHandler())
         {
+            sys.GET("/routers", sysController.GetRouterList)
+        }
+
+        // 测试
+        test := v1.Group("/test").Use(
+            middleware.TranslationHandler(),
+            middleware.JWTHandler(),
+            middleware.CasbinHandler())
+        {
+            // 参数测试
+            test.GET("/article/:id", func(c *gin.Context) {
+              id := c.Param("id")
+              c.JSON(200, gin.H{"id": id})
+            })
+
+            test.GET("/article/:id/user/:user", func(c *gin.Context) {
+              id := c.Param("id")
+              user := c.Param("user")
+              c.JSON(200, gin.H{"id": id, "user": user})
+            })
+
             test.POST("/ping", indexController.Ping)
             test.GET("/ping", indexController.Ping)
             test.GET("/font", indexController.Test)
-            test.GET("/test_users", indexController.GetTestUsers)
-            test.POST("/login", indexController.UserLogin)
         }
 
     }
@@ -64,6 +105,9 @@ func InitRouter() *gin.Engine {
         c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
     })
     r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+    // 路由列表
+    sysController.Routers = r.Routes()
 
     return r
 }

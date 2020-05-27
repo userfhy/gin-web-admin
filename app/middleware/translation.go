@@ -9,7 +9,7 @@ import (
 )
 
 //设置Translation
-func TranslationMiddleware() gin.HandlerFunc {
+func TranslationHandler() gin.HandlerFunc {
     return func(c *gin.Context) {
         locale := c.DefaultQuery("locale", "zh")
         trans, _ := common.Uni.GetTranslator(locale)

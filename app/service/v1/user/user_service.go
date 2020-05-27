@@ -5,16 +5,13 @@ import (
 )
 
 // 用户登录
-type UserLoginStruct struct {
-    // 用户名
-    Username string `json:"username" form:"username" validate:"required,min=4" minLength:"4"`
-    // 密码
-    Password string `json:"password" form:"password" validate:"required,min=6" minLength:"6"`
+type AuthStruct struct {
+    Username string `json:"user_name" form:"user_name" validate:"required,min=1,max=20" minLength:"1",maxLength:"20"`
+    Password string `json:"password" form:"password" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
 }
 
 type UserStruct struct {
-    ID   int
-    Name string
+    ID   int `json:"id"`
     
     PageNum  int
     PageSize int
@@ -22,7 +19,7 @@ type UserStruct struct {
 
 func (u *UserStruct) getMaps() map[string]interface{} {
     maps := make(map[string]interface{})
-
+    maps["deleted_at"] = nil
     return maps
 }
 
@@ -30,15 +27,11 @@ func (u *UserStruct) Count() (int, error) {
     return model.GetUserTotal(u.getMaps())
 }
 
-func (u *UserStruct) GetAll() ([]*model.User, error) {
-    var (
-        testUsers [] *model.User
-    )
-
-    testUsers, err := model.GetTestUsers(u.PageNum, u.PageSize)
+func (u *UserStruct) GetAll() ([]*model.Auth, error) {
+    Users, err := model.GetUsers(u.PageNum, u.PageSize, u.getMaps())
     if err != nil {
         return nil, err
     }
 
-    return testUsers, nil
+    return Users, nil
 }

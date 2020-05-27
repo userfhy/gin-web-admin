@@ -1,17 +1,5 @@
 basePath: '{{.BasePath}}'
 definitions:
-  authController.AuthStruct:
-    properties:
-      password:
-        minLength: 4
-        type: string
-      user_name:
-        minLength: 1
-        type: string
-    required:
-    - password
-    - user_name
-    type: object
   common.Response:
     properties:
       code:
@@ -35,19 +23,17 @@ definitions:
     - name
     - phone
     type: object
-  userService.UserLoginStruct:
+  userService.AuthStruct:
     properties:
       password:
-        description: 密码
-        minLength: 6
-        type: string
-      username:
-        description: 用户名
         minLength: 4
+        type: string
+      user_name:
+        minLength: 1
         type: string
     required:
     - password
-    - username
+    - user_name
     type: object
 host: '{{.Host}}'
 info:
@@ -64,14 +50,14 @@ paths:
     post:
       consumes:
       - application/json
-      description: Test db Connections.
+      description: 用户登录
       parameters:
       - description: user login
         in: body
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/authController.AuthStruct'
+          $ref: '#/definitions/userService.AuthStruct'
           type: object
       produces:
       - application/json
@@ -108,6 +94,24 @@ paths:
       summary: Report Information
       tags:
       - Report
+  /sys/routers:
+    get:
+      consumes:
+      - application/json
+      description: get router list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Routers
+      tags:
+      - SYS
   /test/font:
     get:
       parameters:
@@ -134,32 +138,6 @@ paths:
       summary: Base64 Decode
       tags:
       - Test
-  /test/login:
-    post:
-      consumes:
-      - application/json
-      description: Test db Connections.
-      parameters:
-      - description: user login
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/userService.UserLoginStruct'
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/common.Response'
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: User Login
-      tags:
-      - Test
   /test/ping:
     get:
       consumes:
@@ -178,11 +156,11 @@ paths:
       summary: Ping
       tags:
       - Test
-  /test/test_users:
+  /user:
     get:
       consumes:
       - application/json
-      description: Test db Connections.
+      description: 获取用户列表
       parameters:
       - description: page number
         in: query
@@ -209,9 +187,25 @@ paths:
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Get Users
+      summary: 用户列表
       tags:
-      - Test
+      - User
+  /user/logged_in:
+    get:
+      consumes:
+      - application/json
+      description: 当前登录用户信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      summary: 当前登录用户信息
+      tags:
+      - Auth
 securityDefinitions:
   ApiKeyAuth:
     in: header

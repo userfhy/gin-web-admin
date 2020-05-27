@@ -2,6 +2,7 @@ package authController
 
 import (
     model "gin-test/app/models"
+    "gin-test/app/service/v1/user"
     "gin-test/common"
     "gin-test/utils"
     "gin-test/utils/code"
@@ -9,25 +10,19 @@ import (
     "net/http"
 )
 
-
-type AuthStruct struct {
-    Username string `json:"user_name" form:"user_name" validate:"required,min=1,max=20" minLength:"1",maxLength:"20"`
-    Password string `json:"password" form:"password" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
-}
-
 // @Summary User Login
-// @Description Test db Connections.
+// @Description 用户登录
 // @Accept json
 // @Produce json
 // @Tags Auth
-// @Param payload body authController.AuthStruct true "user login"
+// @Param payload body userService.AuthStruct true "user login"
 // @Success 200 {object} common.Response
 // @Router /login [post]
-func GetAuth(c *gin.Context) {
+func UserLogin(c *gin.Context) {
     appG := common.Gin{C: c}
 
     // 绑定 payload 到结构体
-    var userLogin AuthStruct
+    var userLogin userService.AuthStruct
     if err := c.ShouldBindJSON(&userLogin); err != nil {
         appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
         return
@@ -57,4 +52,22 @@ func GetAuth(c *gin.Context) {
     }
 
     appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), data)
+}
+
+// @Summary 当前登录用户信息
+// @Description 当前登录用户信息
+// @Accept json
+// @Produce json
+// @Tags Auth
+// @Success 200 {object} common.Response
+// @Router /user/logged_in [get]
+func GetLoggedInUser(c *gin.Context) {
+    appG := common.Gin{C: c}
+
+    claims, _ := c.Get("claims")
+    user := claims.(*utils.Claims)
+
+    data := make(map[string]interface{}, 0)
+    data["user_name"] = user.Username
+    appG.Response(http.StatusOK, code.SUCCESS, "当前登录用户信息", data)
 }

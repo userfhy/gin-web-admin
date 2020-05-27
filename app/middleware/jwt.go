@@ -9,8 +9,7 @@ import (
     "strings"
 )
 
-
-func JWT() gin.HandlerFunc {
+func JWTHandler() gin.HandlerFunc {
     return func(c *gin.Context) {
         var rCode int
         var data interface{}
@@ -27,10 +26,12 @@ func JWT() gin.HandlerFunc {
             }
         }
 
+        var claims *utils.Claims
+        var err error
         if token == "" {
             rCode = code.TokenInvalid
         } else {
-            _, err := utils.ParseToken(token)
+            claims, err = utils.ParseToken(token)
             if err != nil {
                 switch err.(*jwt.ValidationError).Errors {
                 case jwt.ValidationErrorExpired:
@@ -51,7 +52,8 @@ func JWT() gin.HandlerFunc {
             c.Abort()
             return
         }
-
+        // 存储登录用户信息
+        c.Set("claims", claims)
         c.Next()
     }
 }

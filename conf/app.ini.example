@@ -5,6 +5,8 @@ TimeFormat = 20060102
 EnabledCORS = false
 
 [server]
+# Running in "debug" mode. Switch to "release" mode in production.
+# Debug mode no routing authority verification.
 #debug or release
 RunMode = debug
 HttpPort = 8080
@@ -12,6 +14,7 @@ ReadTimeout = 60
 WriteTimeout = 60
 
 [database]
+EchoSql = false
 Type = mysql
 User = root
 Password = root

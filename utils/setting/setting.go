@@ -25,6 +25,7 @@ type Server struct {
 var ServerSetting = &Server{}
 
 type Database struct {
+    EchoSql     bool
     Type        string
     User        string
     Password    string

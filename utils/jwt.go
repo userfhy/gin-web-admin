@@ -10,21 +10,24 @@ var jwtSecret = []byte(setting.AppSetting.JwtSecret)
 
 type Claims struct {
     UserId uint `json:"user_id"`
-    Username string `json:"username"`
+    Username string `json:"user_name"`
     jwt.StandardClaims
 }
 
 // GenerateToken generate tokens used for auth
 func GenerateToken(username, password string, userId uint) (string, error) {
     nowTime := time.Now()
-    expireTime := nowTime.Add(3 * time.Hour)
+    zeroTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location())
+    // 明天零点
+    expireTime := zeroTime.Add(time.Hour * 24)
 
     claims := Claims{
         userId,
         username,
         jwt.StandardClaims{
+            Issuer:   "gin-test",
+            IssuedAt: time.Now().Unix(),
             ExpiresAt: expireTime.Unix(),
-            Issuer:    "gin-test",
         },
     }
 
