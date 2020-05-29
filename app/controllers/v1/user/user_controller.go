@@ -46,6 +46,13 @@ func GetUsers(c *gin.Context) {
         return
     }
 
+/*    var uIndex []userService.TestList
+    for i := range userArr {
+        uIndex = append(uIndex, userService.TestList{Index: i + 1, Auth: userArr[i]})
+        //log.Println(userArr[i])
+    }
+    log.Println(uIndex)*/
+
     data := utils.PageResult{
         List: userArr,
         Total: total,

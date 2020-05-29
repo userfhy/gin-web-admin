@@ -126,6 +126,15 @@ func (t *JSONTime) Scan(v interface{}) error {
     return fmt.Errorf("can not convert %v to timestamp", v)
 }
 
+func GetTotal(tableStruct interface{}, maps interface{}) (int, error) {
+    var count int
+    if err := db.Model(tableStruct).Where(maps).Count(&count).Error; err != nil {
+        return 0, err
+    }
+
+    return count, nil
+}
+
 //func GetTotal(maps interface{}) (int, error) {
 //    var count int
 //    if err := db.Model(&Auth{}).Where(maps).Count(&count).Error; err != nil {

@@ -17,18 +17,23 @@ type UserStruct struct {
     PageSize int
 }
 
-func (u *UserStruct) getMaps() map[string]interface{} {
+type TestList struct {
+    Index int `json:"index"`
+    *model.Auth
+}
+
+func (u *UserStruct) getConditionMaps() map[string]interface{} {
     maps := make(map[string]interface{})
     //maps["deleted_at"] = nil
     return maps
 }
 
 func (u *UserStruct) Count() (int, error) {
-    return model.GetUserTotal(model.Auth{}, u.getMaps())
+    return model.GetTotal(model.Auth{}, u.getConditionMaps())
 }
 
 func (u *UserStruct) GetAll() ([]*model.Auth, error) {
-    Users, err := model.GetUsers(model.Auth{}, u.PageNum, u.PageSize, u.getMaps())
+    Users, err := model.GetUsers(u.PageNum, u.PageSize, u.getConditionMaps())
     if err != nil {
         return nil, err
     }

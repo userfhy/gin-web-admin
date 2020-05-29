@@ -30,19 +30,10 @@ func CheckAuth(username, password string) (bool, uint) {
     return false, 0
 }
 
-func GetUserTotal(tableStruct interface{}, maps interface{}) (int, error) {
-    var count int
-    if err := db.Model(tableStruct).Where(maps).Count(&count).Error; err != nil {
-        return 0, err
-    }
-
-    return count, nil
-}
-
 // GetTestUsers gets a list of users based on paging constraints
-func GetUsers(tableStruct interface{}, pageNum int, pageSize int, maps interface{}) ([]*Auth, error) {
+func GetUsers(pageNum int, pageSize int, maps interface{}) ([]*Auth, error) {
     var user [] *Auth
-    err := db.Find(&user).Where(maps).Offset(pageNum).Limit(pageSize).Error
+    err := db.Where(maps).Offset(pageNum).Limit(pageSize).Find(&user).Error
     if err != nil && err != gorm.ErrRecordNotFound {
         return nil, err
     }
