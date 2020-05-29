@@ -8,10 +8,10 @@ import (
 
 type Auth struct {
     BaseModel
-    RoleType int `gorm:"Size:4" json:"role_type"`
+    RoleType int `gorm:"Size:4;DEFAULT:0;NOT NULL;" json:"role_type"`
     LoggedInAt JSONTime `json:"logged_in_at"`
-    Username string `gorm:"Size:20" json:"user_name"`
-    Password string `gorm:"Size:50" json:"-"`
+    Username string `gorm:"Size:20;UNIQUE_INDEX;NOT NULL;" json:"user_name"`
+    Password string `gorm:"Size:50;NOT NULL;" json:"-"`
 }
 
 func CheckAuth(username, password string) (bool, uint) {
@@ -30,9 +30,9 @@ func CheckAuth(username, password string) (bool, uint) {
     return false, 0
 }
 
-func GetUserTotal(maps interface{}) (int, error) {
+func GetUserTotal(tableStruct interface{}, maps interface{}) (int, error) {
     var count int
-    if err := db.Model(&Auth{}).Where(maps).Count(&count).Error; err != nil {
+    if err := db.Model(tableStruct).Where(maps).Count(&count).Error; err != nil {
         return 0, err
     }
 
@@ -40,9 +40,9 @@ func GetUserTotal(maps interface{}) (int, error) {
 }
 
 // GetTestUsers gets a list of users based on paging constraints
-func GetUsers(pageNum int, pageSize int, maps interface{}) ([]*Auth, error) {
+func GetUsers(tableStruct interface{}, pageNum int, pageSize int, maps interface{}) ([]*Auth, error) {
     var user [] *Auth
-    err := db.Where(maps).Offset(pageNum).Limit(pageSize).Find(&user).Error
+    err := db.Find(&user).Where(maps).Offset(pageNum).Limit(pageSize).Error
     if err != nil && err != gorm.ErrRecordNotFound {
         return nil, err
     }

@@ -19,16 +19,16 @@ type UserStruct struct {
 
 func (u *UserStruct) getMaps() map[string]interface{} {
     maps := make(map[string]interface{})
-    maps["deleted_at"] = nil
+    //maps["deleted_at"] = nil
     return maps
 }
 
 func (u *UserStruct) Count() (int, error) {
-    return model.GetUserTotal(u.getMaps())
+    return model.GetUserTotal(model.Auth{}, u.getMaps())
 }
 
 func (u *UserStruct) GetAll() ([]*model.Auth, error) {
-    Users, err := model.GetUsers(u.PageNum, u.PageSize, u.getMaps())
+    Users, err := model.GetUsers(model.Auth{}, u.PageNum, u.PageSize, u.getMaps())
     if err != nil {
         return nil, err
     }

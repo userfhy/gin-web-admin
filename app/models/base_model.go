@@ -125,3 +125,23 @@ func (t *JSONTime) Scan(v interface{}) error {
     }
     return fmt.Errorf("can not convert %v to timestamp", v)
 }
+
+//func GetTotal(maps interface{}) (int, error) {
+//    var count int
+//    if err := db.Model(&Auth{}).Where(maps).Count(&count).Error; err != nil {
+//        return 0, err
+//    }
+//
+//    return count, nil
+//}
+//
+//// GetTestUsers gets a list of users based on paging constraints
+//func GetList(pageNum int, pageSize int, maps interface{}) ([]*interface{}, error) {
+//    var user [] *Auth
+//    err := db.Where(maps).Offset(pageNum).Limit(pageSize).Find(&user).Error
+//    if err != nil && err != gorm.ErrRecordNotFound {
+//        return nil, err
+//    }
+//
+//    return user, nil
+//}
