@@ -57,7 +57,8 @@ func InitRouter() *gin.Engine {
             middleware.CasbinHandler())
         {
              user.GET("", userController.GetUsers)
-             v1.GET("/logged_in", authController.GetLoggedInUser) // 当前登录用户信息
+             user.PUT("/logout", authController.UserLogout) // 登出
+             user.GET("/logged_in", authController.GetLoggedInUser) // 当前登录用户信息
         }
 
         report := v1.Group("/report").Use(

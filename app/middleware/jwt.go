@@ -1,6 +1,7 @@
 package middleware
 
 import (
+    userService "gin-test/app/service/v1/user"
     "gin-test/utils"
     "gin-test/utils/code"
     "github.com/dgrijalva/jwt-go"
@@ -40,6 +41,11 @@ func JWTHandler() gin.HandlerFunc {
                     rCode = code.ErrorAuthCheckTokenFail
                 }
             }
+        }
+
+        jwtCount, _ := userService.InBlockList(token)
+        if jwtCount >= 1 {
+            rCode = code.AuthTokenInBlockList
         }
 
         if rCode != code.SUCCESS {

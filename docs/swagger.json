@@ -247,9 +247,33 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "User"
                 ],
                 "summary": "当前登录用户信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/logout": {
+            "put": {
+                "description": "用户登出",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User Logout",
                 "responses": {
                     "200": {
                         "description": "OK",

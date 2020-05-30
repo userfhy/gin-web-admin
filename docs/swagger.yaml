@@ -205,7 +205,23 @@ paths:
             type: object
       summary: 当前登录用户信息
       tags:
-      - Auth
+      - User
+  /user/logout:
+    put:
+      consumes:
+      - application/json
+      description: 用户登出
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      summary: User Logout
+      tags:
+      - User
 securityDefinitions:
   ApiKeyAuth:
     in: header

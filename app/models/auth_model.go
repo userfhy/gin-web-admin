@@ -3,7 +3,6 @@ package model
 import (
     "gin-test/utils"
     "github.com/jinzhu/gorm"
-    "time"
 )
 
 type Auth struct {
@@ -22,8 +21,6 @@ func CheckAuth(username, password string) (bool, uint) {
     }).First(&auth)
 
     if auth.ID > 0 {
-        // 记录登录时间
-        db.Model(&auth).Update("logged_in_at", time.Now())
         return true, auth.ID
     }
 

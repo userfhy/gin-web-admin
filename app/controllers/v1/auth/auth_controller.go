@@ -43,6 +43,8 @@ func UserLogin(c *gin.Context) {
         if err != nil {
             RCode = code.ErrorAuthToken
         } else {
+            // 设置登录时间
+            userService.SetLoggedTime(userId)
             data["token"] = token
 
             RCode = code.SUCCESS
@@ -54,11 +56,27 @@ func UserLogin(c *gin.Context) {
     appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), data)
 }
 
+// @Summary User Logout
+// @Description 用户登出
+// @Accept json
+// @Produce json
+// @Tags User
+// @Success 200 {object} common.Response
+// @Router /user/logout [put]
+func UserLogout(c *gin.Context) {
+    appG := common.Gin{C: c}
+    claims, _ := c.Get("claims")
+    user := claims.(*utils.Claims)
+
+    userService.JoinBlockList(user.UserId, c.GetHeader("Authorization")[7:])
+    appG.Response(http.StatusOK, code.SUCCESS, "ok", nil)
+}
+
 // @Summary 当前登录用户信息
 // @Description 当前登录用户信息
 // @Accept json
 // @Produce json
-// @Tags Auth
+// @Tags User
 // @Success 200 {object} common.Response
 // @Router /user/logged_in [get]
 func GetLoggedInUser(c *gin.Context) {

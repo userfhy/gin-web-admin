@@ -21,7 +21,7 @@ func CasbinHandler() gin.HandlerFunc {
         check, _ := casbin.CasbinEnforcer.Enforce(username, obj, act)
         if !check {
              //log.Println("权限没有通过")
-            c.JSON(http.StatusUnauthorized, gin.H{
+            c.JSON(http.StatusOK, gin.H{
                 "code": http.StatusUnauthorized,
                 "msg": fmt.Sprintf("[%s]没有[%s]路由的[%s]权限", username, obj, act),
                 "data": gin.H{},

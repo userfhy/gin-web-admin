@@ -62,7 +62,11 @@ func Setup() {
     //}
 
     // 自动迁移表
-    db.AutoMigrate(&Report{}, &Auth{})
+    db.AutoMigrate(
+        &Report{},
+        &Auth{},
+        &JwtBlacklist{},
+    )
 
     gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
         return setting.DatabaseSetting.TablePrefix + defaultTableName
@@ -124,6 +128,25 @@ func (t *JSONTime) Scan(v interface{}) error {
         return nil
     }
     return fmt.Errorf("can not convert %v to timestamp", v)
+}
+
+/*func (v BaseModel) BeforeCreate(scope *gorm.Scope) error {
+   scope.SetColumn("created_at", time.Now())
+   scope.SetColumn("updated_at", time.Now())
+   return nil
+}
+
+func (v BaseModel) BeforeUpdate(scope *gorm.Scope) error {
+   scope.SetColumn("updated_at", time.Now())
+   return nil
+}*/
+
+func Update(tableStruct interface{}, wheres map[string]interface{}, updates map[string]interface{}) (error, int64){
+    res := db.Model(tableStruct).Where(wheres).Update(updates)
+    if err := res.Error; err != nil {
+        return err, 0
+    }
+    return nil, res.RowsAffected
 }
 
 func GetTotal(tableStruct interface{}, maps interface{}) (int, error) {

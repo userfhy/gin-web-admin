@@ -11,6 +11,7 @@ const (
     ErrorAuthToken             = 20003
     ErrorAuth                  = 20004
     ErrorUserPasswordInvalid   = 20005
+    AuthTokenInBlockList       = 20006
 )
 
 var MsgFlags = map[int]string{
@@ -23,6 +24,7 @@ var MsgFlags = map[int]string{
     ErrorAuthToken:             "Token生成失败",
     ErrorAuth:                  "Token错误",
     ErrorUserPasswordInvalid:   "对应用户名或密码错误",
+    AuthTokenInBlockList:       "该Token在blockList中已存在",
 }
 
 // GetMsg get error information based on Code

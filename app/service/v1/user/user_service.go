@@ -2,6 +2,8 @@ package userService
 
 import (
     model "gin-test/app/models"
+    "log"
+    "time"
 )
 
 // 用户登录
@@ -26,6 +28,29 @@ func (u *UserStruct) getConditionMaps() map[string]interface{} {
     maps := make(map[string]interface{})
     //maps["deleted_at"] = nil
     return maps
+}
+
+// 设置登录时间
+func SetLoggedTime(userId uint)  {
+    wheres := make(map[string]interface{})
+    wheres["id"] = userId
+
+    updates := make(map[string]interface{})
+    updates["logged_in_at"] = time.Now()
+    _, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
+    if rowsAffected == 0 {
+        log.Println("设置登录时间失败！")
+    }
+}
+
+func JoinBlockList(userId uint, jwt string) {
+    _ = model.CreatCreateBlockList(userId, jwt)
+}
+
+func InBlockList(jwt string) (int, error){
+    wheres := make(map[string]interface{})
+    wheres["jwt"] = jwt
+    return model.GetTotal(model.JwtBlacklist{}, wheres)
 }
 
 func (u *UserStruct) Count() (int, error) {
