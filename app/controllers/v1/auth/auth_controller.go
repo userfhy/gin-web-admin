@@ -72,6 +72,50 @@ func UserLogout(c *gin.Context) {
     appG.Response(http.StatusOK, code.SUCCESS, "ok", nil)
 }
 
+// @Summary 修改密码
+// @Description 密码修改
+// @Accept json
+// @Produce json
+// @Tags User
+// @Param payload body userService.ChangePasswordStruct true "user change password"
+// @Success 200 {object} common.Response
+// @Router /user/change_password [put]
+func ChangePassword(c *gin.Context) {
+    appG := common.Gin{C: c}
+
+    var userChangePassword userService.ChangePasswordStruct
+    err := c.ShouldBindJSON(&userChangePassword)
+
+    if utils.HandleError(c, http.StatusBadRequest, err) {
+        return
+    }
+
+    err, parameterErrorStr := common.CheckBindStructParameter(userChangePassword, c)
+    if err != nil {
+        appG.Response(http.StatusBadRequest, code.InvalidParams, parameterErrorStr, nil)
+        return
+    }
+
+    claims, _ := c.Get("claims")
+    user := claims.(*utils.Claims)
+
+    isExist, userId := model.CheckAuth(user.Username, userChangePassword.OldPassword)
+    if !isExist {
+        RCode := code.ErrorUserOldPasswordInvalid
+        appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), nil)
+        return
+    }
+
+    passwordChangeSuccessful := userService.ChangeUserPassword(userId, userChangePassword.NewPassword)
+    if !passwordChangeSuccessful {
+        appG.Response(http.StatusOK, code.UnknownError, code.GetMsg(code.UnknownError), nil)
+        return
+    }
+
+    userService.JoinBlockList(user.UserId, c.GetHeader("Authorization")[7:])
+    appG.Response(http.StatusOK, code.SUCCESS, code.GetMsg(code.SUCCESS), nil)
+}
+
 // @Summary 当前登录用户信息
 // @Description 当前登录用户信息
 // @Accept json
@@ -86,6 +130,7 @@ func GetLoggedInUser(c *gin.Context) {
     user := claims.(*utils.Claims)
 
     data := make(map[string]interface{}, 0)
+    data["user_id"] = user.UserId
     data["user_name"] = user.Username
     appG.Response(http.StatusOK, code.SUCCESS, "当前登录用户信息", data)
 }

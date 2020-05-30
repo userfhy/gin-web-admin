@@ -58,6 +58,7 @@ func InitRouter() *gin.Engine {
         {
              user.GET("", userController.GetUsers)
              user.PUT("/logout", authController.UserLogout) // 登出
+             user.PUT("/change_password", authController.ChangePassword) // 修改密码
              user.GET("/logged_in", authController.GetLoggedInUser) // 当前登录用户信息
         }
 

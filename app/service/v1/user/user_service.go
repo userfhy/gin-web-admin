@@ -2,6 +2,7 @@ package userService
 
 import (
     model "gin-test/app/models"
+    "gin-test/utils"
     "log"
     "time"
 )
@@ -10,6 +11,11 @@ import (
 type AuthStruct struct {
     Username string `json:"user_name" form:"user_name" validate:"required,min=1,max=20" minLength:"1",maxLength:"20"`
     Password string `json:"password" form:"password" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
+}
+
+type ChangePasswordStruct struct {
+    OldPassword string `json:"old_password" form:"old_password" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
+    NewPassword string `json:"new_password" form:"new_password" validate:"required,min=6,max=20" minLength:"6",maxLength:"20"`
 }
 
 type UserStruct struct {
@@ -41,6 +47,20 @@ func SetLoggedTime(userId uint)  {
     if rowsAffected == 0 {
         log.Println("设置登录时间失败！")
     }
+}
+
+func ChangeUserPassword(userId uint, newPassword string) bool {
+    wheres := make(map[string]interface{})
+    wheres["id"] = userId
+
+    updates := make(map[string]interface{})
+    updates["password"] = utils.EncodeMD5(newPassword)
+    _, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
+    if rowsAffected == 0 {
+        log.Println("修改用户密码失败！")
+        return false
+    }
+    return true
 }
 
 func JoinBlockList(userId uint, jwt string) {

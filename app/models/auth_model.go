@@ -13,7 +13,7 @@ type Auth struct {
     Password string `gorm:"Size:50;NOT NULL;" json:"-"`
 }
 
-func CheckAuth(username, password string) (bool, uint) {
+func CheckAuth(username string, password string) (bool, uint) {
     var auth Auth
     db.Select("id").Where(Auth{
         Username : username,

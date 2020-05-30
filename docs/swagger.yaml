@@ -35,6 +35,18 @@ definitions:
     - password
     - user_name
     type: object
+  userService.ChangePasswordStruct:
+    properties:
+      new_password:
+        minLength: 6
+        type: string
+      old_password:
+        minLength: 4
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
 host: '{{.Host}}'
 info:
   contact: {}
@@ -188,6 +200,30 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 用户列表
+      tags:
+      - User
+  /user/change_password:
+    put:
+      consumes:
+      - application/json
+      description: 密码修改
+      parameters:
+      - description: user change password
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/userService.ChangePasswordStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      summary: 修改密码
       tags:
       - User
   /user/logged_in:
