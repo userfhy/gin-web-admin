@@ -83,5 +83,9 @@ func (u *UserStruct) GetAll() ([]*model.Auth, error) {
         return nil, err
     }
 
+    for i := range Users {
+        Users[i].RoleName = Users[i].Role.RoleName
+    }
+
     return Users, nil
 }

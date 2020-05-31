@@ -66,6 +66,7 @@ func Setup() {
         &Report{},
         &Auth{},
         &JwtBlacklist{},
+        &Role{},
     )
 
     gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
