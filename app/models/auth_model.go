@@ -16,6 +16,10 @@ type Auth struct {
     Role Role `gorm:"foreignkey:RoleId;ASSOCIATION_FOREIGNKEY:RoleId;" json:"-"`
 }
 
+func (Auth) TableName() string {
+    return TablePrefix + "auth"
+}
+
 func CheckAuth(username string, password string) (bool, uint, string, bool) {
     var auth Auth
     db.Select([]string{"id", "role_id"}).Where(Auth{
@@ -33,7 +37,7 @@ func CheckAuth(username string, password string) (bool, uint, string, bool) {
 // GetTestUsers gets a list of users based on paging constraints
 func GetUsers(pageNum int, pageSize int, maps interface{}) ([]*Auth, error) {
     var user [] *Auth
-    err := db.Select([]string{"auth.*"}).Where(maps).Offset(pageNum).Limit(pageSize).Preload(
+    err := db.Select("*").Where(maps).Offset(pageNum).Limit(pageSize).Preload(
         "Role", func(db *gorm.DB) *gorm.DB {
             return db.Select("role_id,role_name")
     }).Find(&user).Error

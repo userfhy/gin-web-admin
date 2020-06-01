@@ -10,7 +10,10 @@ import (
     "time"
 )
 
-var db *gorm.DB
+var (
+    db *gorm.DB
+    TablePrefix string
+)
 
 // JSONTime format json time field by myself
 type JSONTime struct {
@@ -55,6 +58,12 @@ func Setup() {
 
     db.SingularTable(true)
 
+/*    gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
+        return TablePrefix + defaultTableName
+    }*/
+
+    TablePrefix = setting.DatabaseSetting.TablePrefix
+
     // 不存在 创建表
     //if ! db.HasTable(&Report{}) {
     //   log.Println("不存在上报表，开始创建！")
@@ -68,10 +77,6 @@ func Setup() {
         &JwtBlacklist{},
         &Role{},
     )
-
-    gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-        return setting.DatabaseSetting.TablePrefix + defaultTableName
-    }
 }
 
 func TestDB() {

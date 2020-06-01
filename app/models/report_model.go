@@ -8,6 +8,10 @@ type Report struct {
     Ip string `gorm:"Size:80" json:"ip"`
 }
 
+func (Report) TableName() string {
+    return TablePrefix + "report"
+}
+
 func GetReportUserCount(r Report) int {
     var count = 0
     db.Model(&Report{}).Where(&r).Count(&count)

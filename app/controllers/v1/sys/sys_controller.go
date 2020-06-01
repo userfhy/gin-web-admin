@@ -9,14 +9,14 @@ import (
 
 var Routers gin.RoutesInfo
 
-// @Summary Routers
+// @Summary 后端存在路由列表
 // @Description get router list
 // @Accept  json
 // @Produce  json
 // @Security ApiKeyAuth
 // @Tags SYS
 // @Success 200 {object} common.Response
-// @Router /sys/routers [get]
+// @Router /sys/router [get]
 func GetRouterList(c *gin.Context) {
     appG := common.Gin{C: c}
 

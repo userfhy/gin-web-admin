@@ -74,7 +74,7 @@ func InitRouter() *gin.Engine {
             middleware.JWTHandler(),
             middleware.CasbinHandler())
         {
-            sys.GET("/routers", sysController.GetRouterList)
+            sys.GET("/router", sysController.GetRouterList)
         }
 
         // 测试

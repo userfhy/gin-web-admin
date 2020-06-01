@@ -106,7 +106,7 @@ paths:
       summary: Report Information
       tags:
       - Report
-  /sys/routers:
+  /sys/router:
     get:
       consumes:
       - application/json
@@ -121,7 +121,7 @@ paths:
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Routers
+      summary: 后端存在路由列表
       tags:
       - SYS
   /test/font:

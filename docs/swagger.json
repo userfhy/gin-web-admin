@@ -86,7 +86,7 @@
                 }
             }
         },
-        "/sys/routers": {
+        "/sys/router": {
             "get": {
                 "security": [
                     {
@@ -103,7 +103,7 @@
                 "tags": [
                     "SYS"
                 ],
-                "summary": "Routers",
+                "summary": "后端存在路由列表",
                 "responses": {
                     "200": {
                         "description": "OK",

@@ -14,3 +14,7 @@ type Role struct {
     Params    string `gorm:"-" json:"params"`
     MenuIds   []int  `gorm:"-" json:"menu_ids"`
 }
+
+func (Role) TableName() string {
+    return TablePrefix + "role"
+}
