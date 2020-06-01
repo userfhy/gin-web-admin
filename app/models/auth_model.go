@@ -16,18 +16,18 @@ type Auth struct {
     Role Role `gorm:"foreignkey:RoleId;ASSOCIATION_FOREIGNKEY:RoleId;" json:"-"`
 }
 
-func CheckAuth(username string, password string) (bool, uint) {
+func CheckAuth(username string, password string) (bool, uint, string, bool) {
     var auth Auth
-    db.Select("id").Where(Auth{
+    db.Select([]string{"id", "role_id"}).Where(Auth{
         Username : username,
         Password : utils.EncodeMD5(password),
-    }).First(&auth)
+    }).Preload("Role").First(&auth)
 
     if auth.ID > 0 {
-        return true, auth.ID
+        return true, auth.ID, auth.Role.RoleKey, auth.Role.IsAdmin
     }
 
-    return false, 0
+    return false, 0, "", false
 }
 
 // GetTestUsers gets a list of users based on paging constraints

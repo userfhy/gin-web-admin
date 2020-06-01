@@ -37,9 +37,14 @@ func UserLogin(c *gin.Context) {
 
     data := make(map[string]interface{})
     RCode := code.InvalidParams
-    isExist, userId := model.CheckAuth(userLogin.Username, userLogin.Password)
+    isExist, userId, roleKey, isAdmin := model.CheckAuth(userLogin.Username, userLogin.Password)
     if isExist {
-        token, err := utils.GenerateToken(userLogin.Username, userLogin.Password, userId)
+        token, err := utils.GenerateToken(utils.Claims{
+            UserId: userId,
+            Username: userLogin.Username,
+            RoleKey: roleKey,
+            IsAdmin: isAdmin,
+        })
         if err != nil {
             RCode = code.ErrorAuthToken
         } else {
@@ -99,7 +104,7 @@ func ChangePassword(c *gin.Context) {
     claims, _ := c.Get("claims")
     user := claims.(*utils.Claims)
 
-    isExist, userId := model.CheckAuth(user.Username, userChangePassword.OldPassword)
+    isExist, userId, _, _ := model.CheckAuth(user.Username, userChangePassword.OldPassword)
     if !isExist {
         RCode := code.ErrorUserOldPasswordInvalid
         appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), nil)
