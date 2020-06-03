@@ -10,7 +10,7 @@ func (JwtBlacklist) TableName() string {
     return TablePrefix + "jwt_blacklist"
 }
 
-func CreatCreateBlockList(userId uint, jwt string) error {
+func CreateBlockList(userId uint, jwt string) error {
     table := JwtBlacklist{UserID: userId, Jwt: jwt}
     db.NewRecord(table)
     res := db.Create(&table)

@@ -91,7 +91,7 @@ func ChangePassword(c *gin.Context) {
     var userChangePassword userService.ChangePasswordStruct
     err := c.ShouldBindJSON(&userChangePassword)
 
-    if utils.HandleError(c, http.StatusBadRequest, err) {
+    if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
         return
     }
 

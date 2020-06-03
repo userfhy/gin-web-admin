@@ -235,6 +235,52 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建新用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "创建用户",
+                "parameters": [
+                    {
+                        "description": "create new user",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/userService.AddUserStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
             }
         },
         "/user/change_password": {
@@ -357,6 +403,26 @@
                 }
             }
         },
+        "userService.AddUserStruct": {
+            "type": "object",
+            "required": [
+                "password",
+                "user_name"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "minLength": 4
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string",
+                    "minLength": 4
+                }
+            }
+        },
         "userService.AuthStruct": {
             "type": "object",
             "required": [
@@ -370,7 +436,7 @@
                 },
                 "user_name": {
                     "type": "string",
-                    "minLength": 1
+                    "minLength": 4
                 }
             }
         },

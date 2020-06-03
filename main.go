@@ -5,10 +5,12 @@ import (
     "fmt"
     model "gin-test/app/models"
     "gin-test/common"
+    //"gin-test/common/validator"
     "gin-test/routers"
     "gin-test/utils/gredis"
     "gin-test/utils/setting"
     "github.com/gin-gonic/gin"
+    //"github.com/gin-gonic/gin/binding"
     "log"
     "net/http"
     "os"
@@ -37,6 +39,7 @@ func init() {
 // @in header
 // @name Authorization
 func main() {
+    //binding.Validator = new(validator.DefaultValidator)
     gin.SetMode(setting.ServerSetting.RunMode)
 
     routersInit := routers.InitRouter()

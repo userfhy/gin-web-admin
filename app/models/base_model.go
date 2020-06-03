@@ -79,30 +79,6 @@ func Setup() {
     )
 }
 
-func TestDB() {
-    var err error
-    err = db.DB().Ping()
-    if err != nil {
-        log.Fatalf("DB ping err: %v", err)
-    }
-    
-    // Scan
-    type Result struct {
-        Id int
-        Name string
-    }
-
-    rows, err := db.Raw("SELECT id,name FROM t_user").Rows()
-    defer rows.Close()
-    
-    var result Result
-    for rows.Next() {
-        //rows.Scan(&result)
-        db.ScanRows(rows, &result)
-        log.Println(result)
-    }
-}
-
 // CloseDB closes database connection (unnecessary)
 func CloseDB() {
     defer db.Close()

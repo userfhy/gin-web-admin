@@ -23,13 +23,27 @@ definitions:
     - name
     - phone
     type: object
+  userService.AddUserStruct:
+    properties:
+      password:
+        minLength: 4
+        type: string
+      role_id:
+        type: integer
+      user_name:
+        minLength: 4
+        type: string
+    required:
+    - password
+    - user_name
+    type: object
   userService.AuthStruct:
     properties:
       password:
         minLength: 4
         type: string
       user_name:
-        minLength: 1
+        minLength: 4
         type: string
     required:
     - password
@@ -200,6 +214,36 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 用户列表
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: 创建新用户
+      parameters:
+      - description: create new user
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/userService.AddUserStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 创建用户
       tags:
       - User
   /user/change_password:

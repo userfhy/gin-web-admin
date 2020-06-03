@@ -4,18 +4,25 @@ import (
     model "gin-test/app/models"
     "gin-test/utils"
     "log"
+    "strings"
     "time"
 )
 
 // 用户登录
 type AuthStruct struct {
-    Username string `json:"user_name" form:"user_name" validate:"required,min=1,max=20" minLength:"1",maxLength:"20"`
+    Username string `json:"user_name" form:"user_name" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
     Password string `json:"password" form:"password" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
 }
 
 type ChangePasswordStruct struct {
     OldPassword string `json:"old_password" form:"old_password" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
     NewPassword string `json:"new_password" form:"new_password" validate:"required,min=6,max=20" minLength:"6",maxLength:"20"`
+}
+
+// 添加用户
+type AddUserStruct struct {
+    AuthStruct
+    RoleId int `json:"role_id" validate:"omitempty,numeric,min=0"`
 }
 
 type UserStruct struct {
@@ -54,7 +61,7 @@ func ChangeUserPassword(userId uint, newPassword string) bool {
     wheres["id"] = userId
 
     updates := make(map[string]interface{})
-    updates["password"] = utils.EncodeMD5(newPassword)
+    updates["password"] = utils.EncodeUserPassword(newPassword)
     _, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
     if rowsAffected == 0 {
         log.Println("修改用户密码失败！")
@@ -64,13 +71,21 @@ func ChangeUserPassword(userId uint, newPassword string) bool {
 }
 
 func JoinBlockList(userId uint, jwt string) {
-    _ = model.CreatCreateBlockList(userId, jwt)
+    _ = model.CreateBlockList(userId, jwt)
 }
 
 func InBlockList(jwt string) (int, error){
     wheres := make(map[string]interface{})
     wheres["jwt"] = jwt
     return model.GetTotal(model.JwtBlacklist{}, wheres)
+}
+
+func CreateUser(newUser AddUserStruct) error{
+    return model.CreatUser(model.Auth{
+        Username: strings.TrimSpace(newUser.Username),
+        Password: utils.EncodeUserPassword(newUser.Password),
+        RoleId: newUser.RoleId,
+    })
 }
 
 func (u *UserStruct) Count() (int, error) {

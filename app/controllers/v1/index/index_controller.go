@@ -50,7 +50,7 @@ func Test(c *gin.Context) {
     var imgTextArray []common.ImgText
     err = json.Unmarshal(arrByte, &imgTextArray)
 
-    if utils.HandleError(c, http.StatusInternalServerError, err) {
+    if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "参数绑定失败", err) {
         return
     }
 

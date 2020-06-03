@@ -4,9 +4,10 @@ import (
     "github.com/gin-gonic/gin"
     "github.com/go-playground/locales/en"
     "github.com/go-playground/locales/zh"
-    "github.com/go-playground/locales/zh_Hant_TW"
-    "github.com/go-playground/universal-translator"
-    "gopkg.in/go-playground/validator.v9"
+    "github.com/go-playground/locales/zh_Hant"
+    ut "github.com/go-playground/universal-translator"
+     //"gopkg.in/go-playground/validator.v9"
+    "github.com/go-playground/validator/v10"
     "strings"
 )
 
@@ -18,7 +19,7 @@ var (
 func InitValidate()  {
     en := en.New()
     zh := zh.New()
-    zh_tw := zh_Hant_TW.New()
+    zh_tw := zh_Hant.New()
     Uni = ut.New(en, zh, zh_tw)
     Validate = validator.New()
 }

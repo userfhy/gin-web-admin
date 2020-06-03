@@ -13,7 +13,7 @@ type Auth struct {
     Username string `gorm:"Size:20;UNIQUE_INDEX;NOT NULL;" json:"user_name"`
     Password string `gorm:"Size:50;NOT NULL;" json:"-"`
     RoleName string `gorm:"-" json:"role_name"`
-    Role Role `gorm:"foreignkey:RoleId;ASSOCIATION_FOREIGNKEY:RoleId;" json:"-"`
+    Role Role `gorm:"foreignkey:RoleId;association_foreignkey:RoleId;" json:"-"`
 }
 
 func (Auth) TableName() string {
@@ -24,7 +24,7 @@ func CheckAuth(username string, password string) (bool, uint, string, bool) {
     var auth Auth
     db.Select([]string{"id", "role_id"}).Where(Auth{
         Username : username,
-        Password : utils.EncodeMD5(password),
+        Password : utils.EncodeUserPassword(password),
     }).Preload("Role").First(&auth)
 
     if auth.ID > 0 {
@@ -32,6 +32,15 @@ func CheckAuth(username string, password string) (bool, uint, string, bool) {
     }
 
     return false, 0, "", false
+}
+
+func CreatUser(auth Auth) error {
+    db.NewRecord(auth)
+    res := db.Create(&auth)
+    if err := res.Error; err != nil {
+        return err
+    }
+    return nil
 }
 
 // GetTestUsers gets a list of users based on paging constraints

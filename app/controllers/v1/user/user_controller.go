@@ -9,6 +9,38 @@ import (
     "net/http"
 )
 
+// @Summary 创建用户
+// @Description 创建新用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Tags User
+// @Param payload body userService.AddUserStruct true "create new user"
+// @Success 200 {object} common.Response
+// @Failure 500 {object} common.Response
+// @Router /user [post]
+func CreateUser(c *gin.Context) {
+    appG := common.Gin{C: c}
+
+    var newUser userService.AddUserStruct
+    err := c.ShouldBindJSON(&newUser)
+    if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, "参数绑定失败", err) {
+        return
+    }
+
+    err, parameterErrorStr := common.CheckBindStructParameter(newUser, c)
+    if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
+        return
+    }
+
+    err = userService.CreateUser(newUser)
+    if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "添加新用户失败！", err) {
+        return
+    }
+
+    appG.Response(http.StatusOK, code.SUCCESS, "用户添加成功", nil)
+}
+
 // @Summary 用户列表
 // @Description 获取用户列表
 // @Accept json

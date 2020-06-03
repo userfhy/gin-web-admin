@@ -8,6 +8,7 @@ import (
 
 type App struct {
     JwtSecret string
+    PasswordSalt string
     PrefixUrl string
     TimeFormat  string
     EnabledCORS bool

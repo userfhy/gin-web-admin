@@ -3,9 +3,9 @@ package middleware
 import (
     "gin-test/common"
     "github.com/gin-gonic/gin"
-    en_translations "gopkg.in/go-playground/validator.v9/translations/en"
-    zh_translations "gopkg.in/go-playground/validator.v9/translations/zh"
-    zh_tw_translations "gopkg.in/go-playground/validator.v9/translations/zh_tw"
+    en_translations "github.com/go-playground/validator/v10/translations/en"
+    zh_translations "github.com/go-playground/validator/v10/translations/zh"
+    zh_tw_translations "github.com/go-playground/validator/v10/translations/zh_tw"
 )
 
 //设置Translation
