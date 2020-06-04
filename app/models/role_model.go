@@ -21,6 +21,15 @@ func (Role) TableName() string {
     return TablePrefix + "role"
 }
 
+func CreateRole(role Role) error {
+    db.NewRecord(role)
+    res := db.Create(&role)
+    if err := res.Error; err != nil {
+        return err
+    }
+    return nil
+}
+
 func GetRoles(pageNum int, pageSize int, maps interface{}) ([]*Role, error) {
     var role [] *Role
     err := db.Select("*").Where(maps).Offset(pageNum).Limit(pageSize).Find(&role).Error

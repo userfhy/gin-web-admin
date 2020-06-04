@@ -11,7 +11,7 @@ type RoleStruct struct {
 }
 
 type NewRoleStruct struct {
-    RoleKey string `json:"role_key" form:"role_key" validate:"required,min=4,max=10"`
+    RoleKey string `json:"role_key" form:"role_key" validate:"required,min=4,max=10" minLength:"4" maxLength:"10"`
 }
 
 type UpdateRoleStruct struct {
@@ -19,6 +19,30 @@ type UpdateRoleStruct struct {
     RoleName string `json:"role_name" form:"role_name" validate:"required,min=4,max=10" minLength:"4" maxLength:"10"`
     // 备注
     Remark string `json:"remark" form:"remark" validate:"required,min=4,max=100" minLength:"4" maxLength:"100"`
+}
+
+type CreateRoleStruct struct {
+    NewRoleStruct
+    UpdateRoleStruct
+}
+
+func DeleteRole(roleId uint) bool{
+    wheres := make(map[string]interface{})
+    wheres["role_id"] = roleId
+    _, rowsAffected := model.SoftDelete(&model.Role{RoleId: roleId})
+    if rowsAffected == 0 {
+        log.Println("删除Role失败！")
+        return false
+    }
+    return true
+}
+
+func CreateRole(newRole CreateRoleStruct) error{
+    return model.CreateRole(model.Role{
+        RoleKey: newRole.RoleKey,
+        RoleName: newRole.RoleName,
+        Remark: newRole.Remark,
+    })
 }
 
 func UpdateRole(roleId int, u UpdateRoleStruct) bool{

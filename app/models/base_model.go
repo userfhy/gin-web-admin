@@ -123,6 +123,14 @@ func (v BaseModel) BeforeUpdate(scope *gorm.Scope) error {
    return nil
 }*/
 
+func SoftDelete(tableStruct interface{}) (error, int64){
+    res := db.Delete(tableStruct)
+    if err := res.Error; err != nil {
+        return err, 0
+    }
+    return nil, res.RowsAffected
+}
+
 func Update(tableStruct interface{}, wheres map[string]interface{}, updates map[string]interface{}) (error, int64){
     res := db.Model(tableStruct).Where(wheres).Update(updates)
     if err := res.Error; err != nil {

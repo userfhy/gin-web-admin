@@ -23,6 +23,27 @@ definitions:
     - name
     - phone
     type: object
+  roleService.CreateRoleStruct:
+    properties:
+      remark:
+        description: 备注
+        maxLength: 100
+        minLength: 4
+        type: string
+      role_key:
+        maxLength: 10
+        minLength: 4
+        type: string
+      role_name:
+        description: 角色名称
+        maxLength: 10
+        minLength: 4
+        type: string
+    required:
+    - remark
+    - role_key
+    - role_name
+    type: object
   roleService.UpdateRoleStruct:
     properties:
       remark:
@@ -170,7 +191,70 @@ paths:
       summary: 角色列表
       tags:
       - Role
+    post:
+      consumes:
+      - application/json
+      description: 添加角色
+      parameters:
+      - description: role_id
+        in: path
+        name: role_id
+        required: true
+        type: integer
+      - description: 添加
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/roleService.CreateRoleStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 添加角色
+      tags:
+      - Role
   /role/{role_id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除角色
+      parameters:
+      - description: role_id
+        in: path
+        name: role_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 删除角色
+      tags:
+      - Role
     put:
       consumes:
       - application/json
@@ -353,6 +437,8 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: 修改密码
       tags:
       - User
@@ -369,6 +455,8 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: 当前登录用户信息
       tags:
       - User
@@ -385,6 +473,8 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: User Logout
       tags:
       - User

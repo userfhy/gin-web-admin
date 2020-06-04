@@ -136,6 +136,59 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "添加角色",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "添加角色",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "role_id",
+                        "name": "role_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "添加",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/roleService.CreateRoleStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
             }
         },
         "/role/{role_id}": {
@@ -173,6 +226,49 @@
                             "type": "object",
                             "$ref": "#/definitions/roleService.UpdateRoleStruct"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除角色",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "删除角色",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "role_id",
+                        "name": "role_id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -392,6 +488,11 @@
         },
         "/user/change_password": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "密码修改",
                 "consumes": [
                     "application/json"
@@ -428,6 +529,11 @@
         },
         "/user/logged_in": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "当前登录用户信息",
                 "consumes": [
                     "application/json"
@@ -452,6 +558,11 @@
         },
         "/user/logout": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "用户登出",
                 "consumes": [
                     "application/json"
@@ -506,6 +617,33 @@
                 },
                 "phone": {
                     "type": "string",
+                    "minLength": 4
+                }
+            }
+        },
+        "roleService.CreateRoleStruct": {
+            "type": "object",
+            "required": [
+                "remark",
+                "role_key",
+                "role_name"
+            ],
+            "properties": {
+                "remark": {
+                    "description": "备注",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 4
+                },
+                "role_key": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 4
+                },
+                "role_name": {
+                    "description": "角色名称",
+                    "type": "string",
+                    "maxLength": 10,
                     "minLength": 4
                 }
             }

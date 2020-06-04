@@ -10,6 +10,61 @@ import (
     "net/http"
 )
 
+// @Summary 删除角色
+// @Description 删除角色
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Tags Role
+// @Param role_id path int true "role_id"
+// @Success 200 {object} common.Response
+// @Failure 500 {object} common.Response
+// @Router /role/{role_id} [delete]
+func DeleteRole(c *gin.Context) {
+    appG := common.Gin{C: c}
+    roleId, err := com.StrTo(c.Param("role_id")).Uint()
+    if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
+        return
+    }
+
+    deleteSuccessful := roleService.DeleteRole(roleId)
+    if !deleteSuccessful {
+        appG.Response(http.StatusOK, code.UnknownError, code.GetMsg(code.UnknownError), nil)
+        return
+    }
+
+    appG.Response(http.StatusOK, code.SUCCESS, "ok", nil)
+}
+
+// @Summary 添加角色
+// @Description 添加角色
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Tags Role
+// @Param role_id path int true "role_id"
+// @Param payload body roleService.CreateRoleStruct true "添加"、
+// @Success 200 {object} common.Response
+// @Failure 500 {object} common.Response
+// @Router /role [post]
+func CreateRole(c *gin.Context) {
+    appG := common.Gin{C: c}
+
+    var createRole roleService.CreateRoleStruct
+    err := c.ShouldBindJSON(&createRole)
+
+    if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
+        return
+    }
+
+    err = roleService.CreateRole(createRole)
+    if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "添加新角色失败！", err) {
+        return
+    }
+
+    appG.Response(http.StatusOK, code.SUCCESS, "ok", createRole)
+}
+
 // @Summary 修改角色
 // @Description 修改角色信息
 // @Accept json

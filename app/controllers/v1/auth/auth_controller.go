@@ -65,6 +65,7 @@ func UserLogin(c *gin.Context) {
 // @Description 用户登出
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Tags User
 // @Success 200 {object} common.Response
 // @Router /user/logout [put]
@@ -81,6 +82,7 @@ func UserLogout(c *gin.Context) {
 // @Description 密码修改
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Tags User
 // @Param payload body userService.ChangePasswordStruct true "user change password"
 // @Success 200 {object} common.Response
@@ -125,6 +127,7 @@ func ChangePassword(c *gin.Context) {
 // @Description 当前登录用户信息
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Tags User
 // @Success 200 {object} common.Response
 // @Router /user/logged_in [get]
