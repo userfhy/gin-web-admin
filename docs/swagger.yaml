@@ -23,6 +23,22 @@ definitions:
     - name
     - phone
     type: object
+  roleService.UpdateRoleStruct:
+    properties:
+      remark:
+        description: 备注
+        maxLength: 100
+        minLength: 4
+        type: string
+      role_name:
+        description: 角色名称
+        maxLength: 10
+        minLength: 4
+        type: string
+    required:
+    - remark
+    - role_name
+    type: object
   userService.AddUserStruct:
     properties:
       password:
@@ -120,6 +136,76 @@ paths:
       summary: Report Information
       tags:
       - Report
+  /role:
+    get:
+      consumes:
+      - application/json
+      description: 获取角色表
+      parameters:
+      - description: page number
+        in: query
+        name: p
+        required: true
+        type: integer
+      - description: page limit
+        in: query
+        name: "n"
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 角色列表
+      tags:
+      - Role
+  /role/{role_id}:
+    put:
+      consumes:
+      - application/json
+      description: 修改角色信息
+      parameters:
+      - description: role_id
+        in: path
+        name: role_id
+        required: true
+        type: integer
+      - description: 修改角色
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/roleService.UpdateRoleStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改角色
+      tags:
+      - Role
   /sys/router:
     get:
       consumes:

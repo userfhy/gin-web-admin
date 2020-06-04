@@ -137,5 +137,6 @@ func GetLoggedInUser(c *gin.Context) {
     data := make(map[string]interface{}, 0)
     data["user_id"] = user.UserId
     data["user_name"] = user.Username
+    data["roles"] = [...]string{user.RoleKey}
     appG.Response(http.StatusOK, code.SUCCESS, "当前登录用户信息", data)
 }

@@ -6,6 +6,7 @@ import (
     reportController "gin-test/app/controllers/v1/report"
     sysController "gin-test/app/controllers/v1/sys"
     userController "gin-test/app/controllers/v1/user"
+    roleController "gin-test/app/controllers/v1/role"
     "gin-test/app/middleware"
     "gin-test/docs"
     "gin-test/utils/casbin"
@@ -51,6 +52,7 @@ func InitRouter() *gin.Engine {
     {
         v1.POST("/login", authController.UserLogin) // 登录
 
+        // 用户管理
         user := v1.Group("/user").Use(
             middleware.TranslationHandler(),
             middleware.JWTHandler(),
@@ -61,6 +63,16 @@ func InitRouter() *gin.Engine {
             user.PUT("/logout", authController.UserLogout) // 登出
             user.PUT("/change_password", authController.ChangePassword) // 修改密码
             user.GET("/logged_in", authController.GetLoggedInUser) // 当前登录用户信息
+        }
+
+        // 角色
+        role := v1.Group("/role").Use(
+            middleware.TranslationHandler(),
+            middleware.JWTHandler(),
+            middleware.CasbinHandler())
+        {
+            role.GET("", roleController.GetRoles) // 获取角色列表
+            role.PUT("/:role_id", roleController.UpdateRole) // 修改角色
         }
 
         report := v1.Group("/report").Use(
