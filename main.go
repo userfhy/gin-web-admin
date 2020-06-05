@@ -28,15 +28,12 @@ func init() {
     }
 }
 
-// @title Gin Web Test
-// @version 1.0
-// @description An example of gin
 // @termsOfService https://github.com/fanhengyuan/gin-test
 // @license.name MIT
 // @license.url https://github.com/fanhengyuan/gin-test/blob/master/LICENSE
 
 // @securityDefinitions.apikey ApiKeyAuth
-// @in header
+// @in header like: Bearer xxxx
 // @name Authorization
 func main() {
     //binding.Validator = new(validator.DefaultValidator)

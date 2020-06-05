@@ -1,19 +1,71 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "An example of gin",
-        "title": "Gin Web Test",
+        "description": "{{.Description}}",
+        "title": "{{.Title}}",
         "termsOfService": "https://github.com/fanhengyuan/gin-test",
         "contact": {},
         "license": {
             "name": "MIT",
             "url": "https://github.com/fanhengyuan/gin-test/blob/master/LICENSE"
         },
-        "version": "1.0"
+        "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/casbin": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取规则列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "规则列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "p",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page limit",
+                        "name": "n",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "用户登录",
@@ -728,7 +780,7 @@
         "ApiKeyAuth": {
             "type": "apiKey",
             "name": "Authorization",
-            "in": "header"
+            "in": "header like: Bearer xxxx"
         }
     }
 }

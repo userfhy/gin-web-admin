@@ -101,14 +101,48 @@ definitions:
 host: '{{.Host}}'
 info:
   contact: {}
-  description: An example of gin
+  description: '{{.Description}}'
   license:
     name: MIT
     url: https://github.com/fanhengyuan/gin-test/blob/master/LICENSE
   termsOfService: https://github.com/fanhengyuan/gin-test
-  title: Gin Web Test
-  version: "1.0"
+  title: '{{.Title}}'
+  version: '{{.Version}}'
 paths:
+  /casbin:
+    get:
+      consumes:
+      - application/json
+      description: 获取规则列表
+      parameters:
+      - description: page number
+        in: query
+        name: p
+        required: true
+        type: integer
+      - description: page limit
+        in: query
+        name: "n"
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 规则列表
+      tags:
+      - Casbin
   /login:
     post:
       consumes:
@@ -480,7 +514,7 @@ paths:
       - User
 securityDefinitions:
   ApiKeyAuth:
-    in: header
+    in: 'header like: Bearer xxxx'
     name: Authorization
     type: apiKey
 swagger: "2.0"

@@ -76,6 +76,7 @@ func Setup() {
         &Auth{},
         &JwtBlacklist{},
         &Role{},
+        &CasbinRule{},
     )
 }
 

@@ -1,4 +1,4 @@
-package RoleController
+package roleController
 
 import (
     roleService "gin-test/app/service/v1/role"
