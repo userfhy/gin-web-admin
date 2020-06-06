@@ -18,7 +18,7 @@ type UpdateRoleStruct struct {
      // 角色名称
     RoleName string `json:"role_name" form:"role_name" validate:"required,min=4,max=10" minLength:"4" maxLength:"10"`
     // 备注
-    Remark string `json:"remark" form:"remark" validate:"required,min=4,max=100" minLength:"4" maxLength:"100"`
+    Remark string `json:"remark" form:"remark" validate:"min=4,max=100" minLength:"4" maxLength:"100"`
 }
 
 type CreateRoleStruct struct {

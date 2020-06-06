@@ -57,6 +57,11 @@ func CreateRole(c *gin.Context) {
         return
     }
 
+    err, parameterErrorStr := common.CheckBindStructParameter(createRole, c)
+    if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
+        return
+    }
+
     err = roleService.CreateRole(createRole)
     if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "添加新角色失败！", err) {
         return
