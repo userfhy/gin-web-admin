@@ -17,11 +17,13 @@ import (
 // @Tags Casbin
 // @Param p query int true "page number"
 // @Param n query int true "page limit"
+// @Param group_by query string false "v0 根据 role key 分组"
 // @Success 200 {object} common.Response
 // @Failure 500 {object} common.Response
 // @Router /casbin [get]
 func GetCasbinList(c *gin.Context) {
     appG := common.Gin{C: c}
+    groupBy := c.DefaultQuery("group_by", "")
     err, errStr, p, n := utils.GetPage(c)
     if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, errStr, err) {
         return
@@ -37,15 +39,27 @@ func GetCasbinList(c *gin.Context) {
         return
     }
 
-    userArr, err := casbinServiceObj.GetAll()
+    arr, err := casbinServiceObj.GetAll()
     if utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "服务器错误", err) {
         return
     }
 
     data := utils.PageResult{
-        List: userArr,
+        List: arr,
         Total: total,
         PageSize: n,
     }
+
+    // 筛选 group by
+    if groupBy == "v0" {
+        groupMap := make(map[string] []interface{})
+        for k, v := range arr {
+            if arr[k].V0 == v.V0 {
+                groupMap[arr[k].V0] = append(groupMap[arr[k].V0], v)
+            }
+        }
+        data.List = groupMap
+    }
+
     appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
 }

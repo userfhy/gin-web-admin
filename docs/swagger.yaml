@@ -125,6 +125,10 @@ paths:
         name: "n"
         required: true
         type: integer
+      - description: v0 根据 role key 分组
+        in: query
+        name: group_by
+        type: string
       produces:
       - application/json
       responses:

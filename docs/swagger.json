@@ -46,6 +46,12 @@
                         "name": "n",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "v0 根据 role key 分组",
+                        "name": "group_by",
+                        "in": "query"
                     }
                 ],
                 "responses": {
