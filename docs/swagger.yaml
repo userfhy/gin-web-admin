@@ -1,5 +1,24 @@
 basePath: '{{.BasePath}}'
 definitions:
+  casbinService.AddCasbinStruct:
+    properties:
+      v0:
+        description: role_key
+        minLength: 3
+        type: string
+      v1:
+        description: path
+        minLength: 4
+        type: string
+      v2:
+        description: method
+        minLength: 2
+        type: string
+    required:
+    - v0
+    - v1
+    - v2
+    type: object
   common.Response:
     properties:
       code:
@@ -40,7 +59,6 @@ definitions:
         minLength: 4
         type: string
     required:
-    - remark
     - role_key
     - role_name
     type: object
@@ -57,7 +75,6 @@ definitions:
         minLength: 4
         type: string
     required:
-    - remark
     - role_name
     type: object
   userService.AddUserStruct:
@@ -145,6 +162,72 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 规则列表
+      tags:
+      - Casbin
+    post:
+      consumes:
+      - application/json
+      description: 创建规则
+      parameters:
+      - description: create new user
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/casbinService.AddCasbinStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 创建规则
+      tags:
+      - Casbin
+  /casbin/{id}:
+    put:
+      consumes:
+      - application/json
+      description: 修改规则信息
+      parameters:
+      - description: casbin_id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 修改规则
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/casbinService.AddCasbinStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改规则
       tags:
       - Casbin
   /login:

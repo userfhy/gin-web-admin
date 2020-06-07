@@ -70,6 +70,107 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "创建规则",
+                "parameters": [
+                    {
+                        "description": "create new user",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/casbinService.AddCasbinStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/casbin/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改规则信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "修改规则",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "casbin_id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "修改规则",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/casbinService.AddCasbinStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
             }
         },
         "/login": {
@@ -645,6 +746,31 @@
         }
     },
     "definitions": {
+        "casbinService.AddCasbinStruct": {
+            "type": "object",
+            "required": [
+                "v0",
+                "v1",
+                "v2"
+            ],
+            "properties": {
+                "v0": {
+                    "description": "role_key",
+                    "type": "string",
+                    "minLength": 3
+                },
+                "v1": {
+                    "description": "path",
+                    "type": "string",
+                    "minLength": 4
+                },
+                "v2": {
+                    "description": "method",
+                    "type": "string",
+                    "minLength": 2
+                }
+            }
+        },
         "common.Response": {
             "type": "object",
             "properties": {
@@ -682,7 +808,6 @@
         "roleService.CreateRoleStruct": {
             "type": "object",
             "required": [
-                "remark",
                 "role_key",
                 "role_name"
             ],
@@ -709,7 +834,6 @@
         "roleService.UpdateRoleStruct": {
             "type": "object",
             "required": [
-                "remark",
                 "role_name"
             ],
             "properties": {

@@ -17,6 +17,15 @@ func (CasbinRule) TableName() string {
     return "casbin_rule"
 }
 
+func CreatCasbin(casbin CasbinRule) error {
+    db.NewRecord(casbin)
+    res := db.Create(&casbin)
+    if err := res.Error; err != nil {
+        return err
+    }
+    return nil
+}
+
 func GetCasbinRuleList(pageNum int, pageSize int, maps interface{}) ([]*CasbinRule, error) {
     var casbinRuleList [] *CasbinRule
     err := db.Select("*").Where(maps).Offset(pageNum).Limit(pageSize).Find(&casbinRuleList).Error

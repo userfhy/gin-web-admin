@@ -13,5 +13,7 @@ func InitCasbinRouter(Router *gin.RouterGroup) {
         middleware.CasbinHandler())
     {
         casbin.GET("", casbinController.GetCasbinList) // 存在规则
+        casbin.POST("", casbinController.CreateCasbin)
+        casbin.PUT("/:id", casbinController.UpdateCasbin)
     }
 }
