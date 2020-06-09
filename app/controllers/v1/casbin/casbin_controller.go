@@ -37,11 +37,12 @@ func CreateCasbin(c *gin.Context) {
 
     err = casbinService.CreateCasbin(newCasbin)
     if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "Path添加失败！", err) {
-        return
+       return
     }
 
     // 重新生成权限列表
     casbin.SetupCasbin()
+    //casbin.SetupCasbin().AddPolicy(newCasbin.V0, newCasbin.V1, newCasbin.V2)
 
     appG.Response(http.StatusOK, code.SUCCESS, "Path添加成功", nil)
 }
@@ -80,6 +81,33 @@ func UpdateCasbin(c *gin.Context) {
     appG.Response(http.StatusOK, code.SUCCESS, "ok", update)
 }
 
+// @Summary 删除规则
+// @Description 删除规则信息
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Tags Casbin
+// @Param id path int true "casbin_id"
+// @Param payload body casbinService.AddCasbinStruct true "删除规则"、
+// @Success 200 {object} common.Response
+// @Failure 500 {object} common.Response
+// @Router /casbin/{id} [delete]
+func DeleteCasbin(c *gin.Context) {
+    appG := common.Gin{C: c}
+    //id := com.StrTo(c.Param("id")).MustInt()
+
+    var update casbinService.AddCasbinStruct
+    err := c.ShouldBindJSON(&update)
+
+    if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
+        return
+    }
+
+    // 重新生成权限列表
+    casbin.SetupCasbin().RemovePolicy(update.V0, update.V1, update.V2)
+
+    appG.Response(http.StatusOK, code.SUCCESS, "ok", update)
+}
 
 // @Summary 规则列表
 // @Description 获取规则列表

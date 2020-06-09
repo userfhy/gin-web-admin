@@ -195,6 +195,41 @@ paths:
       tags:
       - Casbin
   /casbin/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除规则信息
+      parameters:
+      - description: casbin_id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 删除规则
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/casbinService.AddCasbinStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 删除规则
+      tags:
+      - Casbin
     put:
       consumes:
       - application/json

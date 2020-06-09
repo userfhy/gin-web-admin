@@ -171,6 +171,59 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除规则信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "删除规则",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "casbin_id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "删除规则",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/casbinService.AddCasbinStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
             }
         },
         "/login": {
