@@ -8,6 +8,9 @@ import (
 type CasbinStruct struct {
     PageNum  int
     PageSize int
+    V0 string // role
+    V1 string // path
+    V2 string // method
 }
 
 type AddCasbinStruct struct {
@@ -41,18 +44,41 @@ func UpdateCasbin(id int, u AddCasbinStruct) bool{
     return true
 }
 
-func (c *CasbinStruct) getConditionMaps() map[string]interface{} {
+func (c *CasbinStruct) getConditionMaps() map[string]interface{}{
     maps := make(map[string]interface{})
     //maps["deleted_at"] = nil
+    if c.V0 != "" {
+         maps["v0"] = c.V0
+    }
+
+    if c.V1 != "" {
+         maps["v1 like"] = "%" +c.V1+ "%"
+    }
+
+    if c.V2 != "" {
+         maps["v2"] = c.V2
+    }
+    log.Println(c)
+    log.Println(maps)
     return maps
 }
 
 func (c *CasbinStruct) Count() (int, error) {
-    return model.GetTotal(model.CasbinRule{}, c.getConditionMaps())
+    whereSql, values, err := model.BuildCondition(c.getConditionMaps())
+    if err != nil {
+        return 0, err
+    }
+
+    return model.GetTotal(model.CasbinRule{}, whereSql, values)
 }
 
 func (c *CasbinStruct) GetAll() ([]*model.CasbinRule, error) {
-    casbins, err := model.GetCasbinRuleList(c.PageNum, c.PageSize, c.getConditionMaps())
+    whereSql, values, err := model.BuildCondition(c.getConditionMaps())
+    if err != nil {
+        return nil, err
+    }
+
+    casbins, err := model.GetCasbinRuleList(c.PageNum, c.PageSize, whereSql, values)
     if err != nil {
         return nil, err
     }

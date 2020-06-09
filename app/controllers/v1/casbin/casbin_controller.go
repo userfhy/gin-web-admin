@@ -132,6 +132,9 @@ func GetCasbinList(c *gin.Context) {
     casbinServiceObj := casbinService.CasbinStruct{
         PageNum: p,
         PageSize: n,
+        V0: c.DefaultQuery("role",""),
+        V1: c.DefaultQuery("path",""),
+        V2: c.DefaultQuery("method",""),
     }
 
     total, err := casbinServiceObj.Count()

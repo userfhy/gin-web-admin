@@ -60,18 +60,29 @@ func UpdateRole(roleId int, u UpdateRoleStruct) bool{
     return true
 }
 
-func (u *RoleStruct) getConditionMaps() map[string]interface{} {
+func (u *RoleStruct) getConditionMaps() map[string]interface{}{
     maps := make(map[string]interface{})
     //maps["deleted_at"] = nil
     return maps
 }
 
+
+
 func (u *RoleStruct) Count() (int, error) {
-    return model.GetTotal(model.Role{}, u.getConditionMaps())
+    whereSql, values, err := model.BuildCondition(u.getConditionMaps())
+    if err != nil {
+        return 0, err
+    }
+
+    return model.GetTotal(model.Role{}, whereSql, values)
 }
 
 func (u *RoleStruct) GetAll() ([]*model.Role, error) {
-    Roles, err := model.GetRoles(u.PageNum, u.PageSize, u.getConditionMaps())
+    whereSql, values, err := model.BuildCondition(u.getConditionMaps())
+    if err != nil {
+        return nil, err
+    }
+    Roles, err := model.GetRoles(u.PageNum, u.PageSize,  whereSql, values)
     if err != nil {
         return nil, err
     }

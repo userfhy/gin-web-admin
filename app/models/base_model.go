@@ -7,6 +7,7 @@ import (
     "github.com/jinzhu/gorm"
     _ "github.com/jinzhu/gorm/dialects/mysql"
     "log"
+    "strings"
     "time"
 )
 
@@ -140,9 +141,9 @@ func Update(tableStruct interface{}, wheres map[string]interface{}, updates map[
     return nil, res.RowsAffected
 }
 
-func GetTotal(tableStruct interface{}, maps interface{}) (int, error) {
+func GetTotal(tableStruct interface{},  whereSql string, values []interface{}) (int, error) {
     var count int
-    if err := db.Model(tableStruct).Where(maps).Count(&count).Error; err != nil {
+    if err := db.Model(tableStruct).Where(whereSql, values...).Count(&count).Error; err != nil {
         return 0, err
     }
 
@@ -168,3 +169,64 @@ func GetTotal(tableStruct interface{}, maps interface{}) (int, error) {
 //
 //    return user, nil
 //}
+
+func BuildCondition(where map[string]interface{}) (whereSql string, values []interface{}, err error) {
+    for key, value := range where {
+        conditionKey := strings.Split(key, " ")
+        if len(conditionKey) > 2 {
+            return "", nil, fmt.Errorf("" +
+                "map构建的条件格式不对，类似于'age >'")
+        }
+        if whereSql != "" {
+            whereSql += " AND "
+        }
+        switch len(conditionKey) {
+        case 1:
+            whereSql += fmt.Sprint(conditionKey[0], " = ?")
+            values = append(values, value)
+            break
+        case 2:
+            field := conditionKey[0]
+            switch conditionKey[1] {
+            case "=":
+                whereSql += fmt.Sprint(field, " = ?")
+                values = append(values, value)
+                break
+            case ">":
+                whereSql += fmt.Sprint(field, " > ?")
+                values = append(values, value)
+                break
+            case ">=":
+                whereSql += fmt.Sprint(field, " >= ?")
+                values = append(values, value)
+                break
+            case "<":
+                whereSql += fmt.Sprint(field, " < ?")
+                values = append(values, value)
+                break
+            case "<=":
+                whereSql += fmt.Sprint(field, " <= ?")
+                values = append(values, value)
+                break
+            case "in":
+                whereSql += fmt.Sprint(field, " in (?)")
+                values = append(values, value)
+                break
+            case "like":
+                whereSql += fmt.Sprint(field, " like ?")
+                values = append(values, value)
+                break
+            case "<>":
+                whereSql += fmt.Sprint(field, " != ?")
+                values = append(values, value)
+                break
+            case "!=":
+                whereSql += fmt.Sprint(field, " != ?")
+                values = append(values, value)
+                break
+            }
+            break
+        }
+    }
+    return
+}

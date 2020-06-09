@@ -30,9 +30,9 @@ func CreateRole(role Role) error {
     return nil
 }
 
-func GetRoles(pageNum int, pageSize int, maps interface{}) ([]*Role, error) {
+func GetRoles(pageNum int, pageSize int, whereSql string, values []interface{}) ([]*Role, error) {
     var role [] *Role
-    err := db.Select("*").Where(maps).Offset(pageNum).Limit(pageSize).Find(&role).Error
+    err := db.Select("*").Where(whereSql, values...).Offset(pageNum).Limit(pageSize).Find(&role).Error
 
     if err != nil && err != gorm.ErrRecordNotFound {
         return nil, err
