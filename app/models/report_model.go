@@ -1,25 +1,25 @@
 package model
 
 type Report struct {
-    BaseModel
-    ActivityId int `json:"activity_id"`
-    Name string `gorm:"Size:20" json:"name"`
-    Phone string `gorm:"Size:30;index:idx_phone" json:"phone"`
-    Ip string `gorm:"Size:80" json:"ip"`
+	BaseModel
+	ActivityId int    `json:"activity_id"`
+	Name       string `gorm:"Size:20" json:"name"`
+	Phone      string `gorm:"Size:30;index:idx_phone" json:"phone"`
+	Ip         string `gorm:"Size:80" json:"ip"`
 }
 
 func (Report) TableName() string {
-    return TablePrefix + "report"
+	return TablePrefix + "report"
 }
 
 func GetReportUserCount(r Report) int {
-    var count = 0
-    db.Model(&Report{}).Where(&r).Count(&count)
-    return count
+	var count = 0
+	db.Model(&Report{}).Where(&r).Count(&count)
+	return count
 }
 
 func CreateReportNewRecord(r Report) Report {
-    //db.NewRecord(r)
-    db.Create(&r)
-    return r
+	//db.NewRecord(r)
+	db.Create(&r)
+	return r
 }
