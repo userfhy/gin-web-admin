@@ -1,5 +1,7 @@
 [app]
 JwtSecret = 233
+# If there is a user record, please do not change it at will
+PasswordSalt = fgyf
 PrefixUrl = http://127.0.0.1:8080
 TimeFormat = 20060102
 EnabledCORS = false

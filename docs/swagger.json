@@ -1,19 +1,231 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "An example of gin",
-        "title": "Gin Web Test",
+        "description": "{{.Description}}",
+        "title": "{{.Title}}",
         "termsOfService": "https://github.com/fanhengyuan/gin-test",
         "contact": {},
         "license": {
             "name": "MIT",
             "url": "https://github.com/fanhengyuan/gin-test/blob/master/LICENSE"
         },
-        "version": "1.0"
+        "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/casbin": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取规则列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "规则列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "p",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page limit",
+                        "name": "n",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "v0 根据 role key 分组",
+                        "name": "group_by",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "创建规则",
+                "parameters": [
+                    {
+                        "description": "create new user",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/casbinService.AddCasbinStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/casbin/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改规则信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "修改规则",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "casbin_id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "修改规则",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/casbinService.AddCasbinStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除规则信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "删除规则",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "casbin_id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "删除规则",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/casbinService.AddCasbinStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "用户登录",
@@ -86,7 +298,210 @@
                 }
             }
         },
-        "/sys/routers": {
+        "/role": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取角色表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "角色列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "p",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page limit",
+                        "name": "n",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "添加角色",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "添加角色",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "role_id",
+                        "name": "role_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "添加",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/roleService.CreateRoleStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/role/{role_id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改角色信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "修改角色",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "role_id",
+                        "name": "role_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "修改角色",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/roleService.UpdateRoleStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除角色",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "删除角色",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "role_id",
+                        "name": "role_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sys/router": {
             "get": {
                 "security": [
                     {
@@ -103,7 +518,7 @@
                 "tags": [
                     "SYS"
                 ],
-                "summary": "Routers",
+                "summary": "后端存在路由列表",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -235,10 +650,102 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建新用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "创建用户",
+                "parameters": [
+                    {
+                        "description": "create new user",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/userService.AddUserStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/change_password": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "密码修改",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "修改密码",
+                "parameters": [
+                    {
+                        "description": "user change password",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/userService.ChangePasswordStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
             }
         },
         "/user/logged_in": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "当前登录用户信息",
                 "consumes": [
                     "application/json"
@@ -247,9 +754,38 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "User"
                 ],
                 "summary": "当前登录用户信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/logout": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "用户登出",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User Logout",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -263,6 +799,31 @@
         }
     },
     "definitions": {
+        "casbinService.AddCasbinStruct": {
+            "type": "object",
+            "required": [
+                "v0",
+                "v1",
+                "v2"
+            ],
+            "properties": {
+                "v0": {
+                    "description": "role_key",
+                    "type": "string",
+                    "minLength": 3
+                },
+                "v1": {
+                    "description": "path",
+                    "type": "string",
+                    "minLength": 4
+                },
+                "v2": {
+                    "description": "method",
+                    "type": "string",
+                    "minLength": 2
+                }
+            }
+        },
         "common.Response": {
             "type": "object",
             "properties": {
@@ -297,6 +858,72 @@
                 }
             }
         },
+        "roleService.CreateRoleStruct": {
+            "type": "object",
+            "required": [
+                "role_key",
+                "role_name"
+            ],
+            "properties": {
+                "remark": {
+                    "description": "备注",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 4
+                },
+                "role_key": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 4
+                },
+                "role_name": {
+                    "description": "角色名称",
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 4
+                }
+            }
+        },
+        "roleService.UpdateRoleStruct": {
+            "type": "object",
+            "required": [
+                "role_name"
+            ],
+            "properties": {
+                "remark": {
+                    "description": "备注",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 4
+                },
+                "role_name": {
+                    "description": "角色名称",
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 4
+                }
+            }
+        },
+        "userService.AddUserStruct": {
+            "type": "object",
+            "required": [
+                "password",
+                "user_name"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "minLength": 4
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string",
+                    "minLength": 4
+                }
+            }
+        },
         "userService.AuthStruct": {
             "type": "object",
             "required": [
@@ -310,7 +937,24 @@
                 },
                 "user_name": {
                     "type": "string",
-                    "minLength": 1
+                    "minLength": 4
+                }
+            }
+        },
+        "userService.ChangePasswordStruct": {
+            "type": "object",
+            "required": [
+                "new_password",
+                "old_password"
+            ],
+            "properties": {
+                "new_password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "old_password": {
+                    "type": "string",
+                    "minLength": 4
                 }
             }
         }
@@ -319,7 +963,7 @@
         "ApiKeyAuth": {
             "type": "apiKey",
             "name": "Authorization",
-            "in": "header"
+            "in": "header like: Bearer xxxx"
         }
     }
 }

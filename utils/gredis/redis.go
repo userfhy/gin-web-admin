@@ -42,19 +42,20 @@ func Setup() {
         },
     }
 
-    TestConnection()
-
     log.Printf("[info] Redis connected %s DB: %d", setting.RedisSetting.Host, setting.RedisSetting.DB)
+
+    TestConnection()
 }
 
 func TestConnection() {
     conn := RedisConn.Get()
     defer conn.Close()
 
-    _, err := conn.Do("PING")
+    res, err := conn.Do("PING")
     if err != nil {
         panic(err)
     }
+    log.Println(res)
 }
 
 // Set a key/value

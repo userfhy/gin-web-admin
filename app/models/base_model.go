@@ -7,10 +7,14 @@ import (
     "github.com/jinzhu/gorm"
     _ "github.com/jinzhu/gorm/dialects/mysql"
     "log"
+    "strings"
     "time"
 )
 
-var db *gorm.DB
+var (
+    db *gorm.DB
+    TablePrefix string
+)
 
 // JSONTime format json time field by myself
 type JSONTime struct {
@@ -19,6 +23,12 @@ type JSONTime struct {
 
 type BaseModel struct {
     ID        uint `gorm:"primary_key" json:"id"`
+    CreatedAt JSONTime `gorm:"column:created_at" json:"created_at"`
+    UpdatedAt JSONTime `gorm:"column:updated_at" json:"updated_at"`
+    DeletedAt *JSONTime `sql:"index" json:"deleted_at"`
+}
+
+type BaseModelNoId struct {
     CreatedAt JSONTime `gorm:"column:created_at" json:"created_at"`
     UpdatedAt JSONTime `gorm:"column:updated_at" json:"updated_at"`
     DeletedAt *JSONTime `sql:"index" json:"deleted_at"`
@@ -55,6 +65,12 @@ func Setup() {
 
     db.SingularTable(true)
 
+/*    gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
+        return TablePrefix + defaultTableName
+    }*/
+
+    TablePrefix = setting.DatabaseSetting.TablePrefix
+
     // 不存在 创建表
     //if ! db.HasTable(&Report{}) {
     //   log.Println("不存在上报表，开始创建！")
@@ -62,35 +78,14 @@ func Setup() {
     //}
 
     // 自动迁移表
-    db.AutoMigrate(&Report{}, &Auth{})
-
-    gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-        return setting.DatabaseSetting.TablePrefix + defaultTableName
-    }
-}
-
-func TestDB() {
-    var err error
-    err = db.DB().Ping()
-    if err != nil {
-        log.Fatalf("DB ping err: %v", err)
-    }
-    
-    // Scan
-    type Result struct {
-        Id int
-        Name string
-    }
-
-    rows, err := db.Raw("SELECT id,name FROM t_user").Rows()
-    defer rows.Close()
-    
-    var result Result
-    for rows.Next() {
-        //rows.Scan(&result)
-        db.ScanRows(rows, &result)
-        log.Println(result)
-    }
+    db.AutoMigrate(
+        &Report{},
+        &Auth{},
+        &JwtBlacklist{},
+        &Role{},
+        &CasbinRule{},
+        &Menu{},
+    )
 }
 
 // CloseDB closes database connection (unnecessary)
@@ -124,4 +119,121 @@ func (t *JSONTime) Scan(v interface{}) error {
         return nil
     }
     return fmt.Errorf("can not convert %v to timestamp", v)
+}
+
+/*func (v BaseModel) BeforeCreate(scope *gorm.Scope) error {
+   scope.SetColumn("created_at", time.Now())
+   scope.SetColumn("updated_at", time.Now())
+   return nil
+}
+
+func (v BaseModel) BeforeUpdate(scope *gorm.Scope) error {
+   scope.SetColumn("updated_at", time.Now())
+   return nil
+}*/
+
+func SoftDelete(tableStruct interface{}) (error, int64){
+    res := db.Delete(tableStruct)
+    if err := res.Error; err != nil {
+        return err, 0
+    }
+    return nil, res.RowsAffected
+}
+
+func Update(tableStruct interface{}, wheres map[string]interface{}, updates map[string]interface{}) (error, int64){
+    res := db.Model(tableStruct).Where(wheres).Update(updates)
+    if err := res.Error; err != nil {
+        return err, 0
+    }
+    return nil, res.RowsAffected
+}
+
+func GetTotal(tableStruct interface{},  whereSql string, values []interface{}) (int, error) {
+    var count int
+    if err := db.Model(tableStruct).Where(whereSql, values...).Count(&count).Error; err != nil {
+        return 0, err
+    }
+
+    return count, nil
+}
+
+//func GetTotal(maps interface{}) (int, error) {
+//    var count int
+//    if err := db.Model(&Auth{}).Where(maps).Count(&count).Error; err != nil {
+//        return 0, err
+//    }
+//
+//    return count, nil
+//}
+//
+//// GetTestUsers gets a list of users based on paging constraints
+//func GetList(pageNum int, pageSize int, maps interface{}) ([]*interface{}, error) {
+//    var user [] *Auth
+//    err := db.Where(maps).Offset(pageNum).Limit(pageSize).Find(&user).Error
+//    if err != nil && err != gorm.ErrRecordNotFound {
+//        return nil, err
+//    }
+//
+//    return user, nil
+//}
+
+func BuildCondition(where map[string]interface{}) (whereSql string, values []interface{}, err error) {
+    for key, value := range where {
+        conditionKey := strings.Split(key, " ")
+        if len(conditionKey) > 2 {
+            return "", nil, fmt.Errorf("" +
+                "map构建的条件格式不对，类似于'age >'")
+        }
+        if whereSql != "" {
+            whereSql += " AND "
+        }
+        switch len(conditionKey) {
+        case 1:
+            whereSql += fmt.Sprint(conditionKey[0], " = ?")
+            values = append(values, value)
+            break
+        case 2:
+            field := conditionKey[0]
+            switch conditionKey[1] {
+            case "=":
+                whereSql += fmt.Sprint(field, " = ?")
+                values = append(values, value)
+                break
+            case ">":
+                whereSql += fmt.Sprint(field, " > ?")
+                values = append(values, value)
+                break
+            case ">=":
+                whereSql += fmt.Sprint(field, " >= ?")
+                values = append(values, value)
+                break
+            case "<":
+                whereSql += fmt.Sprint(field, " < ?")
+                values = append(values, value)
+                break
+            case "<=":
+                whereSql += fmt.Sprint(field, " <= ?")
+                values = append(values, value)
+                break
+            case "in":
+                whereSql += fmt.Sprint(field, " in (?)")
+                values = append(values, value)
+                break
+            case "like":
+                whereSql += fmt.Sprint(field, " like ?")
+                values = append(values, value)
+                break
+            case "<>":
+                whereSql += fmt.Sprint(field, " != ?")
+                values = append(values, value)
+                break
+            case "!=":
+                whereSql += fmt.Sprint(field, " != ?")
+                values = append(values, value)
+                break
+            }
+            break
+        }
+    }
+    return
 }

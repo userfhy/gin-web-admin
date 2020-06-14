@@ -1,5 +1,24 @@
 basePath: '{{.BasePath}}'
 definitions:
+  casbinService.AddCasbinStruct:
+    properties:
+      v0:
+        description: role_key
+        minLength: 3
+        type: string
+      v1:
+        description: path
+        minLength: 4
+        type: string
+      v2:
+        description: method
+        minLength: 2
+        type: string
+    required:
+    - v0
+    - v1
+    - v2
+    type: object
   common.Response:
     properties:
       code:
@@ -23,29 +42,229 @@ definitions:
     - name
     - phone
     type: object
+  roleService.CreateRoleStruct:
+    properties:
+      remark:
+        description: 备注
+        maxLength: 100
+        minLength: 4
+        type: string
+      role_key:
+        maxLength: 10
+        minLength: 4
+        type: string
+      role_name:
+        description: 角色名称
+        maxLength: 10
+        minLength: 4
+        type: string
+    required:
+    - role_key
+    - role_name
+    type: object
+  roleService.UpdateRoleStruct:
+    properties:
+      remark:
+        description: 备注
+        maxLength: 100
+        minLength: 4
+        type: string
+      role_name:
+        description: 角色名称
+        maxLength: 10
+        minLength: 4
+        type: string
+    required:
+    - role_name
+    type: object
+  userService.AddUserStruct:
+    properties:
+      password:
+        minLength: 4
+        type: string
+      role_id:
+        type: integer
+      user_name:
+        minLength: 4
+        type: string
+    required:
+    - password
+    - user_name
+    type: object
   userService.AuthStruct:
     properties:
       password:
         minLength: 4
         type: string
       user_name:
-        minLength: 1
+        minLength: 4
         type: string
     required:
     - password
     - user_name
     type: object
+  userService.ChangePasswordStruct:
+    properties:
+      new_password:
+        minLength: 6
+        type: string
+      old_password:
+        minLength: 4
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
 host: '{{.Host}}'
 info:
   contact: {}
-  description: An example of gin
+  description: '{{.Description}}'
   license:
     name: MIT
     url: https://github.com/fanhengyuan/gin-test/blob/master/LICENSE
   termsOfService: https://github.com/fanhengyuan/gin-test
-  title: Gin Web Test
-  version: "1.0"
+  title: '{{.Title}}'
+  version: '{{.Version}}'
 paths:
+  /casbin:
+    get:
+      consumes:
+      - application/json
+      description: 获取规则列表
+      parameters:
+      - description: page number
+        in: query
+        name: p
+        required: true
+        type: integer
+      - description: page limit
+        in: query
+        name: "n"
+        required: true
+        type: integer
+      - description: v0 根据 role key 分组
+        in: query
+        name: group_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 规则列表
+      tags:
+      - Casbin
+    post:
+      consumes:
+      - application/json
+      description: 创建规则
+      parameters:
+      - description: create new user
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/casbinService.AddCasbinStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 创建规则
+      tags:
+      - Casbin
+  /casbin/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除规则信息
+      parameters:
+      - description: casbin_id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 删除规则
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/casbinService.AddCasbinStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 删除规则
+      tags:
+      - Casbin
+    put:
+      consumes:
+      - application/json
+      description: 修改规则信息
+      parameters:
+      - description: casbin_id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 修改规则
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/casbinService.AddCasbinStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改规则
+      tags:
+      - Casbin
   /login:
     post:
       consumes:
@@ -94,7 +313,140 @@ paths:
       summary: Report Information
       tags:
       - Report
-  /sys/routers:
+  /role:
+    get:
+      consumes:
+      - application/json
+      description: 获取角色表
+      parameters:
+      - description: page number
+        in: query
+        name: p
+        required: true
+        type: integer
+      - description: page limit
+        in: query
+        name: "n"
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 角色列表
+      tags:
+      - Role
+    post:
+      consumes:
+      - application/json
+      description: 添加角色
+      parameters:
+      - description: role_id
+        in: path
+        name: role_id
+        required: true
+        type: integer
+      - description: 添加
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/roleService.CreateRoleStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 添加角色
+      tags:
+      - Role
+  /role/{role_id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除角色
+      parameters:
+      - description: role_id
+        in: path
+        name: role_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 删除角色
+      tags:
+      - Role
+    put:
+      consumes:
+      - application/json
+      description: 修改角色信息
+      parameters:
+      - description: role_id
+        in: path
+        name: role_id
+        required: true
+        type: integer
+      - description: 修改角色
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/roleService.UpdateRoleStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改角色
+      tags:
+      - Role
+  /sys/router:
     get:
       consumes:
       - application/json
@@ -109,7 +461,7 @@ paths:
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Routers
+      summary: 后端存在路由列表
       tags:
       - SYS
   /test/font:
@@ -190,6 +542,62 @@ paths:
       summary: 用户列表
       tags:
       - User
+    post:
+      consumes:
+      - application/json
+      description: 创建新用户
+      parameters:
+      - description: create new user
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/userService.AddUserStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 创建用户
+      tags:
+      - User
+  /user/change_password:
+    put:
+      consumes:
+      - application/json
+      description: 密码修改
+      parameters:
+      - description: user change password
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/userService.ChangePasswordStruct'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改密码
+      tags:
+      - User
   /user/logged_in:
     get:
       consumes:
@@ -203,12 +611,32 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: 当前登录用户信息
       tags:
-      - Auth
+      - User
+  /user/logout:
+    put:
+      consumes:
+      - application/json
+      description: 用户登出
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: User Logout
+      tags:
+      - User
 securityDefinitions:
   ApiKeyAuth:
-    in: header
+    in: 'header like: Bearer xxxx'
     name: Authorization
     type: apiKey
 swagger: "2.0"
