@@ -141,5 +141,10 @@ func GetLoggedInUser(c *gin.Context) {
     data["user_id"] = user.UserId
     data["user_name"] = user.Username
     data["roles"] = [...]string{user.RoleKey}
+    data["permissions"] = [...]string{""}
+    if user.IsAdmin {
+         data["permissions"] = [...]string{"*:*:*"}
+    }
+    //data["permissions"] = [...]string{"system:sysmenu:add"}
     appG.Response(http.StatusOK, code.SUCCESS, "当前登录用户信息", data)
 }

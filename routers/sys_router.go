@@ -13,5 +13,6 @@ func InitSysRouter(Router *gin.RouterGroup) {
         middleware.CasbinHandler())
     {
         sys.GET("/router", sysController.GetRouterList) // 路由列表
+        sys.GET("/menu_list", sysController.GetMenuList) // 菜单列表
     }
 }

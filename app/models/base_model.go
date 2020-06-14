@@ -28,6 +28,12 @@ type BaseModel struct {
     DeletedAt *JSONTime `sql:"index" json:"deleted_at"`
 }
 
+type BaseModelNoId struct {
+    CreatedAt JSONTime `gorm:"column:created_at" json:"created_at"`
+    UpdatedAt JSONTime `gorm:"column:updated_at" json:"updated_at"`
+    DeletedAt *JSONTime `sql:"index" json:"deleted_at"`
+}
+
 func Setup() {
     var err error
     db, err = gorm.Open(
@@ -78,6 +84,7 @@ func Setup() {
         &JwtBlacklist{},
         &Role{},
         &CasbinRule{},
+        &Menu{},
     )
 }
 
