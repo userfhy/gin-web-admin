@@ -2,21 +2,11 @@ package routers
 
 import (
 	sysController "gin-test/app/controllers/v1/sys"
-	"gin-test/app/middleware"
 	"gin-test/utils/casbin"
-	"gin-test/utils/setting"
 	"github.com/gin-gonic/gin"
 )
 
-func InitRouter() *gin.Engine {
-	r := gin.New()
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
-
-	if setting.AppSetting.EnabledCORS {
-		r.Use(middleware.CORS())
-	}
-
+func InitRouter(r *gin.Engine) *gin.Engine {
 	// 初始化路由权限 在这初始化的目的： 避免每次访问路由查询数据库
 	// 如果更改路由权限 需要重新调用一下这个方法
 	casbin.SetupCasbin()
