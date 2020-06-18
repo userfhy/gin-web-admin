@@ -9,8 +9,7 @@ import (
 func InitTestRouter(Router *gin.RouterGroup) {
 	test := Router.Group("/test").Use(
 		middleware.TranslationHandler(),
-		middleware.JWTHandler(),
-		middleware.CasbinHandler())
+	)
 	{
 		test.POST("/ping", indexController.Ping)
 		test.GET("/ping", indexController.Ping)
