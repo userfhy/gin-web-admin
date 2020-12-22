@@ -7,20 +7,20 @@ mv conf/app.ini.example conf/app.ini
 go run main.go
 ```
 
-### Hot Reload(Optional)
-Use Fresh docs: [Fresh](https://github.com/gravityblast/fresh)
+## Cross Compile
 
-Recommended only for development environments.
+### Windows
 
-#### Installation
+```bash
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64  go build -a -ldflags '-extldflags "-static"' .
+```
 
-```go get github.com/pilu/fresh```
+### Linux
 
-#### Usage
+```bash
+CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' .
+```
 
-Start fresh:
-
-```fresh -c fresh.conf```
 
 #### Logs
 ```bash
