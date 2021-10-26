@@ -7,7 +7,6 @@ require (
 	github.com/casbin/casbin/v2 v2.34.0
 	github.com/casbin/gorm-adapter/v2 v2.1.0
 	github.com/denisenkom/go-mssqldb v0.9.0 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/gzip v0.0.3 // indirect
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-ini/ini v1.62.0
@@ -18,6 +17,7 @@ require (
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.7.0
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect

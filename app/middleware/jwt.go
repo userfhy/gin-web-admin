@@ -4,7 +4,7 @@ import (
 	userService "gin-test/app/service/v1/user"
 	"gin-test/utils"
 	"gin-test/utils/code"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
