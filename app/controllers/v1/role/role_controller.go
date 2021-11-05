@@ -1,11 +1,11 @@
 package roleController
 
 import (
-	roleService "gin-test/app/service/v1/role"
-	"gin-test/common"
-	"gin-test/utils"
-	"gin-test/utils/code"
-	"gin-test/utils/com"
+	roleService "gin-web-admin/app/service/v1/role"
+	"gin-web-admin/common"
+	"gin-web-admin/utils"
+	"gin-web-admin/utils/code"
+	"gin-web-admin/utils/com"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

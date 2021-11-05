@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"gin-test/common"
-	"gin-test/utils/com"
+	"gin-web-admin/common"
+	"gin-web-admin/utils/com"
 	"github.com/gin-gonic/gin"
 )
 

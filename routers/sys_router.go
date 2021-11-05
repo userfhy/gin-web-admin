@@ -1,8 +1,8 @@
 package routers
 
 import (
-	sysController "gin-test/app/controllers/v1/sys"
-	"gin-test/app/middleware"
+	sysController "gin-web-admin/app/controllers/v1/sys"
+	"gin-web-admin/app/middleware"
 	"github.com/gin-gonic/gin"
 )
 

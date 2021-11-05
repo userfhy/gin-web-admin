@@ -18,11 +18,11 @@ var doc = `{
     "info": {
         "description": "{{.Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "https://github.com/fanhengyuan/gin-test",
+        "termsOfService": "https://github.com/fanhengyuan/gin-web-admin",
         "contact": {},
         "license": {
             "name": "MIT",
-            "url": "https://github.com/fanhengyuan/gin-test/blob/master/LICENSE"
+            "url": "https://github.com/fanhengyuan/gin-web-admin/blob/master/LICENSE"
         },
         "version": "{{.Version}}"
     },

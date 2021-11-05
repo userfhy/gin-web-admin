@@ -1,9 +1,9 @@
 package reportController
 
 import (
-	reportService "gin-test/app/service/v1/report"
-	"gin-test/common"
-	"gin-test/utils/code"
+	reportService "gin-web-admin/app/service/v1/report"
+	"gin-web-admin/common"
+	"gin-web-admin/utils/code"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

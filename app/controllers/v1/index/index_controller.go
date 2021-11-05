@@ -2,9 +2,9 @@ package indexController
 
 import (
 	"encoding/json"
-	"gin-test/common"
-	"gin-test/utils"
-	"gin-test/utils/code"
+	"gin-web-admin/common"
+	"gin-web-admin/utils"
+	"gin-web-admin/utils/code"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"

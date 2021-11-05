@@ -1,8 +1,8 @@
 package userService
 
 import (
-	model "gin-test/app/models"
-	"gin-test/utils"
+	model "gin-web-admin/app/models"
+	"gin-web-admin/utils"
 	"log"
 	"strings"
 	"time"

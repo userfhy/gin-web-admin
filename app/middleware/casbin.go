@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"fmt"
-	"gin-test/utils"
-	"gin-test/utils/casbin"
+	"gin-web-admin/utils"
+	"gin-web-admin/utils/casbin"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

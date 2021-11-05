@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"gin-test/common"
+	"gin-web-admin/common"
 	"github.com/gin-gonic/gin"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"

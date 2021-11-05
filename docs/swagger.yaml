@@ -121,8 +121,8 @@ info:
   description: '{{.Description}}'
   license:
     name: MIT
-    url: https://github.com/fanhengyuan/gin-test/blob/master/LICENSE
-  termsOfService: https://github.com/fanhengyuan/gin-test
+    url: https://github.com/fanhengyuan/gin-web-admin/blob/master/LICENSE
+  termsOfService: https://github.com/fanhengyuan/gin-web-admin
   title: '{{.Title}}'
   version: '{{.Version}}'
 paths:

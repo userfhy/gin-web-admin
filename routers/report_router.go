@@ -1,8 +1,8 @@
 package routers
 
 import (
-	reportController "gin-test/app/controllers/v1/report"
-	"gin-test/app/middleware"
+	reportController "gin-web-admin/app/controllers/v1/report"
+	"gin-web-admin/app/middleware"
 	"github.com/gin-gonic/gin"
 )
 

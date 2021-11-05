@@ -1,8 +1,8 @@
 package routers
 
 import (
-	roleController "gin-test/app/controllers/v1/role"
-	"gin-test/app/middleware"
+	roleController "gin-web-admin/app/controllers/v1/role"
+	"gin-web-admin/app/middleware"
 	"github.com/gin-gonic/gin"
 )
 

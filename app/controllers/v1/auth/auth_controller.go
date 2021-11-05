@@ -1,11 +1,11 @@
 package authController
 
 import (
-	model "gin-test/app/models"
-	"gin-test/app/service/v1/user"
-	"gin-test/common"
-	"gin-test/utils"
-	"gin-test/utils/code"
+	model "gin-web-admin/app/models"
+	"gin-web-admin/app/service/v1/user"
+	"gin-web-admin/common"
+	"gin-web-admin/utils"
+	"gin-web-admin/utils/code"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

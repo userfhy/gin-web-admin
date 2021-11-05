@@ -3,14 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"gin-test/app/middleware"
-	model "gin-test/app/models"
-	"gin-test/common"
-	"gin-test/utils/logging"
-	//"gin-test/common/validator"
-	"gin-test/routers"
-	"gin-test/utils/gredis"
-	"gin-test/utils/setting"
+	"gin-web-admin/app/middleware"
+	model "gin-web-admin/app/models"
+	"gin-web-admin/common"
+	"gin-web-admin/utils/logging"
+	//"gin-web-admin/common/validator"
+	"gin-web-admin/routers"
+	"gin-web-admin/utils/gredis"
+	"gin-web-admin/utils/setting"
 	"github.com/gin-gonic/gin"
 	//"github.com/gin-gonic/gin/binding"
 	"net/http"
@@ -31,9 +31,9 @@ func init() {
 	}
 }
 
-// @termsOfService https://github.com/fanhengyuan/gin-test
+// @termsOfService https://github.com/fanhengyuan/gin-web-admin
 // @license.name MIT
-// @license.url https://github.com/fanhengyuan/gin-test/blob/master/LICENSE
+// @license.url https://github.com/fanhengyuan/gin-web-admin/blob/master/LICENSE
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header like: Bearer xxxx

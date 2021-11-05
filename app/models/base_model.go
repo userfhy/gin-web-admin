@@ -3,7 +3,7 @@ package model
 import (
 	"database/sql/driver"
 	"fmt"
-	"gin-test/utils/setting"
+	"gin-web-admin/utils/setting"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"

@@ -31,27 +31,27 @@ $ go run main.go
  - using env:	export GIN_MODE=release
  - using code:	gin.SetMode(gin.ReleaseMode)
 
-[GIN-debug] POST   /v1/api/login             --> gin-test/app/controllers/v1/auth.UserLogin (4 handlers)
-[GIN-debug] POST   /v1/api/user              --> gin-test/app/controllers/v1/user.CreateUser (7 handlers)
-[GIN-debug] GET    /v1/api/user              --> gin-test/app/controllers/v1/user.GetUsers (7 handlers)
-[GIN-debug] PUT    /v1/api/user/logout       --> gin-test/app/controllers/v1/auth.UserLogout (7 handlers)
-[GIN-debug] PUT    /v1/api/user/change_password --> gin-test/app/controllers/v1/auth.ChangePassword (7 handlers)
-[GIN-debug] GET    /v1/api/user/logged_in    --> gin-test/app/controllers/v1/auth.GetLoggedInUser (7 handlers)
-[GIN-debug] GET    /v1/api/role              --> gin-test/app/controllers/v1/role.GetRoles (7 handlers)
-[GIN-debug] POST   /v1/api/role              --> gin-test/app/controllers/v1/role.CreateRole (7 handlers)
-[GIN-debug] PUT    /v1/api/role/:role_id     --> gin-test/app/controllers/v1/role.UpdateRole (7 handlers)
-[GIN-debug] DELETE /v1/api/role/:role_id     --> gin-test/app/controllers/v1/role.DeleteRole (7 handlers)
-[GIN-debug] GET    /v1/api/casbin            --> gin-test/app/controllers/v1/casbin.GetCasbinList (7 handlers)
-[GIN-debug] POST   /v1/api/casbin            --> gin-test/app/controllers/v1/casbin.CreateCasbin (7 handlers)
-[GIN-debug] PUT    /v1/api/casbin/:id        --> gin-test/app/controllers/v1/casbin.UpdateCasbin (7 handlers)
-[GIN-debug] DELETE /v1/api/casbin/:id        --> gin-test/app/controllers/v1/casbin.DeleteCasbin (7 handlers)
-[GIN-debug] GET    /v1/api/sys/router        --> gin-test/app/controllers/v1/sys.GetRouterList (7 handlers)
-[GIN-debug] GET    /v1/api/sys/menu_list     --> gin-test/app/controllers/v1/sys.GetMenuList (7 handlers)
-[GIN-debug] POST   /v1/api/test/ping         --> gin-test/app/controllers/v1/index.Ping (5 handlers)
-[GIN-debug] GET    /v1/api/test/ping         --> gin-test/app/controllers/v1/index.Ping (5 handlers)
-[GIN-debug] GET    /v1/api/test/font         --> gin-test/app/controllers/v1/index.Test (5 handlers)
-[GIN-debug] POST   /v1/api/report            --> gin-test/app/controllers/v1/report.Report (5 handlers)
-[GIN-debug] GET    /swagger                  --> gin-test/routers.InitSwaggerRouter.func1 (4 handlers)
+[GIN-debug] POST   /v1/api/login             --> gin-web-admin/app/controllers/v1/auth.UserLogin (4 handlers)
+[GIN-debug] POST   /v1/api/user              --> gin-web-admin/app/controllers/v1/user.CreateUser (7 handlers)
+[GIN-debug] GET    /v1/api/user              --> gin-web-admin/app/controllers/v1/user.GetUsers (7 handlers)
+[GIN-debug] PUT    /v1/api/user/logout       --> gin-web-admin/app/controllers/v1/auth.UserLogout (7 handlers)
+[GIN-debug] PUT    /v1/api/user/change_password --> gin-web-admin/app/controllers/v1/auth.ChangePassword (7 handlers)
+[GIN-debug] GET    /v1/api/user/logged_in    --> gin-web-admin/app/controllers/v1/auth.GetLoggedInUser (7 handlers)
+[GIN-debug] GET    /v1/api/role              --> gin-web-admin/app/controllers/v1/role.GetRoles (7 handlers)
+[GIN-debug] POST   /v1/api/role              --> gin-web-admin/app/controllers/v1/role.CreateRole (7 handlers)
+[GIN-debug] PUT    /v1/api/role/:role_id     --> gin-web-admin/app/controllers/v1/role.UpdateRole (7 handlers)
+[GIN-debug] DELETE /v1/api/role/:role_id     --> gin-web-admin/app/controllers/v1/role.DeleteRole (7 handlers)
+[GIN-debug] GET    /v1/api/casbin            --> gin-web-admin/app/controllers/v1/casbin.GetCasbinList (7 handlers)
+[GIN-debug] POST   /v1/api/casbin            --> gin-web-admin/app/controllers/v1/casbin.CreateCasbin (7 handlers)
+[GIN-debug] PUT    /v1/api/casbin/:id        --> gin-web-admin/app/controllers/v1/casbin.UpdateCasbin (7 handlers)
+[GIN-debug] DELETE /v1/api/casbin/:id        --> gin-web-admin/app/controllers/v1/casbin.DeleteCasbin (7 handlers)
+[GIN-debug] GET    /v1/api/sys/router        --> gin-web-admin/app/controllers/v1/sys.GetRouterList (7 handlers)
+[GIN-debug] GET    /v1/api/sys/menu_list     --> gin-web-admin/app/controllers/v1/sys.GetMenuList (7 handlers)
+[GIN-debug] POST   /v1/api/test/ping         --> gin-web-admin/app/controllers/v1/index.Ping (5 handlers)
+[GIN-debug] GET    /v1/api/test/ping         --> gin-web-admin/app/controllers/v1/index.Ping (5 handlers)
+[GIN-debug] GET    /v1/api/test/font         --> gin-web-admin/app/controllers/v1/index.Test (5 handlers)
+[GIN-debug] POST   /v1/api/report            --> gin-web-admin/app/controllers/v1/report.Report (5 handlers)
+[GIN-debug] GET    /swagger                  --> gin-web-admin/routers.InitSwaggerRouter.func1 (4 handlers)
 [GIN-debug] GET    /swagger/*any             --> github.com/swaggo/gin-swagger.CustomWrapHandler.func1 (4 handlers)
 INFO[0000] [info] start http server listening :8080      func="main.main:77" name=main-logger
 INFO[0000] [info] Actual pid is 625                      func="main.main:78" name=main-logger
@@ -85,7 +85,7 @@ $ swag init
 
 ### 1.Defining structure
 
-use `validator.v9` Docs: [validator.v9](https://godoc.org/gopkg.in/go-playground/validator.v9)
+use `validator.v10` Docs: [validator.v10](https://pkg.go.dev/github.com/go-playground/validator/v10)
 
 ```golang
 type Page struct {

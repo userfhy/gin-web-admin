@@ -1,10 +1,10 @@
 package userController
 
 import (
-	userService "gin-test/app/service/v1/user"
-	"gin-test/common"
-	"gin-test/utils"
-	"gin-test/utils/code"
+	userService "gin-web-admin/app/service/v1/user"
+	"gin-web-admin/common"
+	"gin-web-admin/utils"
+	"gin-web-admin/utils/code"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

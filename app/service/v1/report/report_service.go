@@ -1,7 +1,7 @@
 package reportService
 
 import (
-	model "gin-test/app/models"
+	model "gin-web-admin/app/models"
 )
 
 // 上报信息

@@ -1,12 +1,12 @@
 package casbinController
 
 import (
-	casbinService "gin-test/app/service/v1/casbin"
-	"gin-test/common"
-	"gin-test/utils"
-	"gin-test/utils/casbin"
-	"gin-test/utils/code"
-	"gin-test/utils/com"
+	casbinService "gin-web-admin/app/service/v1/casbin"
+	"gin-web-admin/common"
+	"gin-web-admin/utils"
+	"gin-web-admin/utils/casbin"
+	"gin-web-admin/utils/code"
+	"gin-web-admin/utils/com"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

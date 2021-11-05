@@ -1,7 +1,7 @@
 package roleService
 
 import (
-	model "gin-test/app/models"
+	model "gin-web-admin/app/models"
 	"log"
 )
 

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"gin-test/utils/setting"
+	"gin-web-admin/utils/setting"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 )
@@ -29,7 +29,7 @@ func GenerateToken(userClaims Claims) (string, error) {
 		userClaims.RoleKey,
 		userClaims.IsAdmin,
 		jwt.StandardClaims{
-			Issuer:    "gin-test",
+			Issuer:    "gin-web-admin",
 			IssuedAt:  time.Now().Unix(),
 			ExpiresAt: expireTime.Unix(),
 		},

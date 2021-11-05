@@ -1,7 +1,7 @@
 package model
 
 import (
-	"gin-test/utils"
+	"gin-web-admin/utils"
 	"github.com/jinzhu/gorm"
 )
 

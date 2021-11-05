@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	userService "gin-test/app/service/v1/user"
-	"gin-test/utils"
-	"gin-test/utils/code"
+	userService "gin-web-admin/app/service/v1/user"
+	"gin-web-admin/utils"
+	"gin-web-admin/utils/code"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gin-gonic/gin"
 	"net/http"

@@ -3,7 +3,7 @@ package utils
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"gin-test/utils/setting"
+	"gin-web-admin/utils/setting"
 )
 
 // EncodeMD5 md5 encryption

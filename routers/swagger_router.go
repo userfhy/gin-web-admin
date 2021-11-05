@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"gin-test/docs"
-	"gin-test/utils/setting"
+	"gin-web-admin/docs"
+	"gin-web-admin/utils/setting"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"

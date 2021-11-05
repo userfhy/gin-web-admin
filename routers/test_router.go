@@ -1,8 +1,8 @@
 package routers
 
 import (
-	indexController "gin-test/app/controllers/v1/index"
-	"gin-test/app/middleware"
+	indexController "gin-web-admin/app/controllers/v1/index"
+	"gin-web-admin/app/middleware"
 	"github.com/gin-gonic/gin"
 )
 

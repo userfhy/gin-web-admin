@@ -1,8 +1,8 @@
 package sysController
 
 import (
-	"gin-test/common"
-	"gin-test/utils/code"
+	"gin-web-admin/common"
+	"gin-web-admin/utils/code"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

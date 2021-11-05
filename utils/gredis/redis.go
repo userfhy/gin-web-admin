@@ -2,7 +2,7 @@ package gredis
 
 import (
 	"encoding/json"
-	"gin-test/utils/setting"
+	"gin-web-admin/utils/setting"
 	"github.com/gomodule/redigo/redis"
 	"log"
 	"time"

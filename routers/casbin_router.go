@@ -1,8 +1,8 @@
 package routers
 
 import (
-	casbinController "gin-test/app/controllers/v1/casbin"
-	"gin-test/app/middleware"
+	casbinController "gin-web-admin/app/controllers/v1/casbin"
+	"gin-web-admin/app/middleware"
 	"github.com/gin-gonic/gin"
 )
 

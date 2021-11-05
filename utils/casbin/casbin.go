@@ -2,7 +2,7 @@ package casbin
 
 import (
 	"fmt"
-	"gin-test/utils/setting"
+	"gin-web-admin/utils/setting"
 	"github.com/casbin/casbin/v2"
 	//"github.com/casbin/casbin/v2/util"
 	gormadapter "github.com/casbin/gorm-adapter/v2"

@@ -1,9 +1,9 @@
 package routers
 
 import (
-	authController "gin-test/app/controllers/v1/auth"
-	userController "gin-test/app/controllers/v1/user"
-	"gin-test/app/middleware"
+	authController "gin-web-admin/app/controllers/v1/auth"
+	userController "gin-web-admin/app/controllers/v1/user"
+	"gin-web-admin/app/middleware"
 	"github.com/gin-gonic/gin"
 )
 
