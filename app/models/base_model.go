@@ -4,11 +4,12 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"gin-web-admin/utils/setting"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 var (
@@ -84,6 +85,7 @@ func Setup() {
 		&JwtBlacklist{},
 		&Role{},
 		&CasbinRule{},
+		&Menu{},
 		&Menu{},
 	)
 }
