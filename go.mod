@@ -1,6 +1,6 @@
 module gin-web-admin
 
-go 1.14
+go 1.20
 
 require (
 	github.com/agiledragon/gomonkey/v2 v2.7.0 // indirect
@@ -37,6 +37,9 @@ require (
 	github.com/swaggo/swag v1.8.1
 	github.com/ugorji/go v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29 // indirect
+	golang.org/x/net v0.0.0-20220403103023-749bd193bc2b // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/text v0.3.8 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 )
