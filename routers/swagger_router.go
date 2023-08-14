@@ -3,11 +3,12 @@ package routers
 import (
 	"gin-web-admin/docs"
 	"gin-web-admin/utils/setting"
-	"github.com/gin-gonic/gin"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func InitSwaggerRouter(Router *gin.Engine) {
@@ -31,5 +32,5 @@ func InitSwaggerRouter(Router *gin.Engine) {
 	Router.GET("/swagger", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
 	})
-	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 }
