@@ -153,7 +153,7 @@ func GetPage(c *gin.Context) (error, string, int, int) {
 - [Gin-gonic](https://github.com/gin-gonic/gin)
 - [Go-ini](https://github.com/go-ini/ini)
 - [Redis](https://github.com/gomodule/redigo)
-- [Fresh](https://github.com/gravityblast/fresh)
+- [Air](https://github.com/cosmtrek/air)
 - [JWT](https://github.com/dgrijalva/jwt-go)
 - [Casbin](https://github.com/casbin/casbin)
 - [Gorm-adapter](https://github.com/casbin/gorm-adapter)
