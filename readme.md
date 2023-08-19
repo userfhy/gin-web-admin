@@ -1,9 +1,10 @@
 ## Gin Web Test
 
-## Run
+## First Run
 
 ```bash
-mv conf/app.ini.example conf/app.ini
+cp conf/app.ini.example conf/app.ini
+go mod download
 go run main.go
 ```
 
