@@ -1,4 +1,4 @@
-## Gin Web Test
+## Gin Web Admin
 
 ## First Run
 
