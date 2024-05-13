@@ -2,8 +2,9 @@ package utils
 
 import (
 	"gin-web-admin/utils/setting"
-	"github.com/golang-jwt/jwt/v4"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 var jwtSecret = []byte(setting.AppSetting.JwtSecret)
