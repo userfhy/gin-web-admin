@@ -12,8 +12,8 @@ func (Report) TableName() string {
 	return TablePrefix + "report"
 }
 
-func GetReportUserCount(r Report) int {
-	var count = 0
+func GetReportUserCount(r Report) int64 {
+	var count int64
 	db.Model(&Report{}).Where(&r).Count(&count)
 	return count
 }

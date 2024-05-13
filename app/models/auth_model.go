@@ -2,7 +2,8 @@ package model
 
 import (
 	"gin-web-admin/utils"
-	"github.com/jinzhu/gorm"
+
+	"gorm.io/gorm"
 )
 
 type Auth struct {
@@ -35,7 +36,6 @@ func CheckAuth(username string, password string) (bool, uint, string, bool) {
 }
 
 func CreatUser(auth Auth) error {
-	db.NewRecord(auth)
 	res := db.Create(&auth)
 	if err := res.Error; err != nil {
 		return err

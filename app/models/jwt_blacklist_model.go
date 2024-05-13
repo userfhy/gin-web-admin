@@ -12,8 +12,7 @@ func (JwtBlacklist) TableName() string {
 
 func CreateBlockList(userId uint, jwt string) error {
 	table := JwtBlacklist{UserID: userId, Jwt: jwt}
-	db.NewRecord(table)
-	res := db.Create(&table)
+	res := db.Create(table)
 	if err := res.Error; err != nil {
 		return err
 	}

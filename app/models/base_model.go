@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"gin-web-admin/utils/setting"
 	"log"
+	"os"
 	"strings"
 	"time"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var (
@@ -37,34 +39,46 @@ type BaseModelNoId struct {
 
 func Setup() {
 	var err error
-	db, err = gorm.Open(
-		setting.DatabaseSetting.Type,
-		fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=20s",
-			setting.DatabaseSetting.User,
-			setting.DatabaseSetting.Password,
-			setting.DatabaseSetting.Host,
-			setting.DatabaseSetting.Name,
-		),
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=20s",
+		setting.DatabaseSetting.User,
+		setting.DatabaseSetting.Password,
+		setting.DatabaseSetting.Host,
+		setting.DatabaseSetting.Name,
 	)
+
+	var newLogger logger.Interface
+
+	if setting.DatabaseSetting.EchoSql {
+		newLogger = logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold:             time.Second, // Slow SQL threshold
+				LogLevel:                  logger.Info, // Log level
+				IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+				ParameterizedQueries:      false,       // True - Don't include params in the SQL log
+				Colorful:                  true,
+			},
+		)
+	}
+
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
 
 	if err != nil {
 		log.Fatalf("Base models.Setup err: %v", err)
 	}
 
-	if setting.DatabaseSetting.EchoSql {
-		db.LogMode(true)
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatalf("DB err: %v", err)
 	}
-
 	// 设置连接池中的最大闲置连接数。
-	db.DB().SetMaxIdleConns(10)
+	sqlDB.SetMaxIdleConns(10)
 
 	// 设置数据库的最大连接数量。
-	db.DB().SetMaxOpenConns(100)
+	sqlDB.SetMaxOpenConns(100)
 
 	// 设置连接的最大可复用时间。
-	db.DB().SetConnMaxLifetime(time.Hour)
-
-	db.SingularTable(true)
+	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	/*    gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
 	      return TablePrefix + defaultTableName
@@ -88,11 +102,6 @@ func Setup() {
 		&Menu{},
 		&Menu{},
 	)
-}
-
-// CloseDB closes database connection (unnecessary)
-func CloseDB() {
-	defer db.Close()
 }
 
 // MarshalJSON on JSONTime format Time field with %Y-%m-%d %H:%M:%S
@@ -143,15 +152,15 @@ func SoftDelete(tableStruct interface{}) (error, int64) {
 }
 
 func Update(tableStruct interface{}, wheres map[string]interface{}, updates map[string]interface{}) (error, int64) {
-	res := db.Model(tableStruct).Where(wheres).Update(updates)
+	res := db.Model(tableStruct).Where(wheres).Updates(updates)
 	if err := res.Error; err != nil {
 		return err, 0
 	}
 	return nil, res.RowsAffected
 }
 
-func GetTotal(tableStruct interface{}, whereSql string, values []interface{}) (int, error) {
-	var count int
+func GetTotal(tableStruct interface{}, whereSql string, values []interface{}) (int64, error) {
+	var count int64
 	if err := db.Model(tableStruct).Where(whereSql, values...).Count(&count).Error; err != nil {
 		return 0, err
 	}

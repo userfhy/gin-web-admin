@@ -1,6 +1,6 @@
 package model
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 type Role struct {
 	RoleId    uint      `gorm:"primary_key" json:"role_id"` // 角色编码
@@ -22,7 +22,6 @@ func (Role) TableName() string {
 }
 
 func CreateRole(role Role) error {
-	db.NewRecord(role)
 	res := db.Create(&role)
 	if err := res.Error; err != nil {
 		return err

@@ -148,7 +148,7 @@ func GetPage(c *gin.Context) (error, string, int, int) {
 
 ## Features
 
-- [Gorm](https://github.com/jinzhu/gorm)
+- [Gorm](https://github.com/go-gorm/gorm)
 - [Swagger(swag)](https://github.com/swaggo/swag)
 - [Gin-gonic](https://github.com/gin-gonic/gin)
 - [Go-ini](https://github.com/go-ini/ini)

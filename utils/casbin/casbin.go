@@ -3,7 +3,9 @@ package casbin
 import (
 	"fmt"
 	"gin-web-admin/utils/setting"
+
 	"github.com/casbin/casbin/v2"
+
 	//"github.com/casbin/casbin/v2/util"
 	gormadapter "github.com/casbin/gorm-adapter/v2"
 	_ "github.com/go-sql-driver/mysql"

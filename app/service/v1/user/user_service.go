@@ -74,7 +74,7 @@ func JoinBlockList(userId uint, jwt string) {
 	_ = model.CreateBlockList(userId, jwt)
 }
 
-func InBlockList(jwt string) (int, error) {
+func InBlockList(jwt string) (int64, error) {
 	wheres := make(map[string]interface{})
 	wheres["jwt"] = jwt
 	whereSql, values, err := model.BuildCondition(wheres)
@@ -92,7 +92,7 @@ func CreateUser(newUser AddUserStruct) error {
 	})
 }
 
-func (u *UserStruct) Count() (int, error) {
+func (u *UserStruct) Count() (int64, error) {
 	whereSql, values, err := model.BuildCondition(u.getConditionMaps())
 	if err != nil {
 		return 0, err

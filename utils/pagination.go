@@ -3,12 +3,13 @@ package utils
 import (
 	"gin-web-admin/common"
 	"gin-web-admin/utils/com"
+
 	"github.com/gin-gonic/gin"
 )
 
 type PageResult struct {
 	List  interface{} `json:"list"`
-	Total int         `json:"total"`
+	Total int64       `json:"total"`
 	//Page     int         `json:"page"`
 	PageSize int `json:"page_size"`
 }

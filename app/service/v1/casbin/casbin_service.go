@@ -63,7 +63,7 @@ func (c *CasbinStruct) getConditionMaps() map[string]interface{} {
 	return maps
 }
 
-func (c *CasbinStruct) Count() (int, error) {
+func (c *CasbinStruct) Count() (int64, error) {
 	whereSql, values, err := model.BuildCondition(c.getConditionMaps())
 	if err != nil {
 		return 0, err

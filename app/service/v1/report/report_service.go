@@ -11,7 +11,7 @@ type ReportStruct struct {
 	ActivityId int    `json:"activity_id" form:"activity_id" validate:"omitempty,numeric,min=1,max=10"`
 }
 
-func GetReportUserCountByPhoneAndActivityID(mobile string, activityId int) int {
+func GetReportUserCountByPhoneAndActivityID(mobile string, activityId int) int64 {
 	return model.GetReportUserCount(model.Report{Phone: mobile, ActivityId: activityId})
 }
 

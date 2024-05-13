@@ -66,7 +66,7 @@ func (u *RoleStruct) getConditionMaps() map[string]interface{} {
 	return maps
 }
 
-func (u *RoleStruct) Count() (int, error) {
+func (u *RoleStruct) Count() (int64, error) {
 	whereSql, values, err := model.BuildCondition(u.getConditionMaps())
 	if err != nil {
 		return 0, err
