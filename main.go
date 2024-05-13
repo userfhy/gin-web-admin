@@ -6,12 +6,16 @@ import (
 	"gin-web-admin/app/middleware"
 	model "gin-web-admin/app/models"
 	"gin-web-admin/common"
+	"gin-web-admin/utils/casbin"
 	"gin-web-admin/utils/logging"
+
 	//"gin-web-admin/common/validator"
 	"gin-web-admin/routers"
 	"gin-web-admin/utils/gredis"
 	"gin-web-admin/utils/setting"
+
 	"github.com/gin-gonic/gin"
+
 	//"github.com/gin-gonic/gin/binding"
 	"net/http"
 	"os"
@@ -26,6 +30,11 @@ func init() {
 	setting.Setup()
 	model.Setup()
 	common.InitValidate()
+
+	// 初始化路由权限 在这初始化的目的： 避免每次访问路由查询数据库
+	// 如果更改路由权限 需要重新调用一下这个方法
+	casbin.SetupCasbin()
+
 	if setting.RedisSetting.Host != "" {
 		gredis.Setup()
 	}

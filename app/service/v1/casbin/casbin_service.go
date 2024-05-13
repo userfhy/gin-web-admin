@@ -20,8 +20,8 @@ type AddCasbinStruct struct {
 }
 
 func CreateCasbin(n AddCasbinStruct) error {
-	return model.CreatCasbin(model.CasbinRule{
-		PType: "p",
+	return model.CreatCasbin(model.CasbinRuleM{
+		Ptype: "p",
 		V0:    n.V0,
 		V1:    n.V1,
 		V2:    n.V2,
@@ -35,7 +35,7 @@ func UpdateCasbin(id int, u AddCasbinStruct) bool {
 	updates := make(map[string]interface{})
 	updates["v1"] = u.V1
 	updates["v2"] = u.V2
-	error, rowsAffected := model.Update(&model.CasbinRule{}, wheres, updates)
+	error, rowsAffected := model.Update(&model.CasbinRuleM{}, wheres, updates)
 	if rowsAffected == 0 {
 		log.Println("修改Casbin失败！")
 		log.Println(error)
@@ -69,10 +69,10 @@ func (c *CasbinStruct) Count() (int64, error) {
 		return 0, err
 	}
 
-	return model.GetTotal(model.CasbinRule{}, whereSql, values)
+	return model.GetTotal(model.CasbinRuleM{}, whereSql, values)
 }
 
-func (c *CasbinStruct) GetAll() ([]*model.CasbinRule, error) {
+func (c *CasbinStruct) GetAll() ([]*model.CasbinRuleM, error) {
 	whereSql, values, err := model.BuildCondition(c.getConditionMaps())
 	if err != nil {
 		return nil, err
