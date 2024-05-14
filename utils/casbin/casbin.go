@@ -7,10 +7,10 @@ import (
 )
 
 var (
-	CasbinEnforcer *casbin.Enforcer
+	CasbinEnforcer *casbin.SyncedEnforcer
 )
 
-func SetupCasbin() *casbin.Enforcer {
+func SetupCasbin() *casbin.SyncedEnforcer {
 	CasbinEnforcer = model.SetupCasbin()
 	return CasbinEnforcer
 }

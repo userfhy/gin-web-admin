@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"gorm.io/gorm"
@@ -21,7 +23,7 @@ func (CasbinRuleM) TableName() string {
 	return "casbin_rule"
 }
 
-func SetupCasbin() *casbin.Enforcer {
+func SetupCasbin() *casbin.SyncedEnforcer {
 	// a, _ := gormadapter.NewAdapter(setting.DatabaseSetting.Type, fmt.Sprintf("%s:%s@tcp(%s)/%s",
 	// 	setting.DatabaseSetting.User,
 	// 	setting.DatabaseSetting.Password,
@@ -32,7 +34,7 @@ func SetupCasbin() *casbin.Enforcer {
 	// )
 
 	a, _ := gormadapter.NewAdapterByDBWithCustomTable(db, &CasbinRuleM{})
-	e, _ := casbin.NewEnforcer("conf/rbac_model.conf", a)
+	e, _ := casbin.NewSyncedEnforcer("conf/rbac_model.conf", a)
 
 	// Or you can use an existing DB "abc" like this:
 	// The adapter will use the table named "casbin_rule".
@@ -40,7 +42,10 @@ func SetupCasbin() *casbin.Enforcer {
 	// a := gormadapter.NewAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/abc", true)
 
 	// Load the policy from DB.
-	_ = e.LoadPolicy()
+	// _ = e.LoadPolicy()
+
+	// Refresh every 12 hours.
+	e.StartAutoLoadPolicy(12 * time.Hour)
 
 	// Check the permission.
 	/*    check, _ := e.Enforce("alice", "data1", "read")

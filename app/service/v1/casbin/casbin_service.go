@@ -58,8 +58,8 @@ func (c *CasbinStruct) getConditionMaps() map[string]interface{} {
 	if c.V2 != "" {
 		maps["v2"] = c.V2
 	}
-	log.Println(c)
-	log.Println(maps)
+	// log.Println(c)
+	// log.Println(maps)
 	return maps
 }
 
