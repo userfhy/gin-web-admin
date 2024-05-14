@@ -1,5 +1,7 @@
 package model
 
+import "log"
+
 type JwtBlacklist struct {
 	BaseModel
 	UserID uint   `json:"user_id"`
@@ -12,8 +14,9 @@ func (JwtBlacklist) TableName() string {
 
 func CreateBlockList(userId uint, jwt string) error {
 	table := JwtBlacklist{UserID: userId, Jwt: jwt}
-	res := db.Create(table)
+	res := db.Create(&table)
 	if err := res.Error; err != nil {
+		log.Println(err)
 		return err
 	}
 	return nil
