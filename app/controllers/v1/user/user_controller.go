@@ -5,8 +5,9 @@ import (
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @Summary 创建用户
@@ -52,43 +53,43 @@ func CreateUser(c *gin.Context) {
 // @Success 200 {object} common.Response
 // @Failure 500 {object} common.Response
 // @Router /user [get]
-func GetUsers(c *gin.Context) {
-	appG := common.Gin{C: c}
+// func GetUsers(c *gin.Context) {
+// 	appG := common.Gin{C: c}
 
-	_, errStr, p, n := utils.GetPage(c)
-	if errStr != "" {
-		appG.Response(http.StatusBadRequest, code.InvalidParams, errStr, nil)
-		return
-	}
+// 	_, errStr, p, n := utils.GetPage(c)
+// 	if errStr != "" {
+// 		appG.Response(http.StatusBadRequest, code.InvalidParams, errStr, nil)
+// 		return
+// 	}
 
-	userServiceObj := userService.UserStruct{
-		PageNum:  p,
-		PageSize: n,
-	}
+// 	userServiceObj := userService.UserStruct{
+// 		PageNum:  p,
+// 		PageSize: n,
+// 	}
 
-	total, err := userServiceObj.Count()
-	if err != nil {
-		appG.Response(http.StatusInternalServerError, code.ERROR, "获取页数失败"+err.Error(), nil)
-		return
-	}
+// 	total, err := userServiceObj.Count()
+// 	if err != nil {
+// 		appG.Response(http.StatusInternalServerError, code.ERROR, "获取页数失败"+err.Error(), nil)
+// 		return
+// 	}
 
-	userArr, err := userServiceObj.GetAll()
-	if err != nil {
-		appG.Response(http.StatusInternalServerError, code.ERROR, "服务器错误"+err.Error(), nil)
-		return
-	}
+// 	userArr, err := userServiceObj.GetAll()
+// 	if err != nil {
+// 		appG.Response(http.StatusInternalServerError, code.ERROR, "服务器错误"+err.Error(), nil)
+// 		return
+// 	}
 
-	/*    var uIndex []userService.TestList
-	      for i := range userArr {
-	          uIndex = append(uIndex, userService.TestList{Index: i + 1, Auth: userArr[i]})
-	          //log.Println(userArr[i])
-	      }
-	      log.Println(uIndex)*/
+// 	/*    var uIndex []userService.TestList
+// 	      for i := range userArr {
+// 	          uIndex = append(uIndex, userService.TestList{Index: i + 1, Auth: userArr[i]})
+// 	          //log.Println(userArr[i])
+// 	      }
+// 	      log.Println(uIndex)*/
 
-	data := utils.PageResult{
-		List:     userArr,
-		Total:    total,
-		PageSize: n,
-	}
-	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
-}
+// 	data := utils.PageResult{
+// 		List:     userArr,
+// 		Total:    total,
+// 		PageSize: n,
+// 	}
+// 	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
+// }

@@ -74,9 +74,11 @@ func CreatCasbin(casbin CasbinRuleM) error {
 	return nil
 }
 
-func GetCasbinRuleList(pageNum int, pageSize int, whereSql string, values []interface{}) ([]*CasbinRuleM, error) {
+func GetCasbinRuleList(pageNum int, pageSize int, where map[string]interface{}) ([]*CasbinRuleM, error) {
 	var casbinRuleList []*CasbinRuleM
-	err := db.Select("*").Where(whereSql, values...).Offset(pageNum).Limit(pageSize).Find(&casbinRuleList).Error
+
+	db, _ := BuildCondition(db, where)
+	err := db.Select("*").Offset(pageNum).Limit(pageSize).Find(&casbinRuleList).Error
 
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err

@@ -7,8 +7,9 @@ import (
 	"gin-web-admin/utils/casbin"
 	"gin-web-admin/utils/code"
 	"gin-web-admin/utils/com"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @Summary 创建规则

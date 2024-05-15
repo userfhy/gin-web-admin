@@ -64,21 +64,11 @@ func (c *CasbinStruct) getConditionMaps() map[string]interface{} {
 }
 
 func (c *CasbinStruct) Count() (int64, error) {
-	whereSql, values, err := model.BuildCondition(c.getConditionMaps())
-	if err != nil {
-		return 0, err
-	}
-
-	return model.GetTotal(model.CasbinRuleM{}, whereSql, values)
+	return model.GetTotal(model.CasbinRuleM{}, c.getConditionMaps())
 }
 
 func (c *CasbinStruct) GetAll() ([]*model.CasbinRuleM, error) {
-	whereSql, values, err := model.BuildCondition(c.getConditionMaps())
-	if err != nil {
-		return nil, err
-	}
-
-	casbins, err := model.GetCasbinRuleList(c.PageNum, c.PageSize, whereSql, values)
+	casbins, err := model.GetCasbinRuleList(c.PageNum, c.PageSize, c.getConditionMaps())
 	if err != nil {
 		return nil, err
 	}

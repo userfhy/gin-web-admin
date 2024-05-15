@@ -14,7 +14,7 @@ type Claims struct {
 	Username string `json:"user_name"`
 	RoleKey  string `json:"role_key"`
 	IsAdmin  bool   `json:"is_admin"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 // GenerateToken generate tokens used for auth
@@ -29,10 +29,10 @@ func GenerateToken(userClaims Claims) (string, error) {
 		userClaims.Username,
 		userClaims.RoleKey,
 		userClaims.IsAdmin,
-		jwt.StandardClaims{
+		jwt.RegisteredClaims{
 			Issuer:    "gin-web-admin",
-			IssuedAt:  time.Now().Unix(),
-			ExpiresAt: expireTime.Unix(),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(expireTime),
 		},
 	}
 

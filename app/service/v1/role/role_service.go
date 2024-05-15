@@ -18,7 +18,7 @@ type UpdateRoleStruct struct {
 	// 角色名称
 	RoleName string `json:"role_name" form:"role_name" validate:"required,min=4,max=10" minLength:"4" maxLength:"10"`
 	// 备注
-	Remark string `json:"remark" form:"remark" validate:"min=4,max=100" minLength:"4" maxLength:"100"`
+	Remark string `json:"remark" form:"remark" validate:"omitempty,min=4,max=100" minLength:"4" maxLength:"100"`
 }
 
 type CreateRoleStruct struct {
@@ -62,28 +62,23 @@ func UpdateRole(roleId int, u UpdateRoleStruct) bool {
 
 func (u *RoleStruct) getConditionMaps() map[string]interface{} {
 	maps := make(map[string]interface{})
-	//maps["deleted_at"] = nil
+	maps["deleted_at is"] = nil
 	return maps
 }
 
 func (u *RoleStruct) Count() (int64, error) {
-	whereSql, values, err := model.BuildCondition(u.getConditionMaps())
+	count, err := model.GetTotal(model.Role{}, u.getConditionMaps())
 	if err != nil {
 		return 0, err
 	}
-
-	return model.GetTotal(model.Role{}, whereSql, values)
+	return count, nil
 }
 
 func (u *RoleStruct) GetAll() ([]*model.Role, error) {
-	whereSql, values, err := model.BuildCondition(u.getConditionMaps())
-	if err != nil {
-		return nil, err
-	}
-	Roles, err := model.GetRoles(u.PageNum, u.PageSize, whereSql, values)
+	roles, err := model.GetRoles(u.PageNum, u.PageSize, u.getConditionMaps())
 	if err != nil {
 		return nil, err
 	}
 
-	return Roles, nil
+	return roles, nil
 }

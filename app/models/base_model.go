@@ -24,6 +24,11 @@ type JSONTime struct {
 	time.Time
 }
 
+type PaginateStruct struct {
+	PageNum  int
+	PageSize int
+}
+
 type BaseModel struct {
 	ID        uint      `gorm:"primary_key" json:"id"`
 	CreatedAt JSONTime  `gorm:"column:created_at" json:"created_at"`
@@ -103,6 +108,11 @@ func Setup() {
 	)
 }
 
+func DBClose() {
+	sql, _ := db.DB()
+	sql.Close()
+}
+
 // MarshalJSON on JSONTime format Time field with %Y-%m-%d %H:%M:%S
 func (t JSONTime) MarshalJSON() ([]byte, error) {
 	if t.IsZero() {
@@ -143,7 +153,8 @@ func (v BaseModel) BeforeUpdate(scope *gorm.Scope) error {
 }*/
 
 func SoftDelete(tableStruct interface{}) (error, int64) {
-	res := db.Delete(tableStruct)
+	log.Println(tableStruct)
+	res := db.Model(tableStruct).Update("deleted_at", time.Now())
 	if err := res.Error; err != nil {
 		return err, 0
 	}
@@ -158,92 +169,59 @@ func Update(tableStruct interface{}, wheres map[string]interface{}, updates map[
 	return nil, res.RowsAffected
 }
 
-func GetTotal(tableStruct interface{}, whereSql string, values []interface{}) (int64, error) {
+func GetTotal(tableStruct interface{}, where map[string]interface{}) (int64, error) {
 	var count int64
-	if err := db.Model(tableStruct).Where(whereSql, values...).Count(&count).Error; err != nil {
+	var dbData, err = BuildCondition(db, where)
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return 0, err
+	}
+
+	if err := dbData.Model(tableStruct).Count(&count).Error; err != nil {
 		return 0, err
 	}
 
 	return count, nil
 }
 
-//func GetTotal(maps interface{}) (int, error) {
-//    var count int
-//    if err := db.Model(&Auth{}).Where(maps).Count(&count).Error; err != nil {
-//        return 0, err
-//    }
-//
-//    return count, nil
-//}
-//
-//// GetTestUsers gets a list of users based on paging constraints
-//func GetList(pageNum int, pageSize int, maps interface{}) ([]*interface{}, error) {
-//    var user [] *Auth
-//    err := db.Where(maps).Offset(pageNum).Limit(pageSize).Find(&user).Error
-//    if err != nil && err != gorm.ErrRecordNotFound {
-//        return nil, err
-//    }
-//
-//    return user, nil
-//}
-
-func BuildCondition(where map[string]interface{}) (whereSql string, values []interface{}, err error) {
+func BuildCondition(d *gorm.DB, where map[string]interface{}) (*gorm.DB, error) {
 	for key, value := range where {
 		conditionKey := strings.Split(key, " ")
 		if len(conditionKey) > 2 {
-			return "", nil, fmt.Errorf("" +
-				"map构建的条件格式不对，类似于'age >'")
+			return nil, fmt.Errorf("map构建的条件格式不对，类似于'age >'")
 		}
-		if whereSql != "" {
-			whereSql += " AND "
-		}
-		switch len(conditionKey) {
-		case 1:
-			whereSql += fmt.Sprint(conditionKey[0], " = ?")
-			values = append(values, value)
-			break
-		case 2:
-			field := conditionKey[0]
-			switch conditionKey[1] {
-			case "=":
-				whereSql += fmt.Sprint(field, " = ?")
-				values = append(values, value)
-				break
-			case ">":
-				whereSql += fmt.Sprint(field, " > ?")
-				values = append(values, value)
-				break
-			case ">=":
-				whereSql += fmt.Sprint(field, " >= ?")
-				values = append(values, value)
-				break
-			case "<":
-				whereSql += fmt.Sprint(field, " < ?")
-				values = append(values, value)
-				break
-			case "<=":
-				whereSql += fmt.Sprint(field, " <= ?")
-				values = append(values, value)
-				break
-			case "in":
-				whereSql += fmt.Sprint(field, " in (?)")
-				values = append(values, value)
-				break
-			case "like":
-				whereSql += fmt.Sprint(field, " like ?")
-				values = append(values, value)
-				break
-			case "<>":
-				whereSql += fmt.Sprint(field, " != ?")
-				values = append(values, value)
-				break
-			case "!=":
-				whereSql += fmt.Sprint(field, " != ?")
-				values = append(values, value)
-				break
+
+		field := conditionKey[0]
+		operator := conditionKey[1]
+
+		switch operator {
+		case "=":
+			d = d.Where(fmt.Sprintf("%s = ?", field), value)
+		case ">":
+			d = d.Where(fmt.Sprintf("%s > ?", field), value)
+		case ">=":
+			d = d.Where(fmt.Sprintf("%s >= ?", field), value)
+		case "<":
+			d = d.Where(fmt.Sprintf("%s < ?", field), value)
+		case "<=":
+			d = d.Where(fmt.Sprintf("%s <= ?", field), value)
+		case "in":
+			d = d.Where(fmt.Sprintf("%s IN (?)", field), value)
+		case "like":
+			d = d.Where(fmt.Sprintf("%s LIKE ?", field), value)
+		case "<>", "!=":
+			d = d.Where(fmt.Sprintf("%s != ?", field), value)
+		case "is":
+			if value == nil {
+				d = d.Where(fmt.Sprintf("%s IS NULL", field))
+			} else {
+				d = d.Where(fmt.Sprintf("%s = ?", field), value)
 			}
-			break
+		default:
+			return nil, fmt.Errorf("不支持的操作符：%s", operator)
 		}
 	}
-	return
+
+	return d, nil
 }

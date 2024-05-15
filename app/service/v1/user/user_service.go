@@ -76,12 +76,8 @@ func JoinBlockList(userId uint, jwt string) {
 
 func InBlockList(jwt string) (int64, error) {
 	wheres := make(map[string]interface{})
-	wheres["jwt"] = jwt
-	whereSql, values, err := model.BuildCondition(wheres)
-	if err != nil {
-		return 0, err
-	}
-	return model.GetTotal(model.JwtBlacklist{}, whereSql, values)
+	wheres["jwt ="] = jwt
+	return model.GetTotal(model.JwtBlacklist{}, wheres)
 }
 
 func CreateUser(newUser AddUserStruct) error {
@@ -93,11 +89,7 @@ func CreateUser(newUser AddUserStruct) error {
 }
 
 func (u *UserStruct) Count() (int64, error) {
-	whereSql, values, err := model.BuildCondition(u.getConditionMaps())
-	if err != nil {
-		return 0, err
-	}
-	return model.GetTotal(model.Auth{}, whereSql, values)
+	return model.GetTotal(model.Auth{}, u.getConditionMaps())
 }
 
 func (u *UserStruct) GetAll() ([]*model.Auth, error) {

@@ -14,7 +14,7 @@ type Auth struct {
 	Username   string   `gorm:"Size:20;UNIQUE_INDEX;NOT NULL;" json:"user_name"`
 	Password   string   `gorm:"Size:50;NOT NULL;" json:"-"`
 	RoleName   string   `gorm:"-" json:"role_name"`
-	Role       Role     `gorm:"foreignkey:RoleId;association_foreignkey:RoleId;" json:"-"`
+	Role       Role     `gorm:"foreignkey:RoleId;" json:"-"`
 }
 
 func (Auth) TableName() string {

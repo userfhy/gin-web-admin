@@ -2,12 +2,13 @@ package authController
 
 import (
 	model "gin-web-admin/app/models"
-	"gin-web-admin/app/service/v1/user"
+	userService "gin-web-admin/app/service/v1/user"
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @Summary User Login
