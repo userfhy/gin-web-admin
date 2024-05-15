@@ -1,18 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "{{.Description}}",
-        "title": "{{.Title}}",
         "termsOfService": "https://github.com/fanhengyuan/gin-web-admin",
         "contact": {},
         "license": {
             "name": "MIT",
             "url": "https://github.com/fanhengyuan/gin-web-admin/blob/master/LICENSE"
-        },
-        "version": "{{.Version}}"
+        }
     },
-    "host": "{{.Host}}",
-    "basePath": "{{.BasePath}}",
     "paths": {
         "/casbin": {
             "get": {
@@ -58,14 +53,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -95,7 +88,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/casbinService.AddCasbinStruct"
                         }
                     }
@@ -104,14 +96,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -150,7 +140,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/casbinService.AddCasbinStruct"
                         }
                     }
@@ -159,14 +148,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -203,7 +190,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/casbinService.AddCasbinStruct"
                         }
                     }
@@ -212,14 +198,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -246,7 +230,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/userService.AuthStruct"
                         }
                     }
@@ -255,7 +238,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -282,7 +264,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/reportService.ReportStruct"
                         }
                     }
@@ -291,7 +272,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -336,14 +316,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -380,7 +358,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/roleService.CreateRoleStruct"
                         }
                     }
@@ -389,14 +366,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -435,7 +410,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/roleService.UpdateRoleStruct"
                         }
                     }
@@ -444,14 +418,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -487,14 +459,40 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sys/menu_list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get router list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SYS"
+                ],
+                "summary": "菜单列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -523,7 +521,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -557,14 +554,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -593,7 +588,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -638,14 +632,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -675,7 +667,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/userService.AddUserStruct"
                         }
                     }
@@ -684,14 +675,12 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -723,7 +712,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/userService.ChangePasswordStruct"
                         }
                     }
@@ -732,7 +720,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -761,7 +748,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -790,7 +776,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/common.Response"
                         }
                     }
@@ -810,16 +795,19 @@
                 "v0": {
                     "description": "role_key",
                     "type": "string",
+                    "maxLength": 20,
                     "minLength": 3
                 },
                 "v1": {
                     "description": "path",
                     "type": "string",
+                    "maxLength": 30,
                     "minLength": 4
                 },
                 "v2": {
                     "description": "method",
                     "type": "string",
+                    "maxLength": 8,
                     "minLength": 2
                 }
             }
@@ -830,9 +818,7 @@
                 "code": {
                     "type": "integer"
                 },
-                "data": {
-                    "type": "object"
-                },
+                "data": {},
                 "msg": {
                     "type": "string"
                 }
@@ -846,14 +832,18 @@
             ],
             "properties": {
                 "activity_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 10,
+                    "minimum": 1
                 },
                 "name": {
                     "type": "string",
+                    "maxLength": 10,
                     "minLength": 1
                 },
                 "phone": {
                     "type": "string",
+                    "maxLength": 15,
                     "minLength": 4
                 }
             }
@@ -913,13 +903,16 @@
             "properties": {
                 "password": {
                     "type": "string",
+                    "maxLength": 20,
                     "minLength": 4
                 },
                 "role_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "user_name": {
                     "type": "string",
+                    "maxLength": 20,
                     "minLength": 4
                 }
             }
@@ -933,10 +926,12 @@
             "properties": {
                 "password": {
                     "type": "string",
+                    "maxLength": 20,
                     "minLength": 4
                 },
                 "user_name": {
                     "type": "string",
+                    "maxLength": 20,
                     "minLength": 4
                 }
             }
@@ -950,10 +945,12 @@
             "properties": {
                 "new_password": {
                     "type": "string",
+                    "maxLength": 20,
                     "minLength": 6
                 },
                 "old_password": {
                     "type": "string",
+                    "maxLength": 20,
                     "minLength": 4
                 }
             }

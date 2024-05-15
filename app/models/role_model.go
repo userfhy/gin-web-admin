@@ -10,9 +10,9 @@ type Role struct {
 	RoleName  string    `gorm:"type:varchar(128);" json:"role_name"` // 角色名称
 	IsAdmin   bool      `gorm:"type:int(1);DEFAULT:0;NOT NULL;" json:"is_admin"`
 	Status    int       `gorm:"type:int(1);DEFAULT:0;NOT NULL;" json:"status"`
-	RoleKey   string    `gorm:"type:varchar(128);UNIQUE_INDEX;" json:"role_key"` //角色代码
-	RoleSort  int       `gorm:"type:int(4);" json:"role_sort"`                   //角色排序
-	Remark    string    `gorm:"type:varchar(255);" json:"remark"`                //备注
+	RoleKey   string    `gorm:"type:varchar(128);unique;" json:"role_key"` //角色代码
+	RoleSort  int       `gorm:"type:int(4);" json:"role_sort"`             //角色排序
+	Remark    string    `gorm:"type:varchar(255);" json:"remark"`          //备注
 	Params    string    `gorm:"-" json:"params"`
 	MenuIds   []int     `gorm:"-" json:"menu_ids"`
 }

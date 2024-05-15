@@ -1,17 +1,19 @@
-basePath: '{{.BasePath}}'
 definitions:
   casbinService.AddCasbinStruct:
     properties:
       v0:
         description: role_key
+        maxLength: 20
         minLength: 3
         type: string
       v1:
         description: path
+        maxLength: 30
         minLength: 4
         type: string
       v2:
         description: method
+        maxLength: 8
         minLength: 2
         type: string
     required:
@@ -23,19 +25,22 @@ definitions:
     properties:
       code:
         type: integer
-      data:
-        type: object
+      data: {}
       msg:
         type: string
     type: object
   reportService.ReportStruct:
     properties:
       activity_id:
+        maximum: 10
+        minimum: 1
         type: integer
       name:
+        maxLength: 10
         minLength: 1
         type: string
       phone:
+        maxLength: 15
         minLength: 4
         type: string
     required:
@@ -80,11 +85,14 @@ definitions:
   userService.AddUserStruct:
     properties:
       password:
+        maxLength: 20
         minLength: 4
         type: string
       role_id:
+        minimum: 0
         type: integer
       user_name:
+        maxLength: 20
         minLength: 4
         type: string
     required:
@@ -94,9 +102,11 @@ definitions:
   userService.AuthStruct:
     properties:
       password:
+        maxLength: 20
         minLength: 4
         type: string
       user_name:
+        maxLength: 20
         minLength: 4
         type: string
     required:
@@ -106,25 +116,23 @@ definitions:
   userService.ChangePasswordStruct:
     properties:
       new_password:
+        maxLength: 20
         minLength: 6
         type: string
       old_password:
+        maxLength: 20
         minLength: 4
         type: string
     required:
     - new_password
     - old_password
     type: object
-host: '{{.Host}}'
 info:
   contact: {}
-  description: '{{.Description}}'
   license:
     name: MIT
     url: https://github.com/fanhengyuan/gin-web-admin/blob/master/LICENSE
   termsOfService: https://github.com/fanhengyuan/gin-web-admin
-  title: '{{.Title}}'
-  version: '{{.Version}}'
 paths:
   /casbin:
     get:
@@ -153,12 +161,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 规则列表
@@ -175,7 +181,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/casbinService.AddCasbinStruct'
-          type: object
       produces:
       - application/json
       responses:
@@ -183,12 +188,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 创建规则
@@ -211,7 +214,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/casbinService.AddCasbinStruct'
-          type: object
       produces:
       - application/json
       responses:
@@ -219,12 +221,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 删除规则
@@ -246,7 +246,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/casbinService.AddCasbinStruct'
-          type: object
       produces:
       - application/json
       responses:
@@ -254,12 +253,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 修改规则
@@ -277,7 +274,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/userService.AuthStruct'
-          type: object
       produces:
       - application/json
       responses:
@@ -285,7 +281,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       summary: User Login
       tags:
       - Auth
@@ -301,7 +296,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/reportService.ReportStruct'
-          type: object
       produces:
       - application/json
       responses:
@@ -309,7 +303,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       summary: Report Information
       tags:
       - Report
@@ -336,12 +329,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 角色列表
@@ -363,7 +354,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/roleService.CreateRoleStruct'
-          type: object
       produces:
       - application/json
       responses:
@@ -371,12 +361,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 添加角色
@@ -400,12 +388,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 删除角色
@@ -427,7 +413,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/roleService.UpdateRoleStruct'
-          type: object
       produces:
       - application/json
       responses:
@@ -435,17 +420,32 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 修改角色
       tags:
       - Role
+  /sys/menu_list:
+    get:
+      consumes:
+      - application/json
+      description: get router list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 菜单列表
+      tags:
+      - SYS
   /sys/router:
     get:
       consumes:
@@ -458,7 +458,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 后端存在路由列表
@@ -479,12 +478,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: Base64 Decode
@@ -502,7 +499,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: Ping
@@ -531,12 +527,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 用户列表
@@ -553,7 +547,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/userService.AddUserStruct'
-          type: object
       produces:
       - application/json
       responses:
@@ -561,12 +554,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 创建用户
@@ -584,7 +575,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/userService.ChangePasswordStruct'
-          type: object
       produces:
       - application/json
       responses:
@@ -592,7 +582,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 修改密码
@@ -610,7 +599,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: 当前登录用户信息
@@ -628,7 +616,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/common.Response'
-            type: object
       security:
       - ApiKeyAuth: []
       summary: User Logout

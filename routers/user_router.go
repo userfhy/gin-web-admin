@@ -16,8 +16,8 @@ func InitUserRouter(Router *gin.RouterGroup) {
 		middleware.JWTHandler(),
 		middleware.CasbinHandler())
 	{
-		user.POST("", userController.CreateUser) // 创建用户
-		// user.GET("", userController.GetUsers)                       // 用户列表
+		// user.POST("", userController.CreateUser)                    // 创建用户
+		user.GET("", userController.GetUsers)                       // 用户列表
 		user.PUT("/logout", authController.UserLogout)              // 登出
 		user.PUT("/change_password", authController.ChangePassword) // 修改密码
 		user.GET("/logged_in", authController.GetLoggedInUser)      // 当前登录用户信息

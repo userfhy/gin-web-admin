@@ -5,9 +5,10 @@ import (
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @Summary Ping
