@@ -11,7 +11,7 @@
  Target Server Version : 80036
  File Encoding         : 65001
 
- Date: 13/05/2024 13:23:39
+ Date: 15/05/2024 17:24:18
 */
 
 SET NAMES utf8mb4;
@@ -22,25 +22,25 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `blog_auth`;
 CREATE TABLE `blog_auth` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `created_at` datetime(3) DEFAULT NULL,
   `updated_at` datetime(3) DEFAULT NULL,
   `deleted_at` datetime(3) DEFAULT NULL,
-  `role_id` int NOT NULL DEFAULT '0',
+  `role_id` tinyint NOT NULL DEFAULT '0',
   `status` int NOT NULL DEFAULT '0',
   `logged_in_at` datetime(3) DEFAULT NULL,
   `username` varchar(20) NOT NULL,
   `password` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_blog_auth_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `uni_blog_auth_username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of blog_auth
 -- ----------------------------
 BEGIN;
-INSERT INTO `blog_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`) VALUES (1, NULL, '2024-05-13 11:27:36.809', NULL, 1, 0, '2024-05-13 11:27:36.808', 'admin', '1B44F66F94C34FB0485462E883D81AB5');
-INSERT INTO `blog_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`) VALUES (2, NULL, '2021-10-27 17:00:41.000', NULL, 2, 0, '2021-10-27 17:00:41.000', 'editor', '1B44F66F94C34FB0485462E883D81AB5');
+INSERT INTO `blog_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`) VALUES (1, '2024-05-10 16:39:36.066', '2024-05-15 16:39:36.066', NULL, 1, 0, '2024-05-15 16:39:36.066', 'admin', '1B44F66F94C34FB0485462E883D81AB5');
+INSERT INTO `blog_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`) VALUES (2, '2024-05-10 16:39:36.066', '2024-05-15 16:21:54.388', NULL, 2, 0, '2024-05-15 16:21:54.387', 'editor', '1B44F66F94C34FB0485462E883D81AB5');
 COMMIT;
 
 -- ----------------------------
@@ -56,14 +56,16 @@ CREATE TABLE `blog_jwt_blacklist` (
   `jwt` text,
   PRIMARY KEY (`id`),
   KEY `idx_blog_jwt_blacklist_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of blog_jwt_blacklist
 -- ----------------------------
 BEGIN;
-INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (1, '2021-10-27 11:36:40.000', '2021-10-27 11:36:40.000', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiZXhwIjoxNjM1MzUwNDAwLCJpYXQiOjE2MzUzMDQ0MTIsImlzcyI6Imdpbi10ZXN0In0.qsfy-DV4cfkrV3mimq_kIqWNYJJkSdiaWiFmW2K37v8');
-INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (2, '2021-10-27 16:54:24.000', '2021-10-27 16:54:24.000', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiZXhwIjoxNjM1MzUwNDAwLCJpYXQiOjE2MzUzMjQ0MjQsImlzcyI6Imdpbi10ZXN0In0.PlFXCJS5gbCKFAkjun-vmo8SwPHHIJnWCeqWw_rWWGQ');
+INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (3, '2024-05-14 14:50:44.163', '2024-05-14 14:50:44.163', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiZXhwIjoxNzE1NzAyNDAwLCJpYXQiOjE3MTU2NTgzODksImlzcyI6Imdpbi13ZWItYWRtaW4ifQ.jEUASHI6B1BCLcMetQPkWRlic-kAMJkoUHJGtNDC2h8');
+INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (4, '2024-05-15 13:21:52.807', '2024-05-15 13:21:52.807', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiZXhwIjoxNzE1Nzg4ODAwLCJpYXQiOjE3MTU3NDkyMjAsImlzcyI6Imdpbi13ZWItYWRtaW4ifQ.7UwwI2eTx823xzRhMYN_59rB0FKR4W_CnFccv2tnD4M');
+INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (5, '2024-05-15 16:23:51.839', '2024-05-15 16:23:51.839', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX25hbWUiOiJlZGl0b3IiLCJyb2xlX2tleSI6ImVkaXRvciIsImlzX2FkbWluIjpmYWxzZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNTc4ODgwMCwiaWF0IjoxNzE1NzU5NzQ1fQ.Dawl8F1vxLRQNDh5D3wKsC6VpDaAvstkREziEAkvIls');
+INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (6, '2024-05-15 16:38:04.504', '2024-05-15 16:38:04.504', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNTc4ODgwMCwiaWF0IjoxNzE1NzYxNDMyfQ.3rPps_qjG0JsC7t9UOoAcWBYN8cUmwXPCyP_xGmLt1c');
 COMMIT;
 
 -- ----------------------------
@@ -143,16 +145,22 @@ CREATE TABLE `blog_role` (
   `role_sort` int DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`role_id`),
-  KEY `idx_blog_role_deleted_at` (`deleted_at`),
-  CONSTRAINT `fk_blog_auth_role` FOREIGN KEY (`role_id`) REFERENCES `blog_auth` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `uni_blog_role_role_key` (`role_key`),
+  KEY `idx_blog_role_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of blog_role
 -- ----------------------------
 BEGIN;
-INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (1, NULL, '2021-11-05 10:39:00.000', NULL, '超管223331', 1, 0, 'admin', NULL, '超级管理员');
+INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (1, NULL, '2024-05-15 17:23:36.794', NULL, '超管2233', 1, 0, 'admin', NULL, '超级管理员2');
 INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (2, '2021-10-27 16:49:28.000', '2021-10-27 16:49:28.000', NULL, '编辑角色', 0, 0, 'editor', 0, '1111111111');
+INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (8, '2024-05-14 16:14:47.162', '2024-05-14 16:18:34.497', '2024-05-14 16:18:34.497', '测试2222', 0, 0, 'test2', 0, '');
+INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (9, '2024-05-15 10:43:47.471', '2024-05-15 10:43:47.471', NULL, '222222', 0, 0, '2222222', 0, '22222222');
+INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (10, '2024-05-15 10:43:52.160', '2024-05-15 10:43:52.160', NULL, '33333', 0, 0, '33333', 0, '3333333');
+INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (11, '2024-05-15 10:43:57.720', '2024-05-15 10:44:16.904', '2024-05-15 10:44:16.904', '444444', 0, 0, '4444444', 0, '444444');
+INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (12, '2024-05-15 10:44:07.488', '2024-05-15 10:44:07.488', NULL, '55555', 0, 0, '55555', 0, '55555');
+INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (13, '2024-05-15 10:44:25.257', '2024-05-15 10:44:25.257', NULL, '6666', 0, 0, '6666', 0, '66666ce测试');
 COMMIT;
 
 -- ----------------------------
@@ -173,14 +181,15 @@ CREATE TABLE `casbin_rule` (
   `v5` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_index` (`v0`,`v1`,`v2`,`v3`,`v4`,`v5`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of casbin_rule
 -- ----------------------------
 BEGIN;
-INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (1, '2021-10-27 16:52:33.000', '2021-11-05 14:21:22.000', NULL, 'p', 'editor', '/v1/api/user/change_password', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (1, '2021-10-27 16:52:33.000', '2024-05-15 13:02:07.100', NULL, 'p', 'editor', '/v1/api/user/change_password', 'PUT', '', '', '');
 INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (2, '2021-10-27 17:00:15.000', '2021-10-27 17:00:29.000', NULL, 'p', 'editor', '/v1/api/user/logged_in', 'GET', '', '', '');
+INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (4, '2024-05-14 11:57:08.044', '2024-05-14 11:57:08.044', NULL, 'p', 'editor', '/v1/api/role', 'POST', '', '', '');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

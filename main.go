@@ -40,9 +40,9 @@ func init() {
 	}
 }
 
-// @termsOfService https://github.com/fanhengyuan/gin-web-admin
+// @termsOfService https://github.com/userfhy/gin-web-admin
 // @license.name MIT
-// @license.url https://github.com/fanhengyuan/gin-web-admin/blob/master/LICENSE
+// @license.url https://github.com/userfhy/gin-web-admin/blob/master/LICENSE
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header like: Bearer xxxx

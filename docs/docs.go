@@ -9,11 +9,11 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "https://github.com/fanhengyuan/gin-web-admin",
+        "termsOfService": "https://github.com/userfhy/gin-web-admin",
         "contact": {},
         "license": {
             "name": "MIT",
-            "url": "https://github.com/fanhengyuan/gin-web-admin/blob/master/LICENSE"
+            "url": "https://github.com/userfhy/gin-web-admin/blob/master/LICENSE"
         },
         "version": "{{.Version}}"
     },

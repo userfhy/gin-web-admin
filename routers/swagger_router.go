@@ -13,8 +13,8 @@ import (
 
 func InitSwaggerRouter(Router *gin.Engine) {
 	// programmatically set swagger info
-	docs.SwaggerInfo.Title = "Gin Web Test."
-	docs.SwaggerInfo.Description = "An example of gin."
+	docs.SwaggerInfo.Title = "Gin Web Admin."
+	docs.SwaggerInfo.Description = "Build web admin with gin-gonic."
 	docs.SwaggerInfo.Version = "1.0"
 
 	configHost := ""

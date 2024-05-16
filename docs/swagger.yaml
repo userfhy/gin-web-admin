@@ -131,8 +131,8 @@ info:
   contact: {}
   license:
     name: MIT
-    url: https://github.com/fanhengyuan/gin-web-admin/blob/master/LICENSE
-  termsOfService: https://github.com/fanhengyuan/gin-web-admin
+    url: https://github.com/userfhy/gin-web-admin/blob/master/LICENSE
+  termsOfService: https://github.com/userfhy/gin-web-admin
 paths:
   /casbin:
     get:
