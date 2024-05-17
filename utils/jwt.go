@@ -18,11 +18,14 @@ type Claims struct {
 }
 
 // GenerateToken generate tokens used for auth
-func GenerateToken(userClaims Claims) (string, error) {
+func GenerateToken(userClaims Claims) (string, time.Time, error) {
 	nowTime := time.Now()
-	zeroTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location())
+
 	// 明天零点
-	expireTime := zeroTime.Add(time.Hour * 24)
+	// zeroTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location())
+	// expireTime := zeroTime.Add(time.Second * 24)
+
+	expireTime := nowTime.Add(time.Second * 5)
 
 	claims := Claims{
 		userClaims.UserId,
@@ -39,7 +42,7 @@ func GenerateToken(userClaims Claims) (string, error) {
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := tokenClaims.SignedString(jwtSecret)
 
-	return token, err
+	return token, expireTime, err
 }
 
 // ParseToken parsing token

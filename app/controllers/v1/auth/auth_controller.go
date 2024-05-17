@@ -40,9 +40,10 @@ func UserLogin(c *gin.Context) {
 	RCode := code.InvalidParams
 	isExist, userId, roleKey, isAdmin := model.CheckAuth(userLogin.Username, userLogin.Password)
 	if isExist {
-		token, err := utils.GenerateToken(utils.Claims{
+		username := userLogin.Username
+		token, expireTime, err := utils.GenerateToken(utils.Claims{
 			UserId:   userId,
-			Username: userLogin.Username,
+			Username: username,
 			RoleKey:  roleKey,
 			IsAdmin:  isAdmin,
 		})
@@ -52,6 +53,13 @@ func UserLogin(c *gin.Context) {
 			// 设置登录时间
 			userService.SetLoggedTime(userId)
 			data["token"] = token
+			data["accessToken"] = token
+			data["refreshToken"] = token
+			data["success"] = true
+			data["username"] = username
+			data["nickname"] = username
+			data["roles"] = [1]string{roleKey}
+			data["expires"] = expireTime.Format("2006/01/02 15:04:05")
 
 			RCode = code.SUCCESS
 		}
