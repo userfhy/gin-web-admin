@@ -1,17 +1,19 @@
 package setting
 
 import (
-	"github.com/go-ini/ini"
 	"log"
 	"time"
+
+	"github.com/go-ini/ini"
 )
 
 type App struct {
-	JwtSecret    string
-	PasswordSalt string
-	PrefixUrl    string
-	TimeFormat   string
-	EnabledCORS  bool
+	JwtSecret       string
+	PasswordSalt    string
+	PrefixUrl       string
+	TimeFormat      string
+	EnabledCORS     bool
+	ExpireTimeFomat string
 }
 
 var AppSetting = &App{}

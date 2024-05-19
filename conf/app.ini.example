@@ -4,6 +4,7 @@ JwtSecret = 233
 PasswordSalt = fgyf
 PrefixUrl = http://127.0.0.1:8080
 TimeFormat = 20060102
+expireTimeFomat = 2006/01/02 15:04:05
 EnabledCORS = false
 
 [server]

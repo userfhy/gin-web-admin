@@ -1,12 +1,17 @@
 package userService
 
 import (
+	"fmt"
 	model "gin-web-admin/app/models"
 	"gin-web-admin/utils"
 	"log"
 	"strings"
 	"time"
 )
+
+type RefreshAccessTokenhStruct struct {
+	RefreshToken string `json:"refreshToken" form:"refresh_token" validate:"required"`
+}
 
 // 用户登录
 type AuthStruct struct {
@@ -39,21 +44,57 @@ type TestList struct {
 
 func (u *UserStruct) getConditionMaps() map[string]interface{} {
 	maps := make(map[string]interface{})
-	//maps["deleted_at"] = nil
+	maps["deleted_at is"] = nil
 	return maps
 }
 
-// 设置登录时间
-func SetLoggedTime(userId uint) {
+// 设置登录用户信息
+func SetLoggedUserInfo(userId uint, refreshToken string) error {
 	wheres := make(map[string]interface{})
 	wheres["id"] = userId
 
 	updates := make(map[string]interface{})
 	updates["logged_in_at"] = time.Now()
-	_, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
-	if rowsAffected == 0 {
-		log.Println("设置登录时间失败！")
+	updates["refresh_token"] = refreshToken
+	err, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
+	if err != nil {
+		return err
 	}
+	if rowsAffected == 0 {
+		log.Println("设置登录信息失败！")
+	}
+	return nil
+}
+
+func RefreshAccessToken(RefreshToken string) (map[string]interface{}, error) {
+	data := make(map[string]interface{})
+	_, err := utils.ValidateToken(RefreshToken)
+	if err != nil {
+		return data, err
+	}
+	// 判断 token 是否正确
+	user, _ := model.GetUser(map[string]interface{}{"refresh_token": RefreshToken})
+	if user.ID == 0 {
+		return data, fmt.Errorf("该access_token对应的用户信息不存在")
+	}
+
+	claims := utils.Claims{
+		UserId:   user.ID,
+		Username: user.Username,
+		RoleKey:  user.Role.RoleKey,
+		IsAdmin:  user.Role.IsAdmin,
+	}
+
+	accessToken, expireTime, err := utils.GenerateToken(claims)
+	if err != nil {
+		return data, fmt.Errorf("access_token生成失败")
+	}
+
+	data["expires"] = expireTime.Format("2006/01/02 15:04:05")
+	data["accessToken"] = accessToken
+	data["refreshToken"] = user.RefreshToken
+
+	return data, nil
 }
 
 func ChangeUserPassword(userId uint, newPassword string) bool {

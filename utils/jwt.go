@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"gin-web-admin/utils/setting"
 	"time"
 
@@ -17,24 +18,34 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// GenerateToken generate tokens used for auth
+// GenerateToken generates an access token used for auth
 func GenerateToken(userClaims Claims) (string, time.Time, error) {
+	return generateToken(userClaims, time.Second*5)
+}
+
+// GenerateRefreshToken generates a refresh token used for auth
+func GenerateRefreshToken(userClaims Claims) (string, time.Time, error) {
+	// RefreshToken 7天过期
+	var timeExpiresNumber = time.Hour * 24 * 7
+
 	nowTime := time.Now()
+	expireTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location()).Add(timeExpiresNumber)
+	return generateToken(userClaims, expireTime.Sub(nowTime))
+}
 
-	// 明天零点
-	// zeroTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location())
-	// expireTime := zeroTime.Add(time.Second * 24)
-
-	expireTime := nowTime.Add(time.Second * 5)
+// generateToken generates a JWT token with a specified duration from now
+func generateToken(userClaims Claims, duration time.Duration) (string, time.Time, error) {
+	nowTime := time.Now()
+	expireTime := nowTime.Add(duration)
 
 	claims := Claims{
-		userClaims.UserId,
-		userClaims.Username,
-		userClaims.RoleKey,
-		userClaims.IsAdmin,
-		jwt.RegisteredClaims{
+		UserId:   userClaims.UserId,
+		Username: userClaims.Username,
+		RoleKey:  userClaims.RoleKey,
+		IsAdmin:  userClaims.IsAdmin,
+		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "gin-web-admin",
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			IssuedAt:  jwt.NewNumericDate(nowTime),
 			ExpiresAt: jwt.NewNumericDate(expireTime),
 		},
 	}
@@ -58,4 +69,24 @@ func ParseToken(token string) (*Claims, error) {
 	}
 
 	return nil, err
+}
+
+// 验证 JWT token 是否有效
+func ValidateToken(tokenString string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+		return jwtSecret, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, errors.New("invalid token")
 }

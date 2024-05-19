@@ -9,7 +9,8 @@ import (
 )
 
 func InitUserRouter(Router *gin.RouterGroup) {
-	Router.POST("/login", authController.UserLogin) // 登录
+	Router.POST("/login", authController.UserLogin)                  // 登录
+	Router.POST("/refresh_token", authController.RefreshAccessToken) // 刷新access_token
 
 	user := Router.Group("/user").Use(
 		middleware.TranslationHandler(),

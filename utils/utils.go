@@ -2,11 +2,12 @@ package utils
 
 import (
 	"encoding/base64"
-	"github.com/gin-gonic/gin"
 	"log"
 	"runtime"
 	"time"
 	"unicode"
+
+	"github.com/gin-gonic/gin"
 )
 
 var FormatTime = "2006-01-02 15:04:05"
@@ -60,7 +61,7 @@ func HandleError(c *gin.Context, httpCode int, errCode int, msg string, err erro
 		log.Printf("[Error]: %s\nFile: %s Line: %d  %t", err, file, line, ok)
 
 		//PrintStack()
-		c.JSON(httpCode, gin.H{"data": nil, "code": errCode, "msg": msg, "error": err.Error()})
+		c.JSON(httpCode, gin.H{"success": false, "data": nil, "code": errCode, "msg": msg, "error": err.Error()})
 		return true
 	}
 

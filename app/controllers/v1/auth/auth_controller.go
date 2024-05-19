@@ -6,10 +6,13 @@ import (
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+var ExpireTimeFomat = "2006/01/02 15:04:05"
 
 // @Summary User Login
 // @Description 用户登录
@@ -31,43 +34,80 @@ func UserLogin(c *gin.Context) {
 
 	// 验证绑定结构体参数
 	err, parameterErrorStr := common.CheckBindStructParameter(userLogin, c)
-	if err != nil {
-		appG.Response(http.StatusBadRequest, code.InvalidParams, parameterErrorStr, nil)
+	if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
 		return
 	}
 
 	data := make(map[string]interface{})
 	RCode := code.InvalidParams
 	isExist, userId, roleKey, isAdmin := model.CheckAuth(userLogin.Username, userLogin.Password)
-	if isExist {
-		username := userLogin.Username
-		token, expireTime, err := utils.GenerateToken(utils.Claims{
-			UserId:   userId,
-			Username: username,
-			RoleKey:  roleKey,
-			IsAdmin:  isAdmin,
-		})
-		if err != nil {
-			RCode = code.ErrorAuthToken
-		} else {
-			// 设置登录时间
-			userService.SetLoggedTime(userId)
-			data["token"] = token
-			data["accessToken"] = token
-			data["refreshToken"] = token
-			data["success"] = true
-			data["username"] = username
-			data["nickname"] = username
-			data["roles"] = [1]string{roleKey}
-			data["expires"] = expireTime.Format("2006/01/02 15:04:05")
 
-			RCode = code.SUCCESS
-		}
-	} else {
+	if !isExist {
 		RCode = code.ErrorUserPasswordInvalid
+		appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), data)
+		return
 	}
 
+	username := userLogin.Username
+	claims := utils.Claims{
+		UserId:   userId,
+		Username: username,
+		RoleKey:  roleKey,
+		IsAdmin:  isAdmin,
+	}
+
+	accessToken, expireTime, err := utils.GenerateToken(claims)
+	if utils.HandleError(c, http.StatusOK, code.ErrorAuthToken, "access_token生成失败", err) {
+		log.Println("Error generating access token: ", err)
+		return
+	}
+
+	// Implement and assign refresh token
+	refreshToken, _, refreshErr := utils.GenerateRefreshToken(claims)
+	if utils.HandleError(c, http.StatusOK, code.ErrorAuthToken, "refresh_token生成失败", refreshErr) {
+		log.Println("Error generating refresh token: ", refreshErr)
+		return
+	}
+
+	// Set the logged-in user information
+	userService.SetLoggedUserInfo(userId, refreshToken)
+
+	// Prepare the response data
+	data["accessToken"] = accessToken
+	data["refreshToken"] = refreshToken
+	data["success"] = true
+	data["username"] = username
+	data["nickname"] = username
+	data["roles"] = [1]string{roleKey}
+	data["expires"] = expireTime.Format(ExpireTimeFomat)
+
+	RCode = code.SUCCESS
 	appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), data)
+}
+
+// @Summary User RefreshAccessToken
+// @Description 刷新用户access_token
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Tags User
+// @Success 200 {object} common.Response
+// @Router /user/logout [put]
+func RefreshAccessToken(c *gin.Context) {
+	appG := common.Gin{C: c}
+	var refreshAccessTokenhStruct userService.RefreshAccessTokenhStruct
+	if err := c.ShouldBindJSON(&refreshAccessTokenhStruct); err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
+	}
+
+	data, err := userService.RefreshAccessToken(refreshAccessTokenhStruct.RefreshToken)
+	if utils.HandleError(c, http.StatusOK, code.ErrorAuthToken, "access_token刷新失败", err) {
+		log.Println("Error token: ", err)
+		return
+	}
+
+	appG.Response(http.StatusOK, code.SUCCESS, "刷新access_token成功！", data)
 }
 
 // @Summary User Logout
@@ -77,7 +117,7 @@ func UserLogin(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Tags User
 // @Success 200 {object} common.Response
-// @Router /user/logout [put]
+// @Router /user/refresh_token [post]
 func UserLogout(c *gin.Context) {
 	appG := common.Gin{C: c}
 	claims, _ := c.Get("claims")
