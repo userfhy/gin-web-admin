@@ -1,5 +1,8 @@
 ## Gin Web Admin
 
+### Web admin frontend project
+There: [web-admin-frontend](https://github.com/userfhy/web-admin-frontend)
+
 ## First Run
 
 ```bash
