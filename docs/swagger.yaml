@@ -28,6 +28,8 @@ definitions:
       data: {}
       msg:
         type: string
+      success:
+        type: boolean
     type: object
   reportService.ReportStruct:
     properties:
@@ -126,6 +128,13 @@ definitions:
     required:
     - new_password
     - old_password
+    type: object
+  userService.RefreshAccessTokenhStruct:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
     type: object
 info:
   contact: {}
@@ -282,6 +291,30 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
       summary: User Login
+      tags:
+      - Auth
+  /refresh_token:
+    post:
+      consumes:
+      - application/json
+      description: 刷新用户access_token
+      parameters:
+      - description: 根据refresh_token 刷新access_token
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/userService.RefreshAccessTokenhStruct'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Auth RefreshAccessToken
       tags:
       - Auth
   /report:
@@ -605,7 +638,7 @@ paths:
       tags:
       - User
   /user/logout:
-    put:
+    post:
       consumes:
       - application/json
       description: 用户登出

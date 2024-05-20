@@ -57,14 +57,14 @@ func UserLogin(c *gin.Context) {
 	}
 
 	accessToken, expireTime, err := utils.GenerateToken(claims)
-	if utils.HandleError(c, http.StatusOK, code.ErrorAuthToken, "access_token生成失败", err) {
+	if utils.HandleError(c, http.StatusOK, code.AccessTokenFailure, code.GetMsg(code.AccessTokenFailure), err) {
 		log.Println("Error generating access token: ", err)
 		return
 	}
 
 	// Implement and assign refresh token
 	refreshToken, _, refreshErr := utils.GenerateRefreshToken(claims)
-	if utils.HandleError(c, http.StatusOK, code.ErrorAuthToken, "refresh_token生成失败", refreshErr) {
+	if utils.HandleError(c, http.StatusOK, code.RefreshAccessTokenFailure, code.GetMsg(code.RefreshAccessTokenFailure), refreshErr) {
 		log.Println("Error generating refresh token: ", refreshErr)
 		return
 	}
@@ -74,25 +74,26 @@ func UserLogin(c *gin.Context) {
 
 	// Prepare the response data
 	data["accessToken"] = accessToken
+	data["token"] = accessToken
 	data["refreshToken"] = refreshToken
-	data["success"] = true
 	data["username"] = username
 	data["nickname"] = username
 	data["roles"] = [1]string{roleKey}
 	data["expires"] = expireTime.Format(ExpireTimeFomat)
 
 	RCode = code.SUCCESS
-	appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), data)
+	appG.Response(http.StatusOK, RCode, "用户登录成功", data)
 }
 
-// @Summary User RefreshAccessToken
+// @Summary Auth RefreshAccessToken
 // @Description 刷新用户access_token
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Tags User
+// @Tags Auth
+// @Param payload body userService.RefreshAccessTokenhStruct true "根据refresh_token 刷新access_token"、
 // @Success 200 {object} common.Response
-// @Router /user/logout [put]
+// @Router /refresh_token [post]
 func RefreshAccessToken(c *gin.Context) {
 	appG := common.Gin{C: c}
 	var refreshAccessTokenhStruct userService.RefreshAccessTokenhStruct
@@ -117,7 +118,7 @@ func RefreshAccessToken(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Tags User
 // @Success 200 {object} common.Response
-// @Router /user/refresh_token [post]
+// @Router /user/logout [post]
 func UserLogout(c *gin.Context) {
 	appG := common.Gin{C: c}
 	claims, _ := c.Get("claims")

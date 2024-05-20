@@ -4,6 +4,7 @@ import (
 	"fmt"
 	model "gin-web-admin/app/models"
 	"gin-web-admin/utils"
+	"gin-web-admin/utils/code"
 	"log"
 	"strings"
 	"time"
@@ -87,7 +88,7 @@ func RefreshAccessToken(RefreshToken string) (map[string]interface{}, error) {
 
 	accessToken, expireTime, err := utils.GenerateToken(claims)
 	if err != nil {
-		return data, fmt.Errorf("access_token生成失败")
+		return data, fmt.Errorf(code.GetMsg(code.AccessTokenFailure))
 	}
 
 	data["expires"] = expireTime.Format("2006/01/02 15:04:05")
@@ -113,6 +114,7 @@ func ChangeUserPassword(userId uint, newPassword string) bool {
 
 func JoinBlockList(userId uint, jwt string) {
 	_ = model.CreateBlockList(userId, jwt)
+	_, _ = model.Update(model.Auth{}, map[string]interface{}{"id": userId}, map[string]interface{}{"refresh_token": userId})
 }
 
 func InBlockList(jwt string) (int64, error) {

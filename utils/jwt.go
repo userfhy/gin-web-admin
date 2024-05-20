@@ -20,15 +20,14 @@ type Claims struct {
 
 // GenerateToken generates an access token used for auth
 func GenerateToken(userClaims Claims) (string, time.Time, error) {
-	return generateToken(userClaims, time.Second*5)
+	return generateToken(userClaims, time.Hour*2)
 }
 
 // GenerateRefreshToken generates a refresh token used for auth
 func GenerateRefreshToken(userClaims Claims) (string, time.Time, error) {
-	// RefreshToken 7天过期
-	var timeExpiresNumber = time.Hour * 24 * 7
-
 	nowTime := time.Now()
+	// RefreshToken 7天后零点过期
+	var timeExpiresNumber = time.Hour * 24 * 7
 	expireTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location()).Add(timeExpiresNumber)
 	return generateToken(userClaims, expireTime.Sub(nowTime))
 }
