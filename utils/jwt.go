@@ -2,10 +2,11 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"gin-web-admin/utils/setting"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var jwtSecret = []byte(setting.AppSetting.JwtSecret)
@@ -61,9 +62,15 @@ func ParseToken(token string) (*Claims, error) {
 		return jwtSecret, nil
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
 			return claims, nil
+		} else {
+			return nil, fmt.Errorf("invalid token")
 		}
 	}
 
