@@ -28,7 +28,7 @@ type ChangePasswordStruct struct {
 // 添加用户
 type AddUserStruct struct {
 	AuthStruct
-	RoleId int `json:"role_id" validate:"omitempty,numeric,min=0"`
+	RoleId uint `json:"role_id" validate:"omitempty,numeric,min=0"`
 }
 
 type UserStruct struct {

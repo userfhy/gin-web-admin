@@ -8,14 +8,14 @@ import (
 
 type Auth struct {
 	BaseModel
-	RoleId       int      `gorm:"Size:4;DEFAULT:0;NOT NULL;" json:"role_id"`
+	RoleId       uint     `gorm:"DEFAULT:0;NOT NULL;" json:"role_id"`
 	Status       int      `gorm:"type:int(1);DEFAULT:0;NOT NULL;" json:"status"`
 	LoggedInAt   JSONTime `json:"logged_in_at"`
 	Username     string   `gorm:"Size:20;unique;NOT NULL;" json:"user_name"`
 	Password     string   `gorm:"Size:50;NOT NULL;" json:"-"`
-	RefreshToken string   `gorm:"Size:800;unique;default:''" json:"refresh_token"`
+	RefreshToken string   `gorm:"Size:600;unique;default:''" json:"refresh_token"`
 	RoleName     string   `gorm:"-" json:"role_name"`
-	Role         Role     `gorm:"foreignkey:RoleId;" json:"-"`
+	Role         Role     `gorm:"foreignkey:RoleId" json:"-"`
 }
 
 func (Auth) TableName() string {
