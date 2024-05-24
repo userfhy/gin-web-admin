@@ -1,6 +1,7 @@
-## Gin Web Admin
+# Gin Web Admin
 
-### Web admin frontend project
+## Web admin frontend project
+
 [web-admin-frontend](https://github.com/userfhy/web-admin-frontend)
 
 ## First Run
@@ -25,8 +26,8 @@ CGO_ENABLED=0 GOOS=windows GOARCH=amd64  go build -a -ldflags '-extldflags "-sta
 CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' .
 ```
 
+## Logs
 
-#### Logs
 ```bash
 $ go run main.go 
 2020/06/28 15:42:40 [info] Redis connected 192.168.3.5:6379 DB: 0
@@ -76,6 +77,7 @@ Please check the instructions for use.
 [gin-swagger](https://github.com/swaggo/gin-swagger)
 
 ### Generate
+
 ```bash
 $ swag init
 2019/08/22 16:17:11 Generate swagger docs....
@@ -151,16 +153,16 @@ func GetPage(c *gin.Context) (error, string, int, int) {
 
 ## Features
 
+- [Gin-gonic](https://github.com/gin-gonic/gin)
 - [Gorm](https://github.com/go-gorm/gorm)
 - [Swagger(swag)](https://github.com/swaggo/swag)
-- [Gin-gonic](https://github.com/gin-gonic/gin)
 - [Go-ini](https://github.com/go-ini/ini)
 - [Redis](https://github.com/gomodule/redigo)
 - [Air](https://github.com/cosmtrek/air)
-- [JWT](https://github.com/dgrijalva/jwt-go)
+- [JWT](https://github.com/golang-jwt/jwt)
 - [Casbin](https://github.com/casbin/casbin)
 - [Gorm-adapter](https://github.com/casbin/gorm-adapter)
 
 ## License
 
-MIT
+[MIT](https://github.com/userfhy/gin-web-admin/blob/dev/LICENSE)

@@ -87,9 +87,10 @@ func GetUsers(c *gin.Context) {
 	      log.Println(uIndex)*/
 
 	data := utils.PageResult{
-		List:     userArr,
-		Total:    total,
-		PageSize: n,
+		List:        userArr,
+		Total:       total,
+		CurrentPage: p,
+		PageSize:    n,
 	}
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
 }

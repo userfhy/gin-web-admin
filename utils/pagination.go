@@ -11,12 +11,13 @@ type PageResult struct {
 	List  interface{} `json:"list"`
 	Total int64       `json:"total"`
 	//Page     int         `json:"page"`
-	PageSize int `json:"page_size"`
+	PageSize    int `json:"pageSize"`
+	CurrentPage int `json:"currentPage"`
 }
 
 type Page struct {
-	P uint `json:"p" form:"p" validate:"required,numeric,min=1"`
-	N uint `json:"n" form:"n" validate:"required,numeric,min=1"`
+	P uint `json:"p" form:"p" validate:"numeric" default:"1"`
+	N uint `json:"n" form:"n" validate:"numeric" default:"15"`
 }
 
 // GetPage get page parameters

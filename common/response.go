@@ -16,8 +16,12 @@ type Response struct {
 }
 
 func (g *Gin) Response(httpCode, errCode int, msg string, data interface{}) {
+	Success := true
+	if errCode != 200 {
+		Success = false
+	}
 	g.C.JSON(httpCode, Response{
-		Success: true,
+		Success: Success,
 		Code:    errCode,
 		Msg:     msg,
 		Data:    data,

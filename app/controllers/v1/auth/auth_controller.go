@@ -40,11 +40,16 @@ func UserLogin(c *gin.Context) {
 
 	data := make(map[string]interface{})
 	RCode := code.InvalidParams
-	isExist, userId, roleKey, isAdmin := model.CheckAuth(userLogin.Username, userLogin.Password)
+	isExist, userId, roleKey, isAdmin, status := model.CheckAuth(userLogin.Username, userLogin.Password)
 
 	if !isExist {
 		RCode = code.ErrorUserPasswordInvalid
 		appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), data)
+		return
+	}
+
+	if status == 0 {
+		appG.Response(http.StatusOK, code.ErrorAuth, "该用户已被禁用", data)
 		return
 	}
 
@@ -156,10 +161,15 @@ func ChangePassword(c *gin.Context) {
 	claims, _ := c.Get("claims")
 	user := claims.(*utils.Claims)
 
-	isExist, userId, _, _ := model.CheckAuth(user.Username, userChangePassword.OldPassword)
+	isExist, userId, _, _, status := model.CheckAuth(user.Username, userChangePassword.OldPassword)
 	if !isExist {
 		RCode := code.ErrorUserOldPasswordInvalid
 		appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), nil)
+		return
+	}
+
+	if status == 0 {
+		appG.Response(http.StatusOK, code.ErrorAuth, "该用户已被禁用", nil)
 		return
 	}
 
