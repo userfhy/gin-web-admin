@@ -23,7 +23,7 @@ User = root
 Password = root
 Host = 127.0.0.1:3306
 Name = blog
-TablePrefix = blog_
+TablePrefix = gin_
 
 [redis]
 # Host not "" enable
