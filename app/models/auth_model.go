@@ -48,7 +48,7 @@ func GetUser(maps map[string]interface{}) (*Auth, error) {
 	var user *Auth
 	err := db.Select("*").Where(maps).Preload(
 		"Role", func(db *gorm.DB) *gorm.DB {
-			return db.Select("role_id,role_name")
+			return db.Select("*")
 		}).First(&user).Error
 
 	if err != nil && err != gorm.ErrRecordNotFound {

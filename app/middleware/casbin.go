@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/casbin"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func CasbinHandler() gin.HandlerFunc {
