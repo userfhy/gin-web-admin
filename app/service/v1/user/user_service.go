@@ -32,7 +32,9 @@ type AddUserStruct struct {
 }
 
 type UserStruct struct {
-	ID int `json:"id"`
+	ID       int    `json:"id"`
+	Username string `form:"username"`
+	Status   string `form:"status" validate:"omitempty,numeric,min=0"`
 
 	PageNum  int
 	PageSize int
@@ -46,6 +48,17 @@ type TestList struct {
 func (u *UserStruct) getConditionMaps() map[string]interface{} {
 	maps := make(map[string]interface{})
 	maps["deleted_at is"] = nil
+	// log.Println(u.Username)
+	if u.Username != "" {
+		maps["username like"] = "%" + u.Username + "%"
+	}
+
+	if u.Status == "0" {
+		maps["status ="] = 0
+	} else if u.Status == "1" {
+		maps["status ="] = 1
+	}
+
 	return maps
 }
 

@@ -189,7 +189,8 @@ func BuildCondition(d *gorm.DB, where map[string]interface{}) (*gorm.DB, error) 
 	for key, value := range where {
 		conditionKey := strings.Split(key, " ")
 		if len(conditionKey) != 2 {
-			return nil, fmt.Errorf("map构建的条件格式不对，类似于'age >'")
+			// return nil, fmt.Errorf("map构建的条件格式不对，类似于'age >'")
+			return nil, fmt.Errorf("map构建的条件格式不对")
 		}
 
 		field := conditionKey[0]
