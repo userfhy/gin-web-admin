@@ -9,16 +9,22 @@ type Gin struct {
 }
 
 type Response struct {
-	Code int         `json:"code"`
-	Msg  string      `json:"msg"`
-	Data interface{} `json:"data"`
+	Success bool        `json:"success"`
+	Code    int         `json:"code"`
+	Msg     string      `json:"msg"`
+	Data    interface{} `json:"data"`
 }
 
 func (g *Gin) Response(httpCode, errCode int, msg string, data interface{}) {
+	Success := true
+	if errCode != 200 {
+		Success = false
+	}
 	g.C.JSON(httpCode, Response{
-		Code: errCode,
-		Msg:  msg,
-		Data: data,
+		Success: Success,
+		Code:    errCode,
+		Msg:     msg,
+		Data:    data,
 	})
 
 	return

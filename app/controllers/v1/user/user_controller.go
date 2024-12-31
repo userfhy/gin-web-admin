@@ -62,9 +62,13 @@ func GetUsers(c *gin.Context) {
 		return
 	}
 
-	userServiceObj := userService.UserStruct{
-		PageNum:  p,
-		PageSize: n,
+	var userServiceObj userService.UserStruct
+	userServiceObj.PageNum = p
+	userServiceObj.PageSize = n
+
+	err := c.ShouldBindQuery(&userServiceObj)
+	if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
+		return
 	}
 
 	total, err := userServiceObj.Count()
@@ -87,9 +91,10 @@ func GetUsers(c *gin.Context) {
 	      log.Println(uIndex)*/
 
 	data := utils.PageResult{
-		List:     userArr,
-		Total:    total,
-		PageSize: n,
+		List:        userArr,
+		Total:       total,
+		CurrentPage: p,
+		PageSize:    n,
 	}
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
 }

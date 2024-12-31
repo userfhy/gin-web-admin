@@ -3,165 +3,19 @@
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 80036
+ Source Server Version : 80400
  Source Host           : 192.168.1.128:3306
  Source Schema         : blog
 
  Target Server Type    : MySQL
- Target Server Version : 80036
+ Target Server Version : 80400
  File Encoding         : 65001
 
- Date: 15/05/2024 17:24:18
+ Date: 22/05/2024 09:49:51
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
-
--- ----------------------------
--- Table structure for blog_auth
--- ----------------------------
-DROP TABLE IF EXISTS `blog_auth`;
-CREATE TABLE `blog_auth` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` datetime(3) DEFAULT NULL,
-  `updated_at` datetime(3) DEFAULT NULL,
-  `deleted_at` datetime(3) DEFAULT NULL,
-  `role_id` tinyint NOT NULL DEFAULT '0',
-  `status` int NOT NULL DEFAULT '0',
-  `logged_in_at` datetime(3) DEFAULT NULL,
-  `username` varchar(20) NOT NULL,
-  `password` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uni_blog_auth_username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- ----------------------------
--- Records of blog_auth
--- ----------------------------
-BEGIN;
-INSERT INTO `blog_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`) VALUES (1, '2024-05-10 16:39:36.066', '2024-05-15 16:39:36.066', NULL, 1, 0, '2024-05-15 16:39:36.066', 'admin', '1B44F66F94C34FB0485462E883D81AB5');
-INSERT INTO `blog_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`) VALUES (2, '2024-05-10 16:39:36.066', '2024-05-15 16:21:54.388', NULL, 2, 0, '2024-05-15 16:21:54.387', 'editor', '1B44F66F94C34FB0485462E883D81AB5');
-COMMIT;
-
--- ----------------------------
--- Table structure for blog_jwt_blacklist
--- ----------------------------
-DROP TABLE IF EXISTS `blog_jwt_blacklist`;
-CREATE TABLE `blog_jwt_blacklist` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` datetime(3) DEFAULT NULL,
-  `updated_at` datetime(3) DEFAULT NULL,
-  `deleted_at` datetime(3) DEFAULT NULL,
-  `user_id` bigint unsigned DEFAULT NULL,
-  `jwt` text,
-  PRIMARY KEY (`id`),
-  KEY `idx_blog_jwt_blacklist_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- ----------------------------
--- Records of blog_jwt_blacklist
--- ----------------------------
-BEGIN;
-INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (3, '2024-05-14 14:50:44.163', '2024-05-14 14:50:44.163', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiZXhwIjoxNzE1NzAyNDAwLCJpYXQiOjE3MTU2NTgzODksImlzcyI6Imdpbi13ZWItYWRtaW4ifQ.jEUASHI6B1BCLcMetQPkWRlic-kAMJkoUHJGtNDC2h8');
-INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (4, '2024-05-15 13:21:52.807', '2024-05-15 13:21:52.807', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiZXhwIjoxNzE1Nzg4ODAwLCJpYXQiOjE3MTU3NDkyMjAsImlzcyI6Imdpbi13ZWItYWRtaW4ifQ.7UwwI2eTx823xzRhMYN_59rB0FKR4W_CnFccv2tnD4M');
-INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (5, '2024-05-15 16:23:51.839', '2024-05-15 16:23:51.839', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX25hbWUiOiJlZGl0b3IiLCJyb2xlX2tleSI6ImVkaXRvciIsImlzX2FkbWluIjpmYWxzZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNTc4ODgwMCwiaWF0IjoxNzE1NzU5NzQ1fQ.Dawl8F1vxLRQNDh5D3wKsC6VpDaAvstkREziEAkvIls');
-INSERT INTO `blog_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (6, '2024-05-15 16:38:04.504', '2024-05-15 16:38:04.504', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNTc4ODgwMCwiaWF0IjoxNzE1NzYxNDMyfQ.3rPps_qjG0JsC7t9UOoAcWBYN8cUmwXPCyP_xGmLt1c');
-COMMIT;
-
--- ----------------------------
--- Table structure for blog_menu
--- ----------------------------
-DROP TABLE IF EXISTS `blog_menu`;
-CREATE TABLE `blog_menu` (
-  `menu_id` int NOT NULL AUTO_INCREMENT,
-  `parent_id` int DEFAULT NULL,
-  `sort` int DEFAULT NULL,
-  `menu_name` varchar(11) DEFAULT NULL COMMENT '''路由名称''',
-  `path` varchar(128) DEFAULT NULL COMMENT '''路由路径''',
-  `paths` varchar(128) DEFAULT NULL,
-  `component` varchar(255) DEFAULT NULL COMMENT '''组件路径''',
-  `title` varchar(64) DEFAULT NULL COMMENT '''菜单标题''',
-  `icon` varchar(128) DEFAULT NULL,
-  `menu_type` varchar(1) DEFAULT NULL,
-  `permission` varchar(32) DEFAULT NULL,
-  `visible` int DEFAULT '0',
-  `is_frame` int DEFAULT '0',
-  `created_at` datetime(3) DEFAULT NULL,
-  `updated_at` datetime(3) DEFAULT NULL,
-  `deleted_at` datetime(3) DEFAULT NULL,
-  PRIMARY KEY (`menu_id`),
-  KEY `idx_blog_menu_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- ----------------------------
--- Records of blog_menu
--- ----------------------------
-BEGIN;
-INSERT INTO `blog_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (1, 0, 1, 'Upms', '/upms', NULL, 'Layout', '系统管理', 'example', 'M', NULL, 0, 0, '2021-11-05 15:49:22.000', '2021-11-05 15:49:30.000', NULL);
-INSERT INTO `blog_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (2, 1, 1, 'SysRole', '/permission/role', NULL, '/permission/role', '角色管理', NULL, 'M', NULL, 0, 0, '2021-11-05 15:51:53.000', '2021-11-05 15:51:57.000', NULL);
-INSERT INTO `blog_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (3, 1, 2, 'SysUser', '/permission/user', NULL, '/permission/user', '用户管理', NULL, 'M', NULL, 0, 0, '2021-11-05 16:01:20.000', '2021-11-05 16:01:24.000', NULL);
-INSERT INTO `blog_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (4, 0, 1, 'dict', NULL, NULL, NULL, '字典管理', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL);
-COMMIT;
-
--- ----------------------------
--- Table structure for blog_report
--- ----------------------------
-DROP TABLE IF EXISTS `blog_report`;
-CREATE TABLE `blog_report` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` datetime(3) DEFAULT NULL,
-  `updated_at` datetime(3) DEFAULT NULL,
-  `deleted_at` datetime(3) DEFAULT NULL,
-  `activity_id` bigint DEFAULT NULL,
-  `name` varchar(20) DEFAULT NULL,
-  `phone` varchar(30) DEFAULT NULL,
-  `ip` varchar(80) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_blog_report_deleted_at` (`deleted_at`),
-  KEY `idx_phone` (`phone`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- ----------------------------
--- Records of blog_report
--- ----------------------------
-BEGIN;
-INSERT INTO `blog_report` (`id`, `created_at`, `updated_at`, `deleted_at`, `activity_id`, `name`, `phone`, `ip`) VALUES (1, '2021-10-26 16:06:22.000', '2021-10-26 16:06:22.000', NULL, 1, '', '110000', '192.168.1.128');
-INSERT INTO `blog_report` (`id`, `created_at`, `updated_at`, `deleted_at`, `activity_id`, `name`, `phone`, `ip`) VALUES (2, '2024-05-13 11:28:54.210', '2024-05-13 11:28:54.210', NULL, 1, 'string', '123456789', '127.0.0.1');
-COMMIT;
-
--- ----------------------------
--- Table structure for blog_role
--- ----------------------------
-DROP TABLE IF EXISTS `blog_role`;
-CREATE TABLE `blog_role` (
-  `role_id` int unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` datetime(3) DEFAULT NULL,
-  `updated_at` datetime(3) DEFAULT NULL,
-  `deleted_at` datetime(3) DEFAULT NULL,
-  `role_name` varchar(128) DEFAULT NULL,
-  `is_admin` int NOT NULL DEFAULT '0',
-  `status` int NOT NULL DEFAULT '0',
-  `role_key` varchar(128) DEFAULT NULL,
-  `role_sort` int DEFAULT NULL,
-  `remark` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`role_id`),
-  UNIQUE KEY `uni_blog_role_role_key` (`role_key`),
-  KEY `idx_blog_role_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- ----------------------------
--- Records of blog_role
--- ----------------------------
-BEGIN;
-INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (1, NULL, '2024-05-15 17:23:36.794', NULL, '超管2233', 1, 0, 'admin', NULL, '超级管理员2');
-INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (2, '2021-10-27 16:49:28.000', '2021-10-27 16:49:28.000', NULL, '编辑角色', 0, 0, 'editor', 0, '1111111111');
-INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (8, '2024-05-14 16:14:47.162', '2024-05-14 16:18:34.497', '2024-05-14 16:18:34.497', '测试2222', 0, 0, 'test2', 0, '');
-INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (9, '2024-05-15 10:43:47.471', '2024-05-15 10:43:47.471', NULL, '222222', 0, 0, '2222222', 0, '22222222');
-INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (10, '2024-05-15 10:43:52.160', '2024-05-15 10:43:52.160', NULL, '33333', 0, 0, '33333', 0, '3333333');
-INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (11, '2024-05-15 10:43:57.720', '2024-05-15 10:44:16.904', '2024-05-15 10:44:16.904', '444444', 0, 0, '4444444', 0, '444444');
-INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (12, '2024-05-15 10:44:07.488', '2024-05-15 10:44:07.488', NULL, '55555', 0, 0, '55555', 0, '55555');
-INSERT INTO `blog_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (13, '2024-05-15 10:44:25.257', '2024-05-15 10:44:25.257', NULL, '6666', 0, 0, '6666', 0, '66666ce测试');
-COMMIT;
 
 -- ----------------------------
 -- Table structure for casbin_rule
@@ -190,6 +44,141 @@ BEGIN;
 INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (1, '2021-10-27 16:52:33.000', '2024-05-15 13:02:07.100', NULL, 'p', 'editor', '/v1/api/user/change_password', 'PUT', '', '', '');
 INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (2, '2021-10-27 17:00:15.000', '2021-10-27 17:00:29.000', NULL, 'p', 'editor', '/v1/api/user/logged_in', 'GET', '', '', '');
 INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (4, '2024-05-14 11:57:08.044', '2024-05-14 11:57:08.044', NULL, 'p', 'editor', '/v1/api/role', 'POST', '', '', '');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_auth
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_auth`;
+CREATE TABLE `gin_auth` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  `deleted_at` datetime(3) DEFAULT NULL,
+  `role_id` bigint unsigned NOT NULL DEFAULT '0',
+  `status` int NOT NULL DEFAULT '0',
+  `logged_in_at` datetime(3) DEFAULT NULL,
+  `username` varchar(20) NOT NULL,
+  `password` varchar(50) NOT NULL,
+  `refresh_token` varchar(600) DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uni_gin_auth_username` (`username`),
+  UNIQUE KEY `uni_gin_auth_refresh_token` (`refresh_token`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_auth
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2024-05-21 16:20:21.101', NULL, 1, 0, '2024-05-21 16:19:12.097', 'admin', 'a203793c127cf17027b2cadbbff95355', '1');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2024-05-21 16:20:21.101', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor', 'a203793c127cf17027b2cadbbff95355', '2');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_jwt_blacklist
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_jwt_blacklist`;
+CREATE TABLE `gin_jwt_blacklist` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  `deleted_at` datetime(3) DEFAULT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `jwt` text,
+  PRIMARY KEY (`id`),
+  KEY `idx_blog_jwt_blacklist_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_jwt_blacklist
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_menu
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_menu`;
+CREATE TABLE `gin_menu` (
+  `menu_id` int NOT NULL AUTO_INCREMENT,
+  `parent_id` int DEFAULT NULL,
+  `sort` int DEFAULT NULL,
+  `menu_name` varchar(11) DEFAULT NULL COMMENT '''路由名称''',
+  `path` varchar(128) DEFAULT NULL COMMENT '''路由路径''',
+  `paths` varchar(128) DEFAULT NULL,
+  `component` varchar(255) DEFAULT NULL COMMENT '''组件路径''',
+  `title` varchar(64) DEFAULT NULL COMMENT '''菜单标题''',
+  `icon` varchar(128) DEFAULT NULL,
+  `menu_type` varchar(1) DEFAULT NULL,
+  `permission` varchar(32) DEFAULT NULL,
+  `visible` int DEFAULT '0',
+  `is_frame` int DEFAULT '0',
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  `deleted_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`menu_id`),
+  KEY `idx_blog_menu_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_menu
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (1, 0, 1, 'Upms', '/upms', NULL, 'Layout', '系统管理', 'example', 'M', NULL, 0, 0, '2021-11-05 15:49:22.000', '2021-11-05 15:49:30.000', NULL);
+INSERT INTO `gin_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (2, 1, 1, 'SysRole', '/permission/role', NULL, '/permission/role', '角色管理', NULL, 'M', NULL, 0, 0, '2021-11-05 15:51:53.000', '2021-11-05 15:51:57.000', NULL);
+INSERT INTO `gin_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (3, 1, 2, 'SysUser', '/permission/user', NULL, '/permission/user', '用户管理', NULL, 'M', NULL, 0, 0, '2021-11-05 16:01:20.000', '2021-11-05 16:01:24.000', NULL);
+INSERT INTO `gin_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (4, 0, 1, 'dict', NULL, NULL, NULL, '字典管理', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_report
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_report`;
+CREATE TABLE `gin_report` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  `deleted_at` datetime(3) DEFAULT NULL,
+  `activity_id` bigint DEFAULT NULL,
+  `name` varchar(20) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `ip` varchar(80) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_phone` (`phone`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_report
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_role
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_role`;
+CREATE TABLE `gin_role` (
+  `role_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  `deleted_at` datetime(3) DEFAULT NULL,
+  `role_name` varchar(128) DEFAULT NULL,
+  `is_admin` int NOT NULL DEFAULT '0',
+  `status` int NOT NULL DEFAULT '0',
+  `role_key` varchar(128) DEFAULT NULL,
+  `role_sort` int DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`role_id`),
+  UNIQUE KEY `uni_gin_role_role_key` (`role_key`),
+  CONSTRAINT `fk_gin_auth_role` FOREIGN KEY (`role_id`) REFERENCES `gin_auth` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_role
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (1, NULL, '2024-05-21 11:03:04.239', NULL, '超管2233', 1, 0, 'admin', NULL, '超级管理员2');
+INSERT INTO `gin_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (2, '2021-10-27 16:49:28.000', '2024-05-21 11:03:06.172', NULL, '编辑角色', 0, 0, 'editor', 0, '1111111111');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

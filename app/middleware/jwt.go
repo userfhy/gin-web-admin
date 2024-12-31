@@ -1,13 +1,15 @@
 package middleware
 
 import (
+	"errors"
 	userService "gin-web-admin/app/service/v1/user"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
-	"github.com/golang-jwt/jwt/v4"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func JWTHandler() gin.HandlerFunc {
@@ -33,12 +35,16 @@ func JWTHandler() gin.HandlerFunc {
 			rCode = code.TokenInvalid
 		} else {
 			claims, err = utils.ParseToken(token)
+
 			if err != nil {
-				switch err.(*jwt.ValidationError).Errors {
-				case jwt.ValidationErrorExpired:
+				rCode = code.ErrorAuthCheckTokenFail
+				if errors.Is(err, jwt.ErrTokenMalformed) {
+					// log.Println("That's not even a token")
+				} else if errors.Is(err, jwt.ErrTokenSignatureInvalid) {
+					// log.Println("Invalid signature")
+				} else if errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenNotValidYet) {
 					rCode = code.ErrorAuthCheckTokenTimeout
-				default:
-					rCode = code.ErrorAuthCheckTokenFail
+					// log.Println("Timing is everything")
 				}
 			}
 		}

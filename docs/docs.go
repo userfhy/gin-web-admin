@@ -255,6 +255,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/refresh_token": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "刷新用户access_token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Auth RefreshAccessToken",
+                "parameters": [
+                    {
+                        "description": "根据refresh_token 刷新access_token",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userService.RefreshAccessTokenhStruct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/report": {
             "post": {
                 "description": "User Report Information",
@@ -766,7 +805,7 @@ const docTemplate = `{
             }
         },
         "/user/logout": {
-            "put": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -832,6 +871,9 @@ const docTemplate = `{
                 "data": {},
                 "msg": {
                     "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         },
@@ -963,6 +1005,17 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 4
+                }
+            }
+        },
+        "userService.RefreshAccessTokenhStruct": {
+            "type": "object",
+            "required": [
+                "refreshToken"
+            ],
+            "properties": {
+                "refreshToken": {
+                    "type": "string"
                 }
             }
         }

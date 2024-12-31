@@ -1,10 +1,12 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"gin-web-admin/utils/setting"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var jwtSecret = []byte(setting.AppSetting.JwtSecret)
@@ -17,21 +19,33 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// GenerateToken generate tokens used for auth
-func GenerateToken(userClaims Claims) (string, error) {
+// GenerateToken generates an access token used for auth
+func GenerateToken(userClaims Claims) (string, time.Time, error) {
+	return generateToken(userClaims, time.Hour*2)
+}
+
+// GenerateRefreshToken generates a refresh token used for auth
+func GenerateRefreshToken(userClaims Claims) (string, time.Time, error) {
 	nowTime := time.Now()
-	zeroTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location())
-	// 明天零点
-	expireTime := zeroTime.Add(time.Hour * 24)
+	// RefreshToken 7天后零点过期
+	var timeExpiresNumber = time.Hour * 24 * 7
+	expireTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location()).Add(timeExpiresNumber)
+	return generateToken(userClaims, expireTime.Sub(nowTime))
+}
+
+// generateToken generates a JWT token with a specified duration from now
+func generateToken(userClaims Claims, duration time.Duration) (string, time.Time, error) {
+	nowTime := time.Now()
+	expireTime := nowTime.Add(duration)
 
 	claims := Claims{
-		userClaims.UserId,
-		userClaims.Username,
-		userClaims.RoleKey,
-		userClaims.IsAdmin,
-		jwt.RegisteredClaims{
+		UserId:   userClaims.UserId,
+		Username: userClaims.Username,
+		RoleKey:  userClaims.RoleKey,
+		IsAdmin:  userClaims.IsAdmin,
+		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "gin-web-admin",
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			IssuedAt:  jwt.NewNumericDate(nowTime),
 			ExpiresAt: jwt.NewNumericDate(expireTime),
 		},
 	}
@@ -39,7 +53,7 @@ func GenerateToken(userClaims Claims) (string, error) {
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := tokenClaims.SignedString(jwtSecret)
 
-	return token, err
+	return token, expireTime, err
 }
 
 // ParseToken parsing token
@@ -48,11 +62,37 @@ func ParseToken(token string) (*Claims, error) {
 		return jwtSecret, nil
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
 			return claims, nil
+		} else {
+			return nil, fmt.Errorf("invalid token")
 		}
 	}
 
 	return nil, err
+}
+
+// 验证 JWT token 是否有效
+func ValidateToken(tokenString string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+		return jwtSecret, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, errors.New("invalid token")
 }
