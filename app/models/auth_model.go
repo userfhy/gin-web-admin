@@ -12,6 +12,10 @@ type Auth struct {
 	Status       int      `gorm:"type:int(1);DEFAULT:0;NOT NULL;" json:"status"`
 	LoggedInAt   JSONTime `json:"logged_in_at"`
 	Username     string   `gorm:"Size:20;unique;NOT NULL;" json:"user_name"`
+	Nickname     string   `gorm:"Size:30;" json:"nickname"`
+	Phone        string   `gorm:"Size:30;" json:"phone"`
+	Email        string   `gorm:"Size:40;" json:"email"`
+	Sex          int      `gorm:"type:tinyint(1) unsigned;DEFAULT:0;NOT NULL;comment:1-女 2-男" json:"sex"`
 	Password     string   `gorm:"Size:50;NOT NULL;" json:"-"`
 	RefreshToken string   `gorm:"Size:600;unique;default:''" json:"refresh_token"`
 	RoleName     string   `gorm:"-" json:"role_name"`

@@ -34,6 +34,10 @@ type AddUserStruct struct {
 type UserStruct struct {
 	ID       int    `json:"id"`
 	Username string `form:"username"`
+	Nickname string `form:"nickname"`
+	Phone    string `form:"phone"`
+	Email    string `form:"email"`
+	Sex      string `form:"sex"`
 	Status   string `form:"status" validate:"omitempty,numeric,min=0"`
 
 	PageNum  int
