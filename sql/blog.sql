@@ -1,17 +1,17 @@
 /*
- Navicat Premium Data Transfer
+ Navicat Premium Dump SQL
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 80400
+ Source Server Version : 80402 (8.4.2)
  Source Host           : 192.168.1.128:3306
  Source Schema         : blog
 
  Target Server Type    : MySQL
- Target Server Version : 80400
+ Target Server Version : 80402 (8.4.2)
  File Encoding         : 65001
 
- Date: 22/05/2024 09:49:51
+ Date: 03/01/2025 16:18:58
 */
 
 SET NAMES utf8mb4;
@@ -59,19 +59,27 @@ CREATE TABLE `gin_auth` (
   `status` int NOT NULL DEFAULT '0',
   `logged_in_at` datetime(3) DEFAULT NULL,
   `username` varchar(20) NOT NULL,
+  `nickname` varchar(30) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `email` varchar(40) DEFAULT NULL,
+  `sex` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1-女 2-男',
   `password` varchar(50) NOT NULL,
   `refresh_token` varchar(600) DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni_gin_auth_username` (`username`),
   UNIQUE KEY `uni_gin_auth_refresh_token` (`refresh_token`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of gin_auth
 -- ----------------------------
 BEGIN;
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2024-05-21 16:20:21.101', NULL, 1, 0, '2024-05-21 16:19:12.097', 'admin', 'a203793c127cf17027b2cadbbff95355', '1');
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2024-05-21 16:20:21.101', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor', 'a203793c127cf17027b2cadbbff95355', '2');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2024-12-31 11:41:42.832', NULL, 1, 1, '2024-12-31 11:41:42.831', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTczNjE3OTIwMCwiaWF0IjoxNzM1NjE2NTAyfQ.tu6YlMj33bKjH-IhDXTFQ1PPCAajxFVf7zeKTdzf0nI');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2024-08-27 11:36:07.524', NULL, 2, 1, '2024-08-27 11:34:54.024', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '2');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (3, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor2', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '3');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (4, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor3', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '4');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (5, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor4', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '5');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (6, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor5', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '6');
 COMMIT;
 
 -- ----------------------------
@@ -87,12 +95,27 @@ CREATE TABLE `gin_jwt_blacklist` (
   `jwt` text,
   PRIMARY KEY (`id`),
   KEY `idx_blog_jwt_blacklist_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of gin_jwt_blacklist
 -- ----------------------------
 BEGIN;
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (32, '2024-05-24 15:39:29.863', '2024-05-24 15:39:29.863', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzE2NTQxOTc2LCJpYXQiOjE3MTY1MzQ3NzZ9.TyZ7wLxGSKBLN9CHXjx5qhaxQQ_ErMEoo_ARbjRmwdY');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (33, '2024-05-24 16:49:32.059', '2024-05-24 16:49:32.059', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNjU0MzU3MywiaWF0IjoxNzE2NTM2MzczfQ.ibNNusn6Lv__AJQtK6Lp_8HuPomrarOdugCGInzsWlM');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (34, '2024-05-24 16:56:08.396', '2024-05-24 16:56:08.396', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNjU0ODEyMiwiaWF0IjoxNzE2NTQwOTIyfQ.kKnjAPMkVpgATyCzCIg3pF_hYkxoxTHtdHgIKwbqPEE');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (35, '2024-05-27 10:35:42.441', '2024-05-27 10:35:42.441', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzE2NzgxNzUwLCJpYXQiOjE3MTY3NzQ1NTB9.sdjry8xX2UNHlK4Ha05VZu0LVme_zcbjqp0yQqISwhQ');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (36, '2024-05-27 15:02:03.164', '2024-05-27 15:02:03.164', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzE2Nzk5NzI1LCJpYXQiOjE3MTY3OTI1MjV9.VovJoBLTgs13cJDAflfng3V3oJEOFrkApMHBZ9Q8LmY');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (37, '2024-05-27 16:30:20.148', '2024-05-27 16:30:20.148', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNjgwMDYzNywiaWF0IjoxNzE2NzkzNDM3fQ.3OYA_B4dHQcO5p6OOm3EcvwkBOhmcBYNXne2Sdvkw7c');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (38, '2024-06-08 08:59:33.010', '2024-06-08 08:59:33.010', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNzgxMzA4NSwiaWF0IjoxNzE3ODA1ODg1fQ.8VmyLhQZRBrUdn3_5_YiMfDuazg0i70GNhsK4P8VQ4M');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (39, '2024-06-08 09:01:22.238', '2024-06-08 09:01:22.238', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNzgxNTY4MiwiaWF0IjoxNzE3ODA4NDgyfQ.tYpbx7Je0MVTqpsEv4Zhvt7fpk4PkOGhv-4SPqVKqoU');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (40, '2024-06-08 09:07:33.350', '2024-06-08 09:07:33.350', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNzgxNjA1MywiaWF0IjoxNzE3ODA4ODUzfQ.dK0Yh8kwgBagXy_yL06XdcLE0TtkfN0lwAh-fWVwTHo');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (41, '2024-06-08 09:31:13.986', '2024-06-08 09:31:13.986', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNzgxNjA1NiwiaWF0IjoxNzE3ODA4ODU2fQ.iwsEhR2CxiOzmYiq7VSRSh8gUT-VlN3fbGGywiqCZGg');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (42, '2024-08-27 11:25:42.846', '2024-08-27 11:25:42.846', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNDczNTczNywiaWF0IjoxNzI0NzI4NTM3fQ.DSRSOMahNBeagYUr3cQwIt3tVkDYt172iozcJQ-o8ho');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (43, '2024-08-27 11:34:04.007', '2024-08-27 11:34:04.007', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX25hbWUiOiJlZGl0b3IiLCJyb2xlX2tleSI6ImVkaXRvciIsImlzX2FkbWluIjpmYWxzZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNDczNjQ5MywiaWF0IjoxNzI0NzI5MjkzfQ.6GYn3-_yrrpJa5E1xD6E4lwZiLfgnh7j375lmGcfYOU');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (44, '2024-08-27 11:36:07.523', '2024-08-27 11:36:07.523', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX25hbWUiOiJlZGl0b3IiLCJyb2xlX2tleSI6ImVkaXRvciIsImlzX2FkbWluIjpmYWxzZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNDczNjg5NCwiaWF0IjoxNzI0NzI5Njk0fQ.ALKb5uN-VOdGzBsJ067cArLhOEcHuA9Uuf04lkhhiSI');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (45, '2024-08-27 11:39:17.727', '2024-08-27 11:39:17.727', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNDczNjk3MiwiaWF0IjoxNzI0NzI5NzcyfQ.VntUeYfRWSMcXrUAlOYruXABsVadbOa2-q0cJjPzk20');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (46, '2024-09-23 11:15:16.421', '2024-09-23 11:15:16.421', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNzA2ODAwMywiaWF0IjoxNzI3MDYwODAzfQ.e_JYdURCrBV-IN1u6Saqe6tf7v-epO2hfYGjQ6eMAKs');
 COMMIT;
 
 -- ----------------------------
