@@ -101,7 +101,7 @@ func UserLogin(c *gin.Context) {
 // @Router /refresh_token [post]
 func RefreshAccessToken(c *gin.Context) {
 	appG := common.Gin{C: c}
-	var refreshAccessTokenhStruct userService.RefreshAccessTokenhStruct
+	var refreshAccessTokenhStruct userService.RefreshAccessTokenStruct
 	if err := c.ShouldBindJSON(&refreshAccessTokenhStruct); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
@@ -199,7 +199,7 @@ func GetLoggedInUser(c *gin.Context) {
 
 	data := make(map[string]interface{}, 0)
 	data["user_id"] = user.UserId
-	data["user_name"] = user.Username
+	data["username"] = user.Username
 	data["roles"] = [...]string{user.RoleKey}
 	data["permissions"] = [...]string{""}
 	if user.IsAdmin {

@@ -13,7 +13,7 @@ var jwtSecret = []byte(setting.AppSetting.JwtSecret)
 
 type Claims struct {
 	UserId   uint   `json:"user_id"`
-	Username string `json:"user_name"`
+	Username string `json:"username"`
 	RoleKey  string `json:"role_key"`
 	IsAdmin  bool   `json:"is_admin"`
 	jwt.RegisteredClaims

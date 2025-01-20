@@ -10,19 +10,20 @@ import (
 	"time"
 )
 
-type RefreshAccessTokenhStruct struct {
+// RefreshAccessTokenStruct 刷新令牌结构体
+type RefreshAccessTokenStruct struct {
 	RefreshToken string `json:"refreshToken" form:"refresh_token" validate:"required"`
 }
 
-// 用户登录
+// AuthStruct 用户登录结构体
 type AuthStruct struct {
-	Username string `json:"user_name" form:"user_name" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
-	Password string `json:"password" form:"password" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
+	Username string `json:"username" form:"username" validate:"required,min=4,max=20" minLength:"4" maxLength:"20"`
+	Password string `json:"password" form:"password" validate:"required,min=4,max=20" minLength:"4" maxLength:"20"`
 }
 
 type ChangePasswordStruct struct {
-	OldPassword string `json:"old_password" form:"old_password" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
-	NewPassword string `json:"new_password" form:"new_password" validate:"required,min=6,max=20" minLength:"6",maxLength:"20"`
+	OldPassword string `json:"oldpassword" form:"oldpassword" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
+	NewPassword string `json:"newpassword" form:"newpassword" validate:"required,min=6,max=20" minLength:"6",maxLength:"20"`
 }
 
 // 添加用户
@@ -66,20 +67,23 @@ func (u *UserStruct) getConditionMaps() map[string]interface{} {
 	return maps
 }
 
-// 设置登录用户信息
+// SetLoggedUserInfo 设置登录用户信息
 func SetLoggedUserInfo(userId uint, refreshToken string) error {
-	wheres := make(map[string]interface{})
-	wheres["id"] = userId
+	wheres := map[string]interface{}{
+		"id": userId,
+	}
 
-	updates := make(map[string]interface{})
-	updates["logged_in_at"] = time.Now()
-	updates["refresh_token"] = refreshToken
+	updates := map[string]interface{}{
+		"logged_in_at":  time.Now(),
+		"refresh_token": refreshToken,
+	}
+
 	err, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
 	if err != nil {
-		return err
+		return fmt.Errorf("更新用户登录信息失败: %w", err)
 	}
 	if rowsAffected == 0 {
-		log.Println("设置登录信息失败！")
+		return fmt.Errorf("未找到要更新的用户信息")
 	}
 	return nil
 }
@@ -105,7 +109,7 @@ func RefreshAccessToken(RefreshToken string) (map[string]interface{}, error) {
 
 	accessToken, expireTime, err := utils.GenerateToken(claims)
 	if err != nil {
-		return data, fmt.Errorf(code.GetMsg(code.AccessTokenFailure))
+		return data, fmt.Errorf("%s", code.GetMsg(code.AccessTokenFailure))
 	}
 
 	data["expires"] = expireTime.Format("2006/01/02 15:04:05")

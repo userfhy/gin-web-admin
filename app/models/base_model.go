@@ -6,6 +6,7 @@ import (
 	"gin-web-admin/utils/setting"
 	"log"
 	"os"
+	"reflect"
 	"strings"
 	"time"
 
@@ -185,44 +186,119 @@ func GetTotal(tableStruct interface{}, where map[string]interface{}) (int64, err
 	return count, nil
 }
 
+// SafeOperators contains all allowed SQL operators
+var SafeOperators = map[string]string{
+	"=":    "=",
+	">":    ">",
+	">=":   ">=",
+	"<":    "<",
+	"<=":   "<=",
+	"!=":   "!=",
+	"<>":   "<>",
+	"in":   "IN",
+	"like": "LIKE",
+	"is":   "IS",
+}
+
+// BuildCondition builds SQL conditions safely
 func BuildCondition(d *gorm.DB, where map[string]interface{}) (*gorm.DB, error) {
-	for key, value := range where {
-		conditionKey := strings.Split(key, " ")
-		if len(conditionKey) != 2 {
-			// return nil, fmt.Errorf("map构建的条件格式不对，类似于'age >'")
-			return nil, fmt.Errorf("map构建的条件格式不对")
+	for field, value := range where {
+		parts := strings.Fields(field)
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid condition format: %q (expected 'field operator')", field)
 		}
 
-		field := conditionKey[0]
-		operator := conditionKey[1]
+		column, operator := parts[0], strings.ToLower(parts[1])
 
-		switch operator {
-		case "=":
-			d = d.Where(fmt.Sprintf("%s = ?", field), value)
-		case ">":
-			d = d.Where(fmt.Sprintf("%s > ?", field), value)
-		case ">=":
-			d = d.Where(fmt.Sprintf("%s >= ?", field), value)
-		case "<":
-			d = d.Where(fmt.Sprintf("%s < ?", field), value)
-		case "<=":
-			d = d.Where(fmt.Sprintf("%s <= ?", field), value)
-		case "in":
-			d = d.Where(fmt.Sprintf("%s IN (?)", field), value)
-		case "like":
-			d = d.Where(fmt.Sprintf("%s LIKE ?", field), value)
-		case "<>", "!=":
-			d = d.Where(fmt.Sprintf("%s != ?", field), value)
-		case "is":
-			if value == nil {
-				d = d.Where(fmt.Sprintf("%s IS NULL", field))
-			} else {
-				d = d.Where(fmt.Sprintf("%s = ?", field), value)
+		// Validate column name
+		if err := validateColumnName(column); err != nil {
+			return nil, fmt.Errorf("invalid column name %q: %v", column, err)
+		}
+
+		// Validate operator
+		safeOperator, ok := SafeOperators[operator]
+		if !ok {
+			return nil, fmt.Errorf("unsupported operator: %q", operator)
+		}
+
+		// Handle different operators safely
+		switch safeOperator {
+		case "IN":
+			if err := validateInClauseValues(value); err != nil {
+				return nil, fmt.Errorf("invalid IN clause values: %v", err)
 			}
+			d = d.Where(column+" IN (?)", value)
+
+		case "LIKE":
+			pattern, ok := value.(string)
+			if !ok {
+				return nil, fmt.Errorf("LIKE operator requires string value")
+			}
+			escapedPattern := escapeLikePattern(pattern)
+			d = d.Where(column+" LIKE ?", escapedPattern)
+
+		case "IS":
+			if value == nil {
+				d = d.Where(column + " IS NULL")
+			} else {
+				d = d.Where(column+" = ?", value)
+			}
+
 		default:
-			return nil, fmt.Errorf("不支持的操作符：%s", operator)
+			// Handle standard comparison operators
+			d = d.Where(column+" "+safeOperator+" ?", value)
 		}
 	}
 
 	return d, nil
+}
+
+// validateColumnName checks if the column name is safe
+func validateColumnName(name string) error {
+	if len(name) == 0 || len(name) > 64 { // MySQL's maximum identifier length
+		return fmt.Errorf("column name length must be between 1 and 64 characters")
+	}
+
+	// Only allow alphanumeric characters and underscores
+	for i, char := range name {
+		if i == 0 {
+			if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || char == '_') {
+				return fmt.Errorf("column name must start with a letter or underscore")
+			}
+		} else {
+			if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') ||
+				(char >= '0' && char <= '9') || char == '_') {
+				return fmt.Errorf("column name can only contain letters, numbers, and underscores")
+			}
+		}
+	}
+	return nil
+}
+
+// validateInClauseValues validates values for IN clause
+func validateInClauseValues(value interface{}) error {
+	// Check if the value is a slice
+	v := reflect.ValueOf(value)
+	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
+		return fmt.Errorf("IN clause requires slice or array")
+	}
+
+	// Check if the slice is not empty
+	if v.Len() == 0 {
+		return fmt.Errorf("IN clause requires non-empty slice")
+	}
+
+	// Maximum number of items in IN clause (adjust as needed)
+	if v.Len() > 1000 {
+		return fmt.Errorf("too many values in IN clause (max 1000)")
+	}
+
+	return nil
+}
+
+// escapeLikePattern escapes special characters in LIKE patterns
+func escapeLikePattern(pattern string) string {
+	pattern = strings.ReplaceAll(pattern, "%", "\\%")
+	pattern = strings.ReplaceAll(pattern, "_", "\\_")
+	return pattern
 }
