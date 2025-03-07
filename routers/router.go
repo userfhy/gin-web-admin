@@ -3,6 +3,8 @@ package routers
 import (
 	sysController "gin-web-admin/app/controllers/v1/sys"
 
+	"gin-web-admin/utils/setting"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,7 +19,9 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 		InitReportRouter(v1) // 上报
 	}
 
-	InitSwaggerRouter(r) // swagger docs
+	if setting.ServerSetting.RunMode != "release" {
+		InitSwaggerRouter(r) // swagger docs
+	}
 
 	// 路由列表
 	sysController.Routers = r.Routes()

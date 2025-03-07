@@ -51,7 +51,7 @@ type TestList struct {
 }
 
 func (u *UserStruct) getConditionMaps() map[string]interface{} {
-	maps := make(map[string]interface{})
+	maps := make(map[string]any)
 	maps["deleted_at is"] = nil
 	// log.Println(u.Username)
 	if u.Username != "" {
@@ -73,7 +73,7 @@ func SetLoggedUserInfo(userId uint, refreshToken string) error {
 		"id": userId,
 	}
 
-	updates := map[string]interface{}{
+	updates := map[string]any{
 		"logged_in_at":  time.Now(),
 		"refresh_token": refreshToken,
 	}
@@ -89,13 +89,13 @@ func SetLoggedUserInfo(userId uint, refreshToken string) error {
 }
 
 func RefreshAccessToken(RefreshToken string) (map[string]interface{}, error) {
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	_, err := utils.ValidateToken(RefreshToken)
 	if err != nil {
 		return data, err
 	}
 	// 判断 token 是否正确
-	user, _ := model.GetUser(map[string]interface{}{"refresh_token": RefreshToken})
+	user, _ := model.GetUser(map[string]any{"refresh_token": RefreshToken})
 	if user.ID == 0 {
 		return data, fmt.Errorf("该access_token对应的用户信息不存在")
 	}
@@ -120,10 +120,10 @@ func RefreshAccessToken(RefreshToken string) (map[string]interface{}, error) {
 }
 
 func ChangeUserPassword(userId uint, newPassword string) bool {
-	wheres := make(map[string]interface{})
+	wheres := make(map[string]any)
 	wheres["id"] = userId
 
-	updates := make(map[string]interface{})
+	updates := make(map[string]any)
 	updates["password"] = utils.EncodeUserPassword(newPassword)
 	_, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
 	if rowsAffected == 0 {

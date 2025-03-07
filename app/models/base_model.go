@@ -162,8 +162,29 @@ func SoftDelete(tableStruct interface{}) (error, int64) {
 	return nil, res.RowsAffected
 }
 
-func Update(tableStruct interface{}, wheres map[string]interface{}, updates map[string]interface{}) (error, int64) {
-	res := db.Model(tableStruct).Where(wheres).Updates(updates)
+// 新增字段名验证函数
+func validateUpdateFields(updates map[string]interface{}) error {
+	for field := range updates {
+		if err := validateColumnName(field); err != nil {
+			return fmt.Errorf("invalid field name %q: %v", field, err)
+		}
+	}
+	return nil
+}
+
+func Update(tableStruct interface{}, where map[string]interface{}, updates map[string]interface{}) (error, int64) {
+	// 验证更新字段名
+	if err := validateUpdateFields(updates); err != nil {
+		return err, 0
+	}
+
+	// 安全构建WHERE条件
+	dbData, err := BuildCondition(db.Model(tableStruct), where)
+	if err != nil {
+		return err, 0
+	}
+
+	res := dbData.Updates(updates)
 	if err := res.Error; err != nil {
 		return err, 0
 	}
@@ -172,17 +193,14 @@ func Update(tableStruct interface{}, wheres map[string]interface{}, updates map[
 
 func GetTotal(tableStruct interface{}, where map[string]interface{}) (int64, error) {
 	var count int64
-	var dbData, err = BuildCondition(db, where)
-
+	dbData, err := BuildCondition(db.Model(tableStruct), where)
 	if err != nil {
-		fmt.Println("Error:", err)
 		return 0, err
 	}
 
 	if err := dbData.Model(tableStruct).Count(&count).Error; err != nil {
 		return 0, err
 	}
-
 	return count, nil
 }
 
@@ -210,18 +228,18 @@ func BuildCondition(d *gorm.DB, where map[string]interface{}) (*gorm.DB, error) 
 
 		column, operator := parts[0], strings.ToLower(parts[1])
 
-		// Validate column name
+		// 字段名验证
 		if err := validateColumnName(column); err != nil {
 			return nil, fmt.Errorf("invalid column name %q: %v", column, err)
 		}
 
-		// Validate operator
+		// 操作符白名单验证
 		safeOperator, ok := SafeOperators[operator]
 		if !ok {
 			return nil, fmt.Errorf("unsupported operator: %q", operator)
 		}
 
-		// Handle different operators safely
+		// 安全处理不同操作符
 		switch safeOperator {
 		case "IN":
 			if err := validateInClauseValues(value); err != nil {
@@ -235,41 +253,54 @@ func BuildCondition(d *gorm.DB, where map[string]interface{}) (*gorm.DB, error) 
 				return nil, fmt.Errorf("LIKE operator requires string value")
 			}
 			escapedPattern := escapeLikePattern(pattern)
-			d = d.Where(column+" LIKE ?", escapedPattern)
+			d = d.Where(column+" LIKE ? ESCAPE '\\'", escapedPattern)
 
 		case "IS":
+			// 严格处理IS操作符，只允许NULL/NOT NULL
 			if value == nil {
 				d = d.Where(column + " IS NULL")
+			} else if s, ok := value.(string); ok {
+				switch strings.ToUpper(s) {
+				case "NULL":
+					d = d.Where(column + " IS NULL")
+				case "NOT NULL":
+					d = d.Where(column + " IS NOT NULL")
+				default:
+					return nil, fmt.Errorf("invalid value for IS operator: %q", s)
+				}
 			} else {
-				d = d.Where(column+" = ?", value)
+				return nil, fmt.Errorf("invalid type for IS operator value")
 			}
 
 		default:
-			// Handle standard comparison operators
+			// 标准比较操作符
 			d = d.Where(column+" "+safeOperator+" ?", value)
 		}
 	}
-
 	return d, nil
 }
 
-// validateColumnName checks if the column name is safe
+func isLetter(c rune) bool {
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')
+}
+
+func isDigit(c rune) bool {
+	return '0' <= c && c <= '9'
+}
+
+// 增强的字段名验证
 func validateColumnName(name string) error {
-	if len(name) == 0 || len(name) > 64 { // MySQL's maximum identifier length
-		return fmt.Errorf("column name length must be between 1 and 64 characters")
+	if len(name) == 0 || len(name) > 64 {
+		return fmt.Errorf("column name must be 1-64 characters")
 	}
 
-	// Only allow alphanumeric characters and underscores
-	for i, char := range name {
-		if i == 0 {
-			if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || char == '_') {
-				return fmt.Errorf("column name must start with a letter or underscore")
-			}
-		} else {
-			if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') ||
-				(char >= '0' && char <= '9') || char == '_') {
-				return fmt.Errorf("column name can only contain letters, numbers, and underscores")
-			}
+	// 使用正则表达式验证会更严格，这里简化处理
+	for i, c := range name {
+		if i == 0 && !isLetter(c) {
+			return fmt.Errorf("first character must be a letter")
+		}
+		if !isLetter(c) && !isDigit(c) && c != '_' {
+			return fmt.Errorf("invalid character %q in column name", c)
 		}
 	}
 	return nil
@@ -277,28 +308,37 @@ func validateColumnName(name string) error {
 
 // validateInClauseValues validates values for IN clause
 func validateInClauseValues(value interface{}) error {
-	// Check if the value is a slice
 	v := reflect.ValueOf(value)
 	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
-		return fmt.Errorf("IN clause requires slice or array")
+		return fmt.Errorf("IN clause requires slice/array type")
 	}
 
-	// Check if the slice is not empty
 	if v.Len() == 0 {
-		return fmt.Errorf("IN clause requires non-empty slice")
+		return fmt.Errorf("IN clause requires non-empty values")
 	}
 
-	// Maximum number of items in IN clause (adjust as needed)
 	if v.Len() > 1000 {
-		return fmt.Errorf("too many values in IN clause (max 1000)")
+		return fmt.Errorf("IN clause exceeds maximum allowed values (1000)")
 	}
+
+	// 类型一致性检查（可选）
+	// elemType := v.Type().Elem()
+	// for i := 0; i < v.Len(); i++ {
+	//     if v.Index(i).Type() != elemType {
+	//         return fmt.Errorf("inconsistent element types in slice")
+	//     }
+	// }
 
 	return nil
 }
 
 // escapeLikePattern escapes special characters in LIKE patterns
 func escapeLikePattern(pattern string) string {
-	pattern = strings.ReplaceAll(pattern, "%", "\\%")
-	pattern = strings.ReplaceAll(pattern, "_", "\\_")
-	return pattern
+	escapeChar := "\\"
+	replacer := strings.NewReplacer(
+		"%", escapeChar+"%",
+		"_", escapeChar+"_",
+		escapeChar, escapeChar+escapeChar,
+	)
+	return replacer.Replace(pattern)
 }
