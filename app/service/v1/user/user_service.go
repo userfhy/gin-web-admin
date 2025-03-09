@@ -5,7 +5,7 @@ import (
 	model "gin-web-admin/app/models"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
-	"log"
+	"gin-web-admin/utils/logging"
 	"strings"
 	"time"
 )
@@ -53,7 +53,6 @@ type TestList struct {
 func (u *UserStruct) getConditionMaps() map[string]any {
 	maps := make(map[string]any)
 	maps["deleted_at is"] = nil
-	// log.Println(u.Username)
 	if u.Username != "" {
 		maps["username like"] = "%" + u.Username + "%"
 	}
@@ -127,7 +126,7 @@ func ChangeUserPassword(userId uint, newPassword string) bool {
 	updates["password"] = utils.EncodeUserPassword(newPassword)
 	_, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
 	if rowsAffected == 0 {
-		log.Println("修改用户密码失败！")
+		logging.Println("修改用户密码失败！")
 		return false
 	}
 	return true

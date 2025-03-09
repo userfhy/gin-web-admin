@@ -2,7 +2,7 @@ package roleService
 
 import (
 	model "gin-web-admin/app/models"
-	"log"
+	"gin-web-admin/utils/logging"
 )
 
 type RoleStruct struct {
@@ -31,7 +31,7 @@ func DeleteRole(roleId uint) bool {
 	wheres["role_id"] = roleId
 	_, rowsAffected := model.SoftDelete(&model.Role{RoleId: roleId})
 	if rowsAffected == 0 {
-		log.Println("删除Role失败！")
+		logging.Println("删除Role失败！")
 		return false
 	}
 	return true
@@ -54,7 +54,7 @@ func UpdateRole(roleId int, u UpdateRoleStruct) bool {
 	updates["remark"] = u.Remark
 	_, rowsAffected := model.Update(&model.Role{}, wheres, updates)
 	if rowsAffected == 0 {
-		log.Println("修改Role失败！")
+		logging.Println("修改Role失败！")
 		return false
 	}
 	return true

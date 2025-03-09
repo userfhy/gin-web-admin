@@ -154,7 +154,6 @@ func (v BaseModel) BeforeUpdate(scope *gorm.Scope) error {
 }*/
 
 func SoftDelete(tableStruct any) (error, int64) {
-	log.Println(tableStruct)
 	res := db.Model(tableStruct).Update("deleted_at", time.Now())
 	if err := res.Error; err != nil {
 		return err, 0

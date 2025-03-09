@@ -6,8 +6,9 @@ import (
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
-	"log"
 	"net/http"
+
+	"gin-web-admin/utils/logging"
 
 	"github.com/gin-gonic/gin"
 )
@@ -63,20 +64,20 @@ func UserLogin(c *gin.Context) {
 
 	accessToken, expireTime, err := utils.GenerateToken(claims)
 	if utils.HandleError(c, http.StatusOK, code.AccessTokenFailure, code.GetMsg(code.AccessTokenFailure), err) {
-		log.Println("Error generating access token: ", err)
+		logging.Println("Error generating access token: ", err)
 		return
 	}
 
 	// Implement and assign refresh token
 	refreshToken, _, refreshErr := utils.GenerateRefreshToken(claims)
 	if utils.HandleError(c, http.StatusOK, code.RefreshAccessTokenFailure, code.GetMsg(code.RefreshAccessTokenFailure), refreshErr) {
-		log.Println("Error generating refresh token: ", refreshErr)
+		logging.Println("Error generating refresh token: ", refreshErr)
 		return
 	}
 
 	// Set the logged-in user information
 	userService.SetLoggedUserInfo(userId, refreshToken)
-	// log.Println(errs)
+	// logging.Println(errs)
 
 	// Prepare the response data
 	data["accessToken"] = accessToken
@@ -110,7 +111,7 @@ func RefreshAccessToken(c *gin.Context) {
 
 	data, err := userService.RefreshAccessToken(refreshAccessTokenhStruct.RefreshToken)
 	if utils.HandleError(c, http.StatusOK, code.ErrorAuthToken, "access_token刷新失败", err) {
-		log.Println("Error token: ", err)
+		logging.Println("Error token: ", err)
 		return
 	}
 

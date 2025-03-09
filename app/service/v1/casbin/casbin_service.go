@@ -2,7 +2,7 @@ package casbinService
 
 import (
 	model "gin-web-admin/app/models"
-	"log"
+	"gin-web-admin/utils/logging"
 )
 
 type CasbinStruct struct {
@@ -37,8 +37,8 @@ func UpdateCasbin(id int, u AddCasbinStruct) bool {
 	updates["v2"] = u.V2
 	error, rowsAffected := model.Update(&model.CasbinRuleM{}, wheres, updates)
 	if rowsAffected == 0 {
-		log.Println("修改Casbin失败！")
-		log.Println(error)
+		logging.Println("修改Casbin失败！")
+		logging.Println(error)
 		return false
 	}
 	return true
@@ -58,8 +58,6 @@ func (c *CasbinStruct) getConditionMaps() map[string]any {
 	if c.V2 != "" {
 		maps["v2"] = c.V2
 	}
-	// log.Println(c)
-	// log.Println(maps)
 	return maps
 }
 

@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/base64"
-	"log"
+	"gin-web-admin/utils/logging"
 	"runtime"
 	"time"
 	"unicode"
@@ -50,7 +50,7 @@ func Base64Decode(raw string) ([]byte, error) {
 func PrintStack() {
 	var buf [4096]byte
 	n := runtime.Stack(buf[:], false)
-	log.Printf("==> %s\n", string(buf[:n]))
+	logging.Printf("==> %s\n", string(buf[:n]))
 }
 
 // 统一错误处理
@@ -58,7 +58,7 @@ func HandleError(c *gin.Context, httpCode int, errCode int, msg string, err erro
 	if err != nil {
 		_, file, line, ok := runtime.Caller(1)
 
-		log.Printf("[Error]: %s\nFile: %s Line: %d  %t", err, file, line, ok)
+		logging.Printf("%s\nFile: %s Line: %d  %t", err, file, line, ok)
 
 		//PrintStack()
 		c.JSON(httpCode, gin.H{"success": false, "data": nil, "code": errCode, "msg": msg, "error": err.Error()})

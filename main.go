@@ -24,10 +24,24 @@ import (
 	"time"
 )
 
-var logger = logging.Setup("main-logger", nil)
+var runMode string
 
 func init() {
 	setting.Setup()
+
+	runMode = setting.ServerSetting.RunMode
+	logLevel := "debug"
+	if runMode != "debug" {
+		logLevel = "info"
+	}
+
+	// 初始化全局日志
+	logging.Setup("main-logger", &logging.Option{
+		LogLevel:   logLevel,
+		Formatter:  "text",
+		OutputPath: "",
+	})
+
 	model.Setup()
 	common.InitValidate()
 
@@ -49,7 +63,7 @@ func init() {
 // @name Authorization
 func main() {
 	//binding.Validator = new(validator.DefaultValidator)
-	gin.SetMode(setting.ServerSetting.RunMode)
+	gin.SetMode(runMode)
 
 	r := gin.New()
 
@@ -79,12 +93,12 @@ func main() {
 		// 服务连接
 		err := server.ListenAndServe()
 		if err != nil {
-			logger.Fatalln(err)
+			logging.Error(err)
 		}
 	}()
 
-	logger.Printf("[info] start http server listening %s", endPoint)
-	logger.Printf("[info] Actual pid is %d", os.Getpid())
+	logging.Infof("start http server listening %s", endPoint)
+	logging.Infof("Actual pid is %d", os.Getpid())
 
 	// 等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
 	quit := make(chan os.Signal, 1)
@@ -93,13 +107,13 @@ func main() {
 	// kill -9 is syscall. SIGKILL but can"t be catch, so don't need add it
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	logger.Println("Shutdown Server...")
+	logging.Info("Shutdown Server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		logger.Fatal("Server Shutdown: ", err)
+		logging.Error("Server Shutdown: ", err)
 	}
 
-	logger.Println("Server exiting")
+	logging.Info("Server exiting")
 }

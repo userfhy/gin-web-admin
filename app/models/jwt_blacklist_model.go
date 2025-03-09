@@ -1,6 +1,6 @@
 package model
 
-import "log"
+import "gin-web-admin/utils/logging"
 
 type JwtBlacklist struct {
 	BaseModel
@@ -16,7 +16,7 @@ func CreateBlockList(userId uint, jwt string) error {
 	table := JwtBlacklist{UserID: userId, Jwt: jwt}
 	res := db.Create(&table)
 	if err := res.Error; err != nil {
-		log.Println(err)
+		logging.Println(err)
 		return err
 	}
 	return nil

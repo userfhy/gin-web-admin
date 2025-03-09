@@ -41,7 +41,6 @@ func CheckBindStructParameter(s any, c *gin.Context) (error, string) {
 		for _, e := range errs {
 			sliceErrs = append(sliceErrs, e.Translate(trans))
 		}
-		//log.Println(errs.Translate(trans))
 		return errs, strings.Join(sliceErrs, ",")
 	}
 

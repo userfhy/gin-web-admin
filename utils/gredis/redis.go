@@ -3,8 +3,9 @@ package gredis
 import (
 	"encoding/json"
 	"gin-web-admin/utils/setting"
-	"log"
 	"time"
+
+	"gin-web-admin/utils/logging"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -43,7 +44,7 @@ func Setup() {
 		},
 	}
 
-	log.Printf("[info] Redis connected %s DB: %d", setting.RedisSetting.Host, setting.RedisSetting.DB)
+	logging.Printf("Redis connected %s DB: %d", setting.RedisSetting.Host, setting.RedisSetting.DB)
 
 	TestConnection()
 }
@@ -56,7 +57,7 @@ func TestConnection() {
 	if err != nil {
 		panic(err)
 	}
-	log.Println(res)
+	logging.Println(res)
 }
 
 // Set a key/value

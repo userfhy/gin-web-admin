@@ -29,7 +29,7 @@ func CreateRole(role Role) error {
 	return nil
 }
 
-// func GetRoles(pageNum int, pageSize int, whereSql string, where []interface{}) ([]*Role, error) {
+// func GetRoles(pageNum int, pageSize int, whereSql string, where []any) ([]*Role, error) {
 // 	var role []*Role
 // 	err := db.Select("*").Where(whereSql, values...).Offset(pageNum).Limit(pageSize).Find(&role).Error
 

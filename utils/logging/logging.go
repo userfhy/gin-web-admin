@@ -2,227 +2,188 @@ package logging
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
 	"os"
 	"runtime"
 	"strconv"
-	"time"
+	"sync"
+
+	"github.com/sirupsen/logrus"
+)
+
+var (
+	globalLogger *logger
+	initOnce     sync.Once
 )
 
 type Option struct {
-	WithFunc bool
+	WithFunc   bool
+	LogLevel   string
+	Formatter  string // "text" 或 "json"
+	OutputPath string // 文件路径，空表示 stdout
 }
 
-func Setup(name string, option *Option) *logger {
-	opt := Option{
-		WithFunc: true,
-	}
-	if option != nil {
-		opt = *option
-	}
+// 初始化全局日志实例（线程安全）
+func Setup(name string, option *Option) {
+	initOnce.Do(func() {
+		opt := Option{
+			WithFunc:   true,
+			LogLevel:   option.LogLevel,
+			Formatter:  option.Formatter,
+			OutputPath: "",
+		}
+		if option != nil {
+			if option.WithFunc {
+				opt.WithFunc = option.WithFunc
+			}
+			if option.LogLevel != "" {
+				opt.LogLevel = option.LogLevel
+			}
+			if option.Formatter != "" {
+				opt.Formatter = option.Formatter
+			}
+			if option.OutputPath != "" {
+				opt.OutputPath = option.OutputPath
+			}
+		}
 
-	logrus.SetFormatter(&logrus.TextFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
+		// 创建基础 logger
+		logrusLogger := logrus.New()
+
+		// 配置日志级别
+		level, err := logrus.ParseLevel(opt.LogLevel)
+		if err != nil {
+			level = logrus.InfoLevel
+		}
+		logrusLogger.SetLevel(level)
+
+		// 配置输出格式
+		switch opt.Formatter {
+		case "json":
+			logrusLogger.SetFormatter(&logrus.JSONFormatter{
+				TimestampFormat: "2006-01-02 15:04:05",
+			})
+		default:
+			logrusLogger.SetFormatter(&logrus.TextFormatter{
+				FullTimestamp:   true,
+				TimestampFormat: "2006-01-02 15:04:05",
+			})
+		}
+
+		// 配置输出目标
+		if opt.OutputPath != "" {
+			file, err := os.OpenFile(opt.OutputPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+			if err == nil {
+				logrusLogger.SetOutput(file)
+			} else {
+				logrusLogger.Warn("Failed to log to file, using default stderr")
+			}
+		}
+
+		globalLogger = &logger{
+			name:   name,
+			option: opt,
+			entry_: logrusLogger.WithField("service", name), // 基础字段
+		}
 	})
+}
 
-	logrus.SetOutput(os.Stdout)
-
-	return &logger{name: name, option: opt}
+// 获取全局日志实例（确保先调用 Setup）
+func L() *logger {
+	if globalLogger == nil {
+		panic("logger not initialized, call Setup first")
+	}
+	return globalLogger
 }
 
 type logger struct {
 	name   string
 	option Option
+	entry_ *logrus.Entry
 }
 
-// WithContext creates an entry from the standard logger and adds a context to it.
-func (l logger) WithContext(ctx context.Context) *logrus.Entry {
-	return l.entry().WithContext(ctx)
+func Infof(format string, args ...any) {
+	L().getEntry().Infof(format, args...)
 }
 
-// WithField creates an entry from the standard logger and adds a field to
-// it. If you want multiple fields, use `WithFields`.
-//
-// Note that it doesn't log until you call Debug, Print, Info, Warn, Fatal
-// or Panic on the Entry it returns.
-func (l logger) WithField(key, value string) *logrus.Entry {
-	return l.entry().WithField(key, value)
+func Warnf(format string, args ...any) {
+	L().getEntry().Warnf(format, args...)
 }
 
-// WithFields creates an entry from the standard logger and adds multiple
-// fields to it. This is simply a helper for `WithField`, invoking it
-// once for each field.
-//
-// Note that it doesn't log until you call Debug, Print, Info, Warn, Fatal
-// or Panic on the Entry it returns.
-func (l logger) WithFields(fields logrus.Fields) *logrus.Entry {
-	return l.entry().WithFields(fields)
+func Errorf(format string, args ...any) {
+	L().getEntry().Errorf(format, args...)
 }
 
-// AddHook adds a hook to the standard logger hooks.
-func (l logger) WithError(err error) *logrus.Entry {
-	return l.entry().WithError(err)
+func Printf(format string, args ...any) {
+	L().getEntry().Printf(format, args...)
 }
 
-// WithTime creats an entry from the standard logger and overrides the time of
-// logs generated with it.
-//
-// Note that it doesn't log until you call Debug, Print, Info, Warn, Fatal
-// or Panic on the Entry it returns.
-func (l logger) WithTime(time time.Time) *logrus.Entry {
-	return l.entry().WithTime(time)
+func Println(args ...any) {
+	L().getEntry().Println(args...)
 }
 
-// Trace logs a message at level Trace on the standard logger.
-func (l logger) Trace(args ...interface{}) {
-	l.entry().Trace(args...)
+func Fatalf(format string, args ...any) {
+	L().getEntry().Fatalf(format, args...)
 }
 
-// Debug logs a message at level Debug on the standard logger.
-func (l logger) Debug(args ...interface{}) {
-	l.entry().Debug(args...)
+func Fatalln(args ...any) {
+	L().getEntry().Fatalln(args...)
 }
 
-// Print logs a message at level Info on the standard logger.
-func (l logger) Print(args ...interface{}) {
-	l.entry().Print(args...)
+// 所有日志方法改为包级函数
+func Trace(args ...any) {
+	L().getEntry().Log(logrus.TraceLevel, args...)
 }
 
-// Info logs a message at level Info on the standard logger.
-func (l logger) Info(args ...interface{}) {
-	l.entry().Info(args...)
+func Debug(args ...any) {
+	L().getEntry().Debug(args...)
 }
 
-// Warn logs a message at level Warn on the standard logger.
-func (l logger) Warn(args ...interface{}) {
-	l.entry().Warn(args...)
+func Info(args ...any) {
+	L().getEntry().Info(args...)
 }
 
-// Warning logs a message at level Warn on the standard logger.
-func (l logger) Warning(args ...interface{}) {
-	l.entry().Warning(args...)
+func Warn(args ...any) {
+	L().getEntry().Warn(args...)
 }
 
-// Error logs a message at level Error on the standard logger.
-func (l logger) Error(args ...interface{}) {
-	l.entry().Error(args...)
+func Error(args ...any) {
+	L().getEntry().Error(args...)
 }
 
-// Panic logs a message at level Panic on the standard logger.
-func (l logger) Panic(args ...interface{}) {
-	l.entry().Panic(args...)
+// 带上下文的日志方法
+func WithContext(ctx context.Context) *logrus.Entry {
+	return L().getEntry().WithContext(ctx)
 }
 
-// Fatal logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
-func (l logger) Fatal(args ...interface{}) {
-	l.entry().Fatal(args...)
+func WithField(key string, value interface{}) *logrus.Entry {
+	return L().getEntry().WithField(key, value)
 }
 
-// Traceln logs a message at level Trace on the standard logger.
-func (l logger) Traceln(args ...interface{}) {
-	l.entry().Traceln(args...)
+func WithFields(fields logrus.Fields) *logrus.Entry {
+	return L().getEntry().WithFields(fields)
 }
 
-// Debugln logs a message at level Debug on the standard logger.
-func (l logger) Debugln(args ...interface{}) {
-	l.entry().Debugln(args...)
+func WithError(err error) *logrus.Entry {
+	return L().getEntry().WithError(err)
 }
 
-// Println logs a message at level Info on the standard logger.
-func (l logger) Println(args ...interface{}) {
-	l.entry().Println(args...)
-}
+// 其他方法同理...
+// [保留原有 entry() 逻辑，但改为使用全局 entry]
 
-// Infoln logs a message at level Info on the standard logger.
-func (l logger) Infoln(args ...interface{}) {
-	l.entry().Infoln(args...)
-}
-
-// Warnln logs a message at level Warn on the standard logger.
-func (l logger) Warnln(args ...interface{}) {
-	l.entry().Warnln(args...)
-}
-
-// Warningln logs a message at level Warn on the standard logger.
-func (l logger) Warningln(args ...interface{}) {
-	l.entry().Warningln(args...)
-}
-
-// Errorln logs a message at level Error on the standard logger.
-func (l logger) Errorln(args ...interface{}) {
-	l.entry().Errorln(args...)
-}
-
-// Panicln logs a message at level Panic on the standard logger.
-func (l logger) Panicln(args ...interface{}) {
-	l.entry().Panicln(args...)
-}
-
-// Fatalln logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
-func (l logger) Fatalln(args ...interface{}) {
-	l.entry().Fatalln(args...)
-}
-
-// Tracef logs a message at level Trace on the standard logger.
-func (l logger) Tracef(format string, args ...interface{}) {
-	l.entry().Tracef(format, args...)
-}
-
-// Debugf logs a message at level Debug on the standard logger.
-func (l logger) Debugf(format string, args ...interface{}) {
-	l.entry().Debugf(format, args...)
-}
-
-// Printf logs a message at level Info on the standard logger.
-func (l logger) Printf(format string, args ...interface{}) {
-	l.entry().Printf(format, args...)
-}
-
-// Infof logs a message at level Info on the standard logger.
-func (l logger) Infof(format string, args ...interface{}) {
-	l.entry().Infof(format, args...)
-}
-
-// Warnf logs a message at level Warn on the standard logger.
-func (l logger) Warnf(format string, args ...interface{}) {
-	l.entry().Warnf(format, args...)
-}
-
-// Warningf logs a message at level Warn on the standard logger.
-func (l logger) Warningf(format string, args ...interface{}) {
-	l.entry().Warningf(format, args...)
-}
-
-// Errorf logs a message at level Error on the standard logger.
-func (l logger) Errorf(format string, args ...interface{}) {
-	l.entry().Errorf(format, args...)
-}
-
-// Panicf logs a message at level Panic on the standard logger.
-func (l logger) Panicf(format string, args ...interface{}) {
-	l.entry().Panicf(format, args...)
-}
-
-// Fatalf logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
-func (l logger) Fatalf(format string, args ...interface{}) {
-	l.entry().Fatalf(format, args...)
-}
-
-func (l logger) entry() *logrus.Entry {
-	entry := logrus.WithField("name", l.name)
+// 私有方法
+func (l *logger) getEntry() *logrus.Entry {
+	entry := l.entry_
 	if l.option.WithFunc {
-		entry = entry.WithField("func", getFunc(3))
+		entry = entry.WithField("caller", getCaller(4)) // 修正跳转层级
 	}
-
 	return entry
 }
 
-func getFunc(skip int) string {
+func getCaller(skip int) string {
 	pc, _, _, ok := runtime.Caller(skip)
 	if !ok {
 		return ""
 	}
-
 	f := runtime.FuncForPC(pc)
 	_, line := f.FileLine(pc)
 	return f.Name() + ":" + strconv.Itoa(line)
