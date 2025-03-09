@@ -38,7 +38,7 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	RCode := code.InvalidParams
 	isExist, userId, roleKey, isAdmin, status := model.CheckAuth(userLogin.Username, userLogin.Password)
 
@@ -76,6 +76,7 @@ func UserLogin(c *gin.Context) {
 
 	// Set the logged-in user information
 	userService.SetLoggedUserInfo(userId, refreshToken)
+	// log.Println(errs)
 
 	// Prepare the response data
 	data["accessToken"] = accessToken
@@ -197,7 +198,7 @@ func GetLoggedInUser(c *gin.Context) {
 	claims, _ := c.Get("claims")
 	user := claims.(*utils.Claims)
 
-	data := make(map[string]interface{}, 0)
+	data := make(map[string]any, 0)
 	data["user_id"] = user.UserId
 	data["username"] = user.Username
 	data["roles"] = [...]string{user.RoleKey}

@@ -9,13 +9,13 @@ type Gin struct {
 }
 
 type Response struct {
-	Success bool        `json:"success"`
-	Code    int         `json:"code"`
-	Msg     string      `json:"msg"`
-	Data    interface{} `json:"data"`
+	Success bool   `json:"success"`
+	Code    int    `json:"code"`
+	Msg     string `json:"msg"`
+	Data    any    `json:"data"`
 }
 
-func (g *Gin) Response(httpCode, errCode int, msg string, data interface{}) {
+func (g *Gin) Response(httpCode, errCode int, msg string, data any) {
 	Success := true
 	if errCode != 200 {
 		Success = false

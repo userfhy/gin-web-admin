@@ -6,9 +6,11 @@ import (
 	"github.com/go-playground/locales/zh"
 	"github.com/go-playground/locales/zh_Hant"
 	ut "github.com/go-playground/universal-translator"
+
 	//"gopkg.in/go-playground/validator.v9"
-	"github.com/go-playground/validator/v10"
 	"strings"
+
+	"github.com/go-playground/validator/v10"
 )
 
 var (
@@ -24,7 +26,7 @@ func InitValidate() {
 	Validate = validator.New()
 }
 
-func CheckBindStructParameter(s interface{}, c *gin.Context) (error, string) {
+func CheckBindStructParameter(s any, c *gin.Context) (error, string) {
 	v, _ := c.Get("trans")
 
 	trans, ok := v.(ut.Translator)

@@ -156,7 +156,7 @@ func GetCasbinList(c *gin.Context) {
 
 	// 筛选 group by
 	if groupBy == "v0" {
-		groupMap := make(map[string][]interface{})
+		groupMap := make(map[string][]any)
 		for k, v := range arr {
 			if arr[k].V0 == v.V0 {
 				groupMap[arr[k].V0] = append(groupMap[arr[k].V0], v)

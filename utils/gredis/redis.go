@@ -3,9 +3,10 @@ package gredis
 import (
 	"encoding/json"
 	"gin-web-admin/utils/setting"
-	"github.com/gomodule/redigo/redis"
 	"log"
 	"time"
+
+	"github.com/gomodule/redigo/redis"
 )
 
 var RedisConn *redis.Pool
@@ -59,7 +60,7 @@ func TestConnection() {
 }
 
 // Set a key/value
-func Set(key string, data interface{}, time int) error {
+func Set(key string, data any, time int) error {
 	conn := RedisConn.Get()
 	defer conn.Close()
 

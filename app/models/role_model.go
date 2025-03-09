@@ -40,7 +40,7 @@ func CreateRole(role Role) error {
 // 	return role, nil
 // }
 
-func GetRoles(pageNum int, pageSize int, where map[string]interface{}) ([]*Role, error) {
+func GetRoles(pageNum int, pageSize int, where map[string]any) ([]*Role, error) {
 	var role []*Role
 
 	db, _ := BuildCondition(db, where)

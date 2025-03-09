@@ -74,7 +74,7 @@ func CreatCasbin(casbin CasbinRuleM) error {
 	return nil
 }
 
-func GetCasbinRuleList(pageNum int, pageSize int, where map[string]interface{}) ([]*CasbinRuleM, error) {
+func GetCasbinRuleList(pageNum int, pageSize int, where map[string]any) ([]*CasbinRuleM, error) {
 	var casbinRuleList []*CasbinRuleM
 
 	db, _ := BuildCondition(db, where)

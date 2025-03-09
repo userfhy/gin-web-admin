@@ -133,7 +133,7 @@ func (t JSONTime) Value() (driver.Value, error) {
 }
 
 // Scan valueof time.Time
-func (t *JSONTime) Scan(v interface{}) error {
+func (t *JSONTime) Scan(v any) error {
 	value, ok := v.(time.Time)
 	if ok {
 		*t = JSONTime{Time: value}
@@ -153,7 +153,7 @@ func (v BaseModel) BeforeUpdate(scope *gorm.Scope) error {
    return nil
 }*/
 
-func SoftDelete(tableStruct interface{}) (error, int64) {
+func SoftDelete(tableStruct any) (error, int64) {
 	log.Println(tableStruct)
 	res := db.Model(tableStruct).Update("deleted_at", time.Now())
 	if err := res.Error; err != nil {
@@ -163,7 +163,7 @@ func SoftDelete(tableStruct interface{}) (error, int64) {
 }
 
 // 新增字段名验证函数
-func validateUpdateFields(updates map[string]interface{}) error {
+func validateUpdateFields(updates map[string]any) error {
 	for field := range updates {
 		if err := validateColumnName(field); err != nil {
 			return fmt.Errorf("invalid field name %q: %v", field, err)
@@ -172,7 +172,7 @@ func validateUpdateFields(updates map[string]interface{}) error {
 	return nil
 }
 
-func Update(tableStruct interface{}, where map[string]interface{}, updates map[string]interface{}) (error, int64) {
+func Update(tableStruct any, where map[string]any, updates map[string]any) (error, int64) {
 	// 验证更新字段名
 	if err := validateUpdateFields(updates); err != nil {
 		return err, 0
@@ -191,7 +191,7 @@ func Update(tableStruct interface{}, where map[string]interface{}, updates map[s
 	return nil, res.RowsAffected
 }
 
-func GetTotal(tableStruct interface{}, where map[string]interface{}) (int64, error) {
+func GetTotal(tableStruct any, where map[string]any) (int64, error) {
 	var count int64
 	dbData, err := BuildCondition(db.Model(tableStruct), where)
 	if err != nil {
@@ -219,7 +219,7 @@ var SafeOperators = map[string]string{
 }
 
 // BuildCondition builds SQL conditions safely
-func BuildCondition(d *gorm.DB, where map[string]interface{}) (*gorm.DB, error) {
+func BuildCondition(d *gorm.DB, where map[string]any) (*gorm.DB, error) {
 	for field, value := range where {
 		parts := strings.Fields(field)
 		if len(parts) != 2 {
@@ -307,7 +307,7 @@ func validateColumnName(name string) error {
 }
 
 // validateInClauseValues validates values for IN clause
-func validateInClauseValues(value interface{}) error {
+func validateInClauseValues(value any) error {
 	v := reflect.ValueOf(value)
 	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
 		return fmt.Errorf("IN clause requires slice/array type")

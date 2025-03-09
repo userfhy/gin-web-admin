@@ -79,7 +79,7 @@ func (f StrTo) String() string {
 }
 
 // Convert any type to string.
-func ToStr(value interface{}, args ...int) (s string) {
+func ToStr(value any, args ...int) (s string) {
 	switch v := value.(type) {
 	case bool:
 		s = strconv.FormatBool(v)

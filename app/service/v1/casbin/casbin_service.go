@@ -29,10 +29,10 @@ func CreateCasbin(n AddCasbinStruct) error {
 }
 
 func UpdateCasbin(id int, u AddCasbinStruct) bool {
-	wheres := make(map[string]interface{})
-	wheres["id"] = id
+	wheres := make(map[string]any)
+	wheres["id ="] = id
 
-	updates := make(map[string]interface{})
+	updates := make(map[string]any)
 	updates["v1"] = u.V1
 	updates["v2"] = u.V2
 	error, rowsAffected := model.Update(&model.CasbinRuleM{}, wheres, updates)
@@ -44,8 +44,8 @@ func UpdateCasbin(id int, u AddCasbinStruct) bool {
 	return true
 }
 
-func (c *CasbinStruct) getConditionMaps() map[string]interface{} {
-	maps := make(map[string]interface{})
+func (c *CasbinStruct) getConditionMaps() map[string]any {
+	maps := make(map[string]any)
 	//maps["deleted_at"] = nil
 	if c.V0 != "" {
 		maps["v0"] = c.V0

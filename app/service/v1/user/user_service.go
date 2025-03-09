@@ -50,7 +50,7 @@ type TestList struct {
 	*model.Auth
 }
 
-func (u *UserStruct) getConditionMaps() map[string]interface{} {
+func (u *UserStruct) getConditionMaps() map[string]any {
 	maps := make(map[string]any)
 	maps["deleted_at is"] = nil
 	// log.Println(u.Username)
@@ -69,8 +69,8 @@ func (u *UserStruct) getConditionMaps() map[string]interface{} {
 
 // SetLoggedUserInfo 设置登录用户信息
 func SetLoggedUserInfo(userId uint, refreshToken string) error {
-	wheres := map[string]interface{}{
-		"id": userId,
+	wheres := map[string]any{
+		"id =": userId,
 	}
 
 	updates := map[string]any{
@@ -88,7 +88,7 @@ func SetLoggedUserInfo(userId uint, refreshToken string) error {
 	return nil
 }
 
-func RefreshAccessToken(RefreshToken string) (map[string]interface{}, error) {
+func RefreshAccessToken(RefreshToken string) (map[string]any, error) {
 	data := make(map[string]any)
 	_, err := utils.ValidateToken(RefreshToken)
 	if err != nil {
@@ -121,7 +121,7 @@ func RefreshAccessToken(RefreshToken string) (map[string]interface{}, error) {
 
 func ChangeUserPassword(userId uint, newPassword string) bool {
 	wheres := make(map[string]any)
-	wheres["id"] = userId
+	wheres["id ="] = userId
 
 	updates := make(map[string]any)
 	updates["password"] = utils.EncodeUserPassword(newPassword)
@@ -135,11 +135,11 @@ func ChangeUserPassword(userId uint, newPassword string) bool {
 
 func JoinBlockList(userId uint, jwt string) {
 	_ = model.CreateBlockList(userId, jwt)
-	_, _ = model.Update(model.Auth{}, map[string]interface{}{"id": userId}, map[string]interface{}{"refresh_token": userId})
+	_, _ = model.Update(model.Auth{}, map[string]any{"id =": userId}, map[string]any{"refresh_token": userId})
 }
 
 func InBlockList(jwt string) (int64, error) {
-	wheres := make(map[string]interface{})
+	wheres := make(map[string]any)
 	wheres["jwt ="] = jwt
 	return model.GetTotal(model.JwtBlacklist{}, wheres)
 }

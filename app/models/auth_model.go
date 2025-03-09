@@ -48,7 +48,7 @@ func CreatUser(auth Auth) error {
 	return nil
 }
 
-func GetUser(maps map[string]interface{}) (*Auth, error) {
+func GetUser(maps map[string]any) (*Auth, error) {
 	var user *Auth
 	err := db.Select("*").Where(maps).Preload(
 		"Role", func(db *gorm.DB) *gorm.DB {
@@ -63,7 +63,7 @@ func GetUser(maps map[string]interface{}) (*Auth, error) {
 }
 
 // GetTestUsers gets a list of users based on paging constraints
-func GetUsers(pageNum int, pageSize int, where map[string]interface{}) ([]*Auth, error) {
+func GetUsers(pageNum int, pageSize int, where map[string]any) ([]*Auth, error) {
 	var user []*Auth
 
 	db, _ := BuildCondition(db, where)

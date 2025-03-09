@@ -58,7 +58,7 @@ func generateToken(userClaims Claims, duration time.Duration) (string, time.Time
 
 // ParseToken parsing token
 func ParseToken(token string) (*Claims, error) {
-	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (any, error) {
 		return jwtSecret, nil
 	})
 
@@ -79,7 +79,7 @@ func ParseToken(token string) (*Claims, error) {
 
 // 验证 JWT token 是否有效
 func ValidateToken(tokenString string) (jwt.MapClaims, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}

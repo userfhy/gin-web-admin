@@ -4,8 +4,9 @@ import (
 	reportService "gin-web-admin/app/service/v1/report"
 	"gin-web-admin/common"
 	"gin-web-admin/utils/code"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @Summary Report Information
@@ -52,7 +53,7 @@ func Report(c *gin.Context) {
 		return
 	}
 
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	m["id"] = reportResult.ID
 	m["name"] = report.Name
 	//m["created_at"] = utils.TimeToDateTimesString(reportResult.CreatedAt)

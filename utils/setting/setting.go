@@ -71,7 +71,7 @@ func Setup() {
 }
 
 // mapTo map section
-func mapTo(section string, v interface{}) {
+func mapTo(section string, v any) {
 	err := cfg.Section(section).MapTo(v)
 	if err != nil {
 		log.Fatalf("Cfg.MapTo %s err: %v", section, err)

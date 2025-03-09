@@ -16,7 +16,7 @@ type DefaultValidator struct {
 var _ binding.StructValidator = &DefaultValidator{}
 
 // ValidateStruct 如果接收到的类型是一个结构体或指向结构体的指针，则执行验证。
-func (v *DefaultValidator) ValidateStruct(obj interface{}) error {
+func (v *DefaultValidator) ValidateStruct(obj any) error {
 	if kindOfData(obj) == reflect.Struct {
 
 		v.lazyinit()
@@ -31,7 +31,7 @@ func (v *DefaultValidator) ValidateStruct(obj interface{}) error {
 }
 
 // Engine 返回支持`StructValidator`实现的底层验证引擎
-func (v *DefaultValidator) Engine() interface{} {
+func (v *DefaultValidator) Engine() any {
 	v.lazyinit()
 	return v.validate
 }
@@ -45,7 +45,7 @@ func (v *DefaultValidator) lazyinit() {
 	})
 }
 
-func kindOfData(data interface{}) reflect.Kind {
+func kindOfData(data any) reflect.Kind {
 	value := reflect.ValueOf(data)
 	valueType := value.Kind()
 

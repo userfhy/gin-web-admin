@@ -27,7 +27,7 @@ type CreateRoleStruct struct {
 }
 
 func DeleteRole(roleId uint) bool {
-	wheres := make(map[string]interface{})
+	wheres := make(map[string]any)
 	wheres["role_id"] = roleId
 	_, rowsAffected := model.SoftDelete(&model.Role{RoleId: roleId})
 	if rowsAffected == 0 {
@@ -46,10 +46,10 @@ func CreateRole(newRole CreateRoleStruct) error {
 }
 
 func UpdateRole(roleId int, u UpdateRoleStruct) bool {
-	wheres := make(map[string]interface{})
-	wheres["role_id"] = roleId
+	wheres := make(map[string]any)
+	wheres["role_id ="] = roleId
 
-	updates := make(map[string]interface{})
+	updates := make(map[string]any)
 	updates["role_name"] = u.RoleName
 	updates["remark"] = u.Remark
 	_, rowsAffected := model.Update(&model.Role{}, wheres, updates)
@@ -60,8 +60,8 @@ func UpdateRole(roleId int, u UpdateRoleStruct) bool {
 	return true
 }
 
-func (u *RoleStruct) getConditionMaps() map[string]interface{} {
-	maps := make(map[string]interface{})
+func (u *RoleStruct) getConditionMaps() map[string]any {
+	maps := make(map[string]any)
 	maps["deleted_at is"] = nil
 	return maps
 }

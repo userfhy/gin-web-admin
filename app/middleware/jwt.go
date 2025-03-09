@@ -15,7 +15,7 @@ import (
 func JWTHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var rCode int
-		var data interface{}
+		var data any
 
 		rCode = code.SUCCESS
 
