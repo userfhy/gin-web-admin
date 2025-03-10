@@ -9,8 +9,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte(setting.AppSetting.JwtSecret)
-
 type Claims struct {
 	UserId   uint   `json:"user_id"`
 	Username string `json:"username"`
@@ -51,7 +49,7 @@ func generateToken(userClaims Claims, duration time.Duration) (string, time.Time
 	}
 
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenClaims.SignedString(jwtSecret)
+	token, err := tokenClaims.SignedString([]byte(setting.AppSetting.JwtSecret))
 
 	return token, expireTime, err
 }
@@ -59,7 +57,7 @@ func generateToken(userClaims Claims, duration time.Duration) (string, time.Time
 // ParseToken parsing token
 func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (any, error) {
-		return jwtSecret, nil
+		return []byte(setting.AppSetting.JwtSecret), nil
 	})
 
 	if err != nil {
@@ -83,7 +81,7 @@ func ValidateToken(tokenString string) (jwt.MapClaims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
-		return jwtSecret, nil
+		return []byte(setting.AppSetting.JwtSecret), nil
 	})
 
 	if err != nil {
