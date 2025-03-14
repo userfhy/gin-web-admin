@@ -10,16 +10,16 @@ import (
 	"net/http"
 )
 
-// @Summary 删除角色
-// @Description 删除角色
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags Role
-// @Param role_id path int true "role_id"
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /role/{role_id} [delete]
+//	@Summary		删除角色
+//	@Description	删除角色
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			Role
+//	@Param			role_id	path		int	true	"role_id"
+//	@Success		200		{object}	common.Response
+//	@Failure		500		{object}	common.Response
+//	@Router			/role/{role_id} [delete]
 func DeleteRole(c *gin.Context) {
 	appG := common.Gin{C: c}
 	roleId, err := com.StrTo(c.Param("role_id")).Uint()
@@ -36,17 +36,17 @@ func DeleteRole(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", nil)
 }
 
-// @Summary 添加角色
-// @Description 添加角色
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags Role
-// @Param role_id path int true "role_id"
-// @Param payload body roleService.CreateRoleStruct true "添加"、
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /role [post]
+//	@Summary		添加角色
+//	@Description	添加角色
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			Role
+//	@Param			role_id	path		int								true	"role_id"
+//	@Param			payload	body		roleService.CreateRoleStruct	true	"添加"、
+//	@Success		200		{object}	common.Response
+//	@Failure		500		{object}	common.Response
+//	@Router			/role [post]
 func CreateRole(c *gin.Context) {
 	appG := common.Gin{C: c}
 
@@ -70,17 +70,17 @@ func CreateRole(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", createRole)
 }
 
-// @Summary 修改角色
-// @Description 修改角色信息
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags Role
-// @Param role_id path int true "role_id"
-// @Param payload body roleService.UpdateRoleStruct true "修改角色"、
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /role/{role_id} [put]
+//	@Summary		修改角色
+//	@Description	修改角色信息
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			Role
+//	@Param			role_id	path		int								true	"role_id"
+//	@Param			payload	body		roleService.UpdateRoleStruct	true	"修改角色"、
+//	@Success		200		{object}	common.Response
+//	@Failure		500		{object}	common.Response
+//	@Router			/role/{role_id} [put]
 func UpdateRole(c *gin.Context) {
 	appG := common.Gin{C: c}
 	roleId := com.StrTo(c.Param("role_id")).MustInt()
@@ -101,17 +101,17 @@ func UpdateRole(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", updateRole)
 }
 
-// @Summary 角色列表
-// @Description 获取角色表
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags Role
-// @Param p query int true "page number"
-// @Param n query int true "page limit"
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /role [get]
+//	@Summary		角色列表
+//	@Description	获取角色表
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			Role
+//	@Param			p	query		int	true	"page number"
+//	@Param			n	query		int	true	"page limit"
+//	@Success		200	{object}	common.Response
+//	@Failure		500	{object}	common.Response
+//	@Router			/role [get]
 func GetRoles(c *gin.Context) {
 	appG := common.Gin{C: c}
 	err, errStr, p, n := utils.GetPage(c)

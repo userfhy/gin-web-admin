@@ -84,6 +84,12 @@ definitions:
     required:
     - role_name
     type: object
+  sse.Message:
+    properties:
+      data: {}
+      event:
+        type: string
+    type: object
   userService.AddUserStruct:
     properties:
       password:
@@ -93,13 +99,13 @@ definitions:
       role_id:
         minimum: 0
         type: integer
-      user_name:
+      username:
         maxLength: 20
         minLength: 4
         type: string
     required:
     - password
-    - user_name
+    - username
     type: object
   userService.AuthStruct:
     properties:
@@ -107,29 +113,29 @@ definitions:
         maxLength: 20
         minLength: 4
         type: string
-      user_name:
+      username:
         maxLength: 20
         minLength: 4
         type: string
     required:
     - password
-    - user_name
+    - username
     type: object
   userService.ChangePasswordStruct:
     properties:
-      new_password:
+      newpassword:
         maxLength: 20
         minLength: 6
         type: string
-      old_password:
+      oldpassword:
         maxLength: 20
         minLength: 4
         type: string
     required:
-    - new_password
-    - old_password
+    - newpassword
+    - oldpassword
     type: object
-  userService.RefreshAccessTokenhStruct:
+  userService.RefreshAccessTokenStruct:
     properties:
       refreshToken:
         type: string
@@ -304,7 +310,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/userService.RefreshAccessTokenhStruct'
+          $ref: '#/definitions/userService.RefreshAccessTokenStruct'
       produces:
       - application/json
       responses:
@@ -462,6 +468,23 @@ paths:
       summary: 修改角色
       tags:
       - Role
+  /send:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Message Content
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/sse.Message'
+      produces:
+      - application/json
+      responses: {}
+      summary: Send message to specific client
+      tags:
+      - Test
   /sys/menu_list:
     get:
       consumes:
@@ -496,6 +519,22 @@ paths:
       summary: 后端存在路由列表
       tags:
       - SYS
+  /test/count:
+    get:
+      produces:
+      - application/json
+      responses: {}
+      summary: Test SSE Client Count
+      tags:
+      - Test
+  /test/events:
+    get:
+      produces:
+      - text/event-stream
+      responses: {}
+      summary: Test SSE
+      tags:
+      - Test
   /test/font:
     get:
       parameters:

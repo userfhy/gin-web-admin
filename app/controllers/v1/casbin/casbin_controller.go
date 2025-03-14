@@ -12,16 +12,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary 创建规则
-// @Description 创建规则
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags Casbin
-// @Param payload body casbinService.AddCasbinStruct true "create new user"
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /casbin [post]
+//	@Summary		创建规则
+//	@Description	创建规则
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			Casbin
+//	@Param			payload	body		casbinService.AddCasbinStruct	true	"create new user"
+//	@Success		200		{object}	common.Response
+//	@Failure		500		{object}	common.Response
+//	@Router			/casbin [post]
 func CreateCasbin(c *gin.Context) {
 	appG := common.Gin{C: c}
 
@@ -48,17 +48,17 @@ func CreateCasbin(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "Path添加成功", nil)
 }
 
-// @Summary 修改规则
-// @Description 修改规则信息
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags Casbin
-// @Param id path int true "casbin_id"
-// @Param payload body casbinService.AddCasbinStruct true "修改规则"、
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /casbin/{id} [put]
+//	@Summary		修改规则
+//	@Description	修改规则信息
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			Casbin
+//	@Param			id		path		int								true	"casbin_id"
+//	@Param			payload	body		casbinService.AddCasbinStruct	true	"修改规则"、
+//	@Success		200		{object}	common.Response
+//	@Failure		500		{object}	common.Response
+//	@Router			/casbin/{id} [put]
 func UpdateCasbin(c *gin.Context) {
 	appG := common.Gin{C: c}
 	id := com.StrTo(c.Param("id")).MustInt()
@@ -82,17 +82,17 @@ func UpdateCasbin(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", update)
 }
 
-// @Summary 删除规则
-// @Description 删除规则信息
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags Casbin
-// @Param id path int true "casbin_id"
-// @Param payload body casbinService.AddCasbinStruct true "删除规则"、
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /casbin/{id} [delete]
+//	@Summary		删除规则
+//	@Description	删除规则信息
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			Casbin
+//	@Param			id		path		int								true	"casbin_id"
+//	@Param			payload	body		casbinService.AddCasbinStruct	true	"删除规则"、
+//	@Success		200		{object}	common.Response
+//	@Failure		500		{object}	common.Response
+//	@Router			/casbin/{id} [delete]
 func DeleteCasbin(c *gin.Context) {
 	appG := common.Gin{C: c}
 	//id := com.StrTo(c.Param("id")).MustInt()
@@ -110,18 +110,18 @@ func DeleteCasbin(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", update)
 }
 
-// @Summary 规则列表
-// @Description 获取规则列表
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags Casbin
-// @Param p query int true "page number"
-// @Param n query int true "page limit"
-// @Param group_by query string false "v0 根据 role key 分组"
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /casbin [get]
+//	@Summary		规则列表
+//	@Description	获取规则列表
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			Casbin
+//	@Param			p			query		int		true	"page number"
+//	@Param			n			query		int		true	"page limit"
+//	@Param			group_by	query		string	false	"v0 根据 role key 分组"
+//	@Success		200			{object}	common.Response
+//	@Failure		500			{object}	common.Response
+//	@Router			/casbin [get]
 func GetCasbinList(c *gin.Context) {
 	appG := common.Gin{C: c}
 	groupBy := c.DefaultQuery("group_by", "")

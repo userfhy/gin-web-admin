@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSE Client Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { border: 1px solid #ccc; padding: 15px; border-radius: 5px; }
+        .messages { height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 10px; }
+        input[type="text"] { width: 200px; padding: 5px; }
+        button { padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>SSE Client Demo</h1>
+    <div class="container">
+        <div class="panel">
+            <h2>我的连接</h2>
+            <p>Client ID: <span id="clientId">等待连接...</span></p>
+            <div class="messages" id="myMessages"></div>
+        </div>
+
+        <div class="panel">
+            <h2>发送消息</h2>
+            <div>
+                <input type="text" id="targetClient" placeholder="目标Client ID">
+                <input type="text" id="message" placeholder="消息内容">
+                <button onclick="sendMessage()">发送</button>
+            </div>
+            <h3>广播消息</h3>
+            <div class="messages" id="broadcastMessages"></div>
+        </div>
+    </div>
+
+    <script>
+        let clientId = null;
+        const es = new EventSource('/v1/api/test/events');
+
+        // 处理初始化消息
+        es.addEventListener('init', (e) => {
+            clientId = e.data;
+            document.getElementById('clientId').textContent = clientId;
+            addMessage('system', `Connected with ID: ${clientId}`, 'myMessages');
+        });
+
+        es.addEventListener('private', (e) => {
+            addMessage('private', e.data, 'myMessages');
+        });
+
+        // 处理广播消息
+        es.addEventListener('broadcast', (e) => {
+            addMessage('broadcast', e.data, 'broadcastMessages');
+        });
+
+        // 处理心跳消息
+        es.addEventListener('heartbeat', (e) => {
+            console.log('Heartbeat:', e.data);
+        });
+
+        // 通用消息处理
+        es.onmessage = (e) => {
+            addMessage('message', e.data, 'myMessages');
+        };
+
+        // 发送消息
+        function sendMessage() {
+            const targetClient = document.getElementById('targetClient').value;
+            const message = document.getElementById('message').value;
+
+            fetch('/v1/api/test/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    clientId: targetClient,
+                    event: 'private',
+                    data: message
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('发送失败');
+                addMessage('me', `发送给 ${targetClient}: ${message}`, 'myMessages');
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
+
+        // 添加消息到面板
+        function addMessage(type, content, panelId) {
+            const panel = document.getElementById(panelId);
+            const div = document.createElement('div');
+            div.className = 'message';
+            div.innerHTML = `
+                <span style="color: ${getColor(type)}">[${new Date().toLocaleTimeString()}] ${type}:</span>
+                ${content}
+            `;
+            panel.appendChild(div);
+            panel.scrollTop = panel.scrollHeight;
+        }
+
+        function getColor(type) {
+            const colors = {
+                system: '#28a745',
+                broadcast: '#6c757d',
+                private: '#007bff',
+                me: '#dc3545'
+            };
+            return colors[type] || '#000';
+        }
+    </script>
+</body>
+</html>

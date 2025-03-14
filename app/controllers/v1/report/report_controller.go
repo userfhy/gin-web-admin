@@ -9,14 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Report Information
-// @Description User Report Information
-// @Accept json
-// @Produce json
-// @Tags Report
-// @Param payload body reportService.ReportStruct true "上报信息"
-// @Success 200 {object} common.Response
-// @Router /report [post]
+//	@Summary		Report Information
+//	@Description	User Report Information
+//	@Accept			json
+//	@Produce		json
+//	@Tags			Report
+//	@Param			payload	body		reportService.ReportStruct	true	"上报信息"
+//	@Success		200		{object}	common.Response
+//	@Router			/report [post]
 func Report(c *gin.Context) {
 	appG := common.Gin{C: c}
 

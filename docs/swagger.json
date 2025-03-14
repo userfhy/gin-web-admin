@@ -269,7 +269,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/userService.RefreshAccessTokenhStruct"
+                            "$ref": "#/definitions/userService.RefreshAccessTokenStruct"
                         }
                     }
                 ],
@@ -510,6 +510,32 @@
                 }
             }
         },
+        "/send": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Send message to specific client",
+                "parameters": [
+                    {
+                        "description": "Message Content",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sse.Message"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/sys/menu_list": {
             "get": {
                 "security": [
@@ -564,6 +590,30 @@
                         }
                     }
                 }
+            }
+        },
+        "/test/count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Test SSE Client Count",
+                "responses": {}
+            }
+        },
+        "/test/events": {
+            "get": {
+                "produces": [
+                    "text/event-stream"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Test SSE",
+                "responses": {}
             }
         },
         "/test/font": {
@@ -936,11 +986,20 @@
                 }
             }
         },
+        "sse.Message": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "event": {
+                    "type": "string"
+                }
+            }
+        },
         "userService.AddUserStruct": {
             "type": "object",
             "required": [
                 "password",
-                "user_name"
+                "username"
             ],
             "properties": {
                 "password": {
@@ -952,7 +1011,7 @@
                     "type": "integer",
                     "minimum": 0
                 },
-                "user_name": {
+                "username": {
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 4
@@ -963,7 +1022,7 @@
             "type": "object",
             "required": [
                 "password",
-                "user_name"
+                "username"
             ],
             "properties": {
                 "password": {
@@ -971,7 +1030,7 @@
                     "maxLength": 20,
                     "minLength": 4
                 },
-                "user_name": {
+                "username": {
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 4
@@ -981,23 +1040,23 @@
         "userService.ChangePasswordStruct": {
             "type": "object",
             "required": [
-                "new_password",
-                "old_password"
+                "newpassword",
+                "oldpassword"
             ],
             "properties": {
-                "new_password": {
+                "newpassword": {
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 6
                 },
-                "old_password": {
+                "oldpassword": {
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 4
                 }
             }
         },
-        "userService.RefreshAccessTokenhStruct": {
+        "userService.RefreshAccessTokenStruct": {
             "type": "object",
             "required": [
                 "refreshToken"

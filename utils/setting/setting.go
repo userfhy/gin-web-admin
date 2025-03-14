@@ -8,12 +8,12 @@ import (
 )
 
 type App struct {
-	JwtSecret       string
-	PasswordSalt    string
-	PrefixUrl       string
-	TimeFormat      string
-	EnabledCORS     bool
-	ExpireTimeFomat string
+	JwtSecret        string
+	PasswordSalt     string
+	PrefixUrl        string
+	TimeFormat       string
+	EnabledCORS      bool
+	ExpireTimeFormat string
 }
 
 var AppSetting = &App{}

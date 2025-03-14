@@ -280,7 +280,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/userService.RefreshAccessTokenhStruct"
+                            "$ref": "#/definitions/userService.RefreshAccessTokenStruct"
                         }
                     }
                 ],
@@ -521,6 +521,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/send": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Send message to specific client",
+                "parameters": [
+                    {
+                        "description": "Message Content",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sse.Message"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/sys/menu_list": {
             "get": {
                 "security": [
@@ -575,6 +601,30 @@ const docTemplate = `{
                         }
                     }
                 }
+            }
+        },
+        "/test/count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Test SSE Client Count",
+                "responses": {}
+            }
+        },
+        "/test/events": {
+            "get": {
+                "produces": [
+                    "text/event-stream"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Test SSE",
+                "responses": {}
             }
         },
         "/test/font": {
@@ -947,11 +997,20 @@ const docTemplate = `{
                 }
             }
         },
+        "sse.Message": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "event": {
+                    "type": "string"
+                }
+            }
+        },
         "userService.AddUserStruct": {
             "type": "object",
             "required": [
                 "password",
-                "user_name"
+                "username"
             ],
             "properties": {
                 "password": {
@@ -963,7 +1022,7 @@ const docTemplate = `{
                     "type": "integer",
                     "minimum": 0
                 },
-                "user_name": {
+                "username": {
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 4
@@ -974,7 +1033,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "password",
-                "user_name"
+                "username"
             ],
             "properties": {
                 "password": {
@@ -982,7 +1041,7 @@ const docTemplate = `{
                     "maxLength": 20,
                     "minLength": 4
                 },
-                "user_name": {
+                "username": {
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 4
@@ -992,23 +1051,23 @@ const docTemplate = `{
         "userService.ChangePasswordStruct": {
             "type": "object",
             "required": [
-                "new_password",
-                "old_password"
+                "newpassword",
+                "oldpassword"
             ],
             "properties": {
-                "new_password": {
+                "newpassword": {
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 6
                 },
-                "old_password": {
+                "oldpassword": {
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 4
                 }
             }
         },
-        "userService.RefreshAccessTokenhStruct": {
+        "userService.RefreshAccessTokenStruct": {
             "type": "object",
             "required": [
                 "refreshToken"

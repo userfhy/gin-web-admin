@@ -10,16 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary 创建用户
-// @Description 创建新用户
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags User
-// @Param payload body userService.AddUserStruct true "create new user"
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /user [post]
+//	@Summary		创建用户
+//	@Description	创建新用户
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			User
+//	@Param			payload	body		userService.AddUserStruct	true	"create new user"
+//	@Success		200		{object}	common.Response
+//	@Failure		500		{object}	common.Response
+//	@Router			/user [post]
 func CreateUser(c *gin.Context) {
 	appG := common.Gin{C: c}
 
@@ -42,17 +42,17 @@ func CreateUser(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "用户添加成功", nil)
 }
 
-// @Summary 用户列表
-// @Description 获取用户列表
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags User
-// @Param p query int true "page number"
-// @Param n query int true "page limit"
-// @Success 200 {object} common.Response
-// @Failure 500 {object} common.Response
-// @Router /user [get]
+//	@Summary		用户列表
+//	@Description	获取用户列表
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			User
+//	@Param			p	query		int	true	"page number"
+//	@Param			n	query		int	true	"page limit"
+//	@Success		200	{object}	common.Response
+//	@Failure		500	{object}	common.Response
+//	@Router			/user [get]
 func GetUsers(c *gin.Context) {
 	appG := common.Gin{C: c}
 

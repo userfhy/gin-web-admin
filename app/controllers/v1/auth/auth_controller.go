@@ -13,16 +13,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var ExpireTimeFomat = "2006/01/02 15:04:05"
+var ExpireTimeFormat = "2006/01/02 15:04:05"
 
-// @Summary User Login
-// @Description 用户登录
-// @Accept json
-// @Produce json
-// @Tags Auth
-// @Param payload body userService.AuthStruct true "user login"
-// @Success 200 {object} common.Response
-// @Router /login [post]
+//	@Summary		User Login
+//	@Description	用户登录
+//	@Accept			json
+//	@Produce		json
+//	@Tags			Auth
+//	@Param			payload	body		userService.AuthStruct	true	"user login"
+//	@Success		200		{object}	common.Response
+//	@Router			/login [post]
 func UserLogin(c *gin.Context) {
 	appG := common.Gin{C: c}
 
@@ -86,21 +86,21 @@ func UserLogin(c *gin.Context) {
 	data["username"] = username
 	data["nickname"] = username
 	data["roles"] = [1]string{roleKey}
-	data["expires"] = expireTime.Format(ExpireTimeFomat)
+	data["expires"] = expireTime.Format(ExpireTimeFormat)
 
 	RCode = code.SUCCESS
 	appG.Response(http.StatusOK, RCode, "用户登录成功", data)
 }
 
-// @Summary Auth RefreshAccessToken
-// @Description 刷新用户access_token
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags Auth
-// @Param payload body userService.RefreshAccessTokenhStruct true "根据refresh_token 刷新access_token"、
-// @Success 200 {object} common.Response
-// @Router /refresh_token [post]
+//	@Summary		Auth RefreshAccessToken
+//	@Description	刷新用户access_token
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			Auth
+//	@Param			payload	body		userService.RefreshAccessTokenStruct	true	"根据refresh_token 刷新access_token"
+//	@Success		200		{object}	common.Response
+//	@Router			/refresh_token [post]
 func RefreshAccessToken(c *gin.Context) {
 	appG := common.Gin{C: c}
 	var refreshAccessTokenhStruct userService.RefreshAccessTokenStruct
@@ -118,14 +118,14 @@ func RefreshAccessToken(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "刷新access_token成功！", data)
 }
 
-// @Summary User Logout
-// @Description 用户登出
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags User
-// @Success 200 {object} common.Response
-// @Router /user/logout [post]
+//	@Summary		User Logout
+//	@Description	用户登出
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			User
+//	@Success		200	{object}	common.Response
+//	@Router			/user/logout [post]
 func UserLogout(c *gin.Context) {
 	appG := common.Gin{C: c}
 	claims, _ := c.Get("claims")
@@ -135,15 +135,15 @@ func UserLogout(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", nil)
 }
 
-// @Summary 修改密码
-// @Description 密码修改
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags User
-// @Param payload body userService.ChangePasswordStruct true "user change password"
-// @Success 200 {object} common.Response
-// @Router /user/change_password [put]
+//	@Summary		修改密码
+//	@Description	密码修改
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			User
+//	@Param			payload	body		userService.ChangePasswordStruct	true	"user change password"
+//	@Success		200		{object}	common.Response
+//	@Router			/user/change_password [put]
 func ChangePassword(c *gin.Context) {
 	appG := common.Gin{C: c}
 
@@ -185,14 +185,14 @@ func ChangePassword(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, code.GetMsg(code.SUCCESS), nil)
 }
 
-// @Summary 当前登录用户信息
-// @Description 当前登录用户信息
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Tags User
-// @Success 200 {object} common.Response
-// @Router /user/logged_in [get]
+//	@Summary		当前登录用户信息
+//	@Description	当前登录用户信息
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Tags			User
+//	@Success		200	{object}	common.Response
+//	@Router			/user/logged_in [get]
 func GetLoggedInUser(c *gin.Context) {
 	appG := common.Gin{C: c}
 
