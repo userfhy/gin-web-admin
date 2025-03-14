@@ -521,55 +521,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/send": {
-            "post": {
-                "description": "支持点对点消息和广播消息（clientId留空时广播）",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "TEST"
-                ],
-                "summary": "发送消息到指定客户端",
-                "parameters": [
-                    {
-                        "description": "消息内容",
-                        "name": "message",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/indexController.SendRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "消息已接受"
-                    },
-                    "400": {
-                        "description": "请求格式错误",
-                        "schema": {
-                            "$ref": "#/definitions/indexController.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "客户端不存在",
-                        "schema": {
-                            "$ref": "#/definitions/indexController.ErrorResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "服务不可用",
-                        "schema": {
-                            "$ref": "#/definitions/indexController.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/sys/menu_list": {
             "get": {
                 "security": [
@@ -712,6 +663,55 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/test/send": {
+            "post": {
+                "description": "支持点对点消息和广播消息（clientId留空时广播）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "发送消息到指定客户端",
+                "parameters": [
+                    {
+                        "description": "消息内容",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/indexController.SendRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "消息已接受"
+                    },
+                    "400": {
+                        "description": "请求格式错误",
+                        "schema": {
+                            "$ref": "#/definitions/indexController.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "客户端不存在",
+                        "schema": {
+                            "$ref": "#/definitions/indexController.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "服务不可用",
+                        "schema": {
+                            "$ref": "#/definitions/indexController.ErrorResponse"
                         }
                     }
                 }

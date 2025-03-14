@@ -481,38 +481,6 @@ paths:
       summary: 修改角色
       tags:
       - Role
-  /send:
-    post:
-      consumes:
-      - application/json
-      description: 支持点对点消息和广播消息（clientId留空时广播）
-      parameters:
-      - description: 消息内容
-        in: body
-        name: message
-        required: true
-        schema:
-          $ref: '#/definitions/indexController.SendRequest'
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: 消息已接受
-        "400":
-          description: 请求格式错误
-          schema:
-            $ref: '#/definitions/indexController.ErrorResponse'
-        "404":
-          description: 客户端不存在
-          schema:
-            $ref: '#/definitions/indexController.ErrorResponse'
-        "503":
-          description: 服务不可用
-          schema:
-            $ref: '#/definitions/indexController.ErrorResponse'
-      summary: 发送消息到指定客户端
-      tags:
-      - TEST
   /sys/menu_list:
     get:
       consumes:
@@ -602,6 +570,38 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Ping
+      tags:
+      - Test
+  /test/send:
+    post:
+      consumes:
+      - application/json
+      description: 支持点对点消息和广播消息（clientId留空时广播）
+      parameters:
+      - description: 消息内容
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/indexController.SendRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: 消息已接受
+        "400":
+          description: 请求格式错误
+          schema:
+            $ref: '#/definitions/indexController.ErrorResponse'
+        "404":
+          description: 客户端不存在
+          schema:
+            $ref: '#/definitions/indexController.ErrorResponse'
+        "503":
+          description: 服务不可用
+          schema:
+            $ref: '#/definitions/indexController.ErrorResponse'
+      summary: 发送消息到指定客户端
       tags:
       - Test
   /user:

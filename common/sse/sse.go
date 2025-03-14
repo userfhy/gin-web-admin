@@ -297,16 +297,23 @@ func (s *sseImpl) handleClientMessage(c *gin.Context, client *client, msg Messag
 
 func (s *sseImpl) flushWithTimeout(c *gin.Context) error {
 	done := make(chan struct{})
+	errChan := make(chan error)
+
 	go func() {
+		defer close(done)
+		if _, err := c.Writer.Write([]byte("\n")); err != nil {
+			errChan <- err
+		}
 		c.Writer.Flush()
-		close(done)
 	}()
 
 	select {
 	case <-done:
 		return nil
+	case err := <-errChan:
+		return err
 	case <-time.After(s.config.WriteTimeout):
-		return fmt.Errorf("write timeout after %v", s.config.WriteTimeout)
+		return fmt.Errorf("write timeout")
 	}
 }
 

@@ -20,7 +20,9 @@ import (
 var SSEService = sse.NewSSE(
 	sse.WithConfig(sse.Config{
 		HeartbeatInterval: 10 * time.Second,
-		WriteTimeout:      60 * time.Second,
+		ChannelBufferSize: 50,
+		WriteTimeout:      30 * time.Second,
+		MaxClientMessages: 10000,
 	}),
 	sse.WithSendFailHandler(func(clientID string, msg sse.Message) {
 		logging.Printf("重要消息发送失败: client=%s event=%s", clientID, msg.Event)
@@ -98,13 +100,13 @@ type ErrorResponse struct {
 // @Description 支持点对点消息和广播消息（clientId留空时广播）
 // @Accept  json
 // @Produce json
-// @Tags    TEST
+// @Tags    Test
 // @Param   message body SendRequest true "消息内容"
 // @Success 204 "消息已接受"
 // @Failure 400 {object} ErrorResponse "请求格式错误"
 // @Failure 404 {object} ErrorResponse "客户端不存在"
 // @Failure 503 {object} ErrorResponse "服务不可用"
-// @Router  /send [post]
+// @Router  /test/send [post]
 func SendStream(c *gin.Context) {
 	var req SendRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
