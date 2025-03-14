@@ -1,112 +1,309 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SSE Client Demo</title>
+    <title>SSE Client Demo (优化版)</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
-        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .panel { border: 1px solid #ccc; padding: 15px; border-radius: 5px; }
-        .messages { height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 10px; }
-        input[type="text"] { width: 200px; padding: 5px; }
-        button { padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 3px; }
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --info-color: #6c757d;
+        }
+        body { 
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 24px; 
+            margin-top: 24px;
+        }
+        .panel {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+        .messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+            background: #f8f9fa;
+        }
+        .message {
+            padding: 8px 12px;
+            margin: 6px 0;
+            background: white;
+            border-radius: 4px;
+            border-left: 3px solid var(--primary-color);
+        }
+        .form-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .status-bar {
+            display: flex;
+            gap: 16px;
+            color: var(--info-color);
+            margin-bottom: 12px;
+        }
     </style>
 </head>
 <body>
-    <h1>SSE Client Demo</h1>
+    <h1>实时消息系统</h1>
+    <div class="status-bar">
+        <div>连接状态: <span id="connectionStatus">未连接</span></div>
+        <div>客户端ID: <span onclick="copyHandle(this.textContent)" id="clientId"></span></div>
+        <div>活跃客户端: <span id="clientCount">0</span></div>
+    </div>
+    
     <div class="container">
         <div class="panel">
-            <h2>我的连接</h2>
-            <p>Client ID: <span id="clientId">等待连接...</span></p>
+            <h2>我的消息中心</h2>
             <div class="messages" id="myMessages"></div>
         </div>
 
         <div class="panel">
-            <h2>发送消息</h2>
-            <div>
-                <input type="text" id="targetClient" placeholder="目标Client ID">
-                <input type="text" id="message" placeholder="消息内容">
+            <h2>消息发送</h2>
+            <div class="form-group">
+                <input 
+                    type="text" 
+                    id="targetClient" 
+                    placeholder="输入Client ID (留空则广播)"
+                    list="clientList"
+                >
+                <datalist id="clientList"></datalist>
+                <input type="text" id="message" placeholder="输入消息内容">
                 <button onclick="sendMessage()">发送</button>
             </div>
-            <h3>广播消息</h3>
+            
+            <h3>系统广播</h3>
             <div class="messages" id="broadcastMessages"></div>
         </div>
     </div>
 
     <script>
         let clientId = null;
-        const es = new EventSource('/v1/api/test/events');
+        let reconnectAttempts = 0;
+        let es = null;
 
-        // 处理初始化消息
-        es.addEventListener('init', (e) => {
-            clientId = e.data;
-            document.getElementById('clientId').textContent = clientId;
-            addMessage('system', `Connected with ID: ${clientId}`, 'myMessages');
-        });
+        function copyHandle(content){
+            let copy = (e)=>{
+                e.preventDefault()
+                e.clipboardData.setData('text/plain',content)
+                // alert('复制成功')
+                document.removeEventListener('copy',copy)
+            }
+            document.addEventListener('copy',copy)
+            document.execCommand("Copy");
+        }
 
-        es.addEventListener('private', (e) => {
-            addMessage('private', e.data, 'myMessages');
-        });
+        // 初始化连接
+        function connectSSE() {
+            const es = new EventSource('/v1/api/test/events', {
+                withCredentials: false // 明确禁用凭据
+            });
+            
+            es.addEventListener('open', () => {
+                updateStatus('已连接', 'var(--success-color)');
+                reconnectAttempts = 0;
+            });
 
-        // 处理广播消息
-        es.addEventListener('broadcast', (e) => {
-            addMessage('broadcast', e.data, 'broadcastMessages');
-        });
+            // 处理注册事件
+            es.addEventListener('register', (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    clientId = data.client_id;
+                    document.getElementById('clientCount').textContent = data.clients;
+                    document.getElementById('clientId').textContent = clientId;
+                    addSystemMessage(`成功连接，您的ID: ${clientId}`);
+                    updateClientList(data.initial_clients || []);
+                } catch (err) {
+                    console.error('解析注册消息失败:', err);
+                }
+            });
 
-        // 处理心跳消息
-        es.addEventListener('heartbeat', (e) => {
-            console.log('Heartbeat:', e.data);
-        });
+            // 处理心跳事件
+            es.addEventListener('heartbeat', (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    document.getElementById('clientCount').textContent = data.clients;
+                    updateClientList(data.client_list || []);
+                } catch (err) {
+                    console.error('解析心跳消息失败:', err);
+                }
+            });
 
-        // 通用消息处理
-        es.onmessage = (e) => {
-            addMessage('message', e.data, 'myMessages');
-        };
+            // 处理私有消息
+            es.addEventListener('private', (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    addMessage('private', `来自 ${data.from}: ${data.content}`, 'myMessages');
+                } catch (err) {
+                    console.error('解析私有消息失败:', err);
+                }
+            });
 
-        // 发送消息
-        function sendMessage() {
-            const targetClient = document.getElementById('targetClient').value;
-            const message = document.getElementById('message').value;
+            // 处理系统广播
+            es.addEventListener('system_status', (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    const content = `系统状态 - CPU: ${data.cpu}%, 内存: ${data.memory}MB`;
+                    addMessage('system', content, 'broadcastMessages');
+                } catch (err) {
+                    console.error('解析系统广播失败:', err);
+                }
+            });
 
-            fetch('/v1/api/test/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    clientId: targetClient,
-                    event: 'private',
-                    data: message
-                })
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('发送失败');
-                addMessage('me', `发送给 ${targetClient}: ${message}`, 'myMessages');
-            })
-            .catch(error => {
-                alert(error.message);
+            // 处理错误消息
+            es.addEventListener('error', (e) => {
+                console.log(e)
+                if (es.readyState === EventSource.CLOSED) {
+                    handleDisconnect();
+                }
+
+                try {
+                    if(!e.data) {
+                        return
+                    }
+                    const data = JSON.parse(e.data);
+                    addSystemMessage(`错误: ${data.message}`);
+                } catch(err) {
+                    console.log(err)
+                    addSystemMessage('发生未知错误');
+                }
             });
         }
 
-        // 添加消息到面板
+        // 自动重连逻辑
+        function handleDisconnect() {
+            updateStatus('连接断开，尝试重连...', 'var(--danger-color)');
+            setTimeout(() => {
+                if (reconnectAttempts < 5) {
+                    reconnectAttempts++;
+                    connectSSE();
+                } else {
+                    updateStatus('连接失败，请刷新页面', 'var(--danger-color)');
+                }
+            }, Math.min(1000 * reconnectAttempts, 5000));
+        }
+
+        // 发送消息
+        async function sendMessage() {
+            const targetClient = document.getElementById('targetClient').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            if (!message) {
+                alert('请输入消息内容');
+                return;
+            }
+
+            try {
+                const response = await fetch('/v1/api/test/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        clientId: targetClient || '*', // 空值表示广播
+                        event: 'private',
+                        data: {
+                            from: clientId,
+                            content: message,
+                            timestamp: Date.now()
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || '发送失败');
+                }
+
+                if (targetClient) {
+                    addMessage('me', `发送给 ${targetClient}: ${message}`, 'myMessages');
+                } else {
+                    addMessage('me', `广播消息: ${message}`, 'myMessages');
+                }
+            } catch (err) {
+                addSystemMessage(`发送失败: ${err.message}`);
+            } finally {
+                document.getElementById('message').value = '';
+            }
+        }
+
+        // 更新客户端列表
+        function updateClientList(clients) {
+            const datalist = document.getElementById('clientList');
+            datalist.innerHTML = clients
+                .map(id => `<option value="${id}">${id}</option>`)
+                .join('');
+        }
+
+        // 状态显示更新
+        function updateStatus(text, color) {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.textContent = text;
+            statusEl.style.color = color;
+        }
+
+        // 添加系统消息
+        function addSystemMessage(text) {
+            addMessage('system', text, 'myMessages');
+        }
+
+        // 通用消息添加方法
         function addMessage(type, content, panelId) {
             const panel = document.getElementById(panelId);
             const div = document.createElement('div');
             div.className = 'message';
             div.innerHTML = `
-                <span style="color: ${getColor(type)}">[${new Date().toLocaleTimeString()}] ${type}:</span>
+                <span style="color: ${getColor(type)}">[${new Date().toLocaleTimeString()}]</span>
                 ${content}
             `;
+            
+            // 自动滚动到底部
             panel.appendChild(div);
             panel.scrollTop = panel.scrollHeight;
         }
 
         function getColor(type) {
             const colors = {
-                system: '#28a745',
-                broadcast: '#6c757d',
-                private: '#007bff',
-                me: '#dc3545'
+                system: 'var(--success-color)',
+                private: 'var(--primary-color)',
+                me: 'var(--danger-color)',
+                error: 'var(--danger-color)'
             };
-            return colors[type] || '#000';
+            return colors[type] || 'var(--info-color)';
         }
+
+        // 初始化连接
+        connectSSE();
     </script>
 </body>
 </html>

@@ -523,6 +523,7 @@ const docTemplate = `{
         },
         "/send": {
             "post": {
+                "description": "支持点对点消息和广播消息（clientId留空时广播）",
                 "consumes": [
                     "application/json"
                 ],
@@ -530,21 +531,43 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Test"
+                    "TEST"
                 ],
-                "summary": "Send message to specific client",
+                "summary": "发送消息到指定客户端",
                 "parameters": [
                     {
-                        "description": "Message Content",
+                        "description": "消息内容",
                         "name": "message",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/sse.Message"
+                            "$ref": "#/definitions/indexController.SendRequest"
                         }
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "204": {
+                        "description": "消息已接受"
+                    },
+                    "400": {
+                        "description": "请求格式错误",
+                        "schema": {
+                            "$ref": "#/definitions/indexController.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "客户端不存在",
+                        "schema": {
+                            "$ref": "#/definitions/indexController.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "服务不可用",
+                        "schema": {
+                            "$ref": "#/definitions/indexController.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/sys/menu_list": {
@@ -927,6 +950,34 @@ const docTemplate = `{
                 }
             }
         },
+        "indexController.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "indexController.SendRequest": {
+            "type": "object",
+            "required": [
+                "event"
+            ],
+            "properties": {
+                "clientId": {
+                    "description": "使用uuid4格式校验",
+                    "type": "string"
+                },
+                "data": {},
+                "event": {
+                    "description": "必须字母数字组合",
+                    "type": "string"
+                }
+            }
+        },
         "reportService.ReportStruct": {
             "type": "object",
             "required": [
@@ -994,15 +1045,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 10,
                     "minLength": 4
-                }
-            }
-        },
-        "sse.Message": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "event": {
-                    "type": "string"
                 }
             }
         },

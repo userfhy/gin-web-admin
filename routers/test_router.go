@@ -29,13 +29,17 @@ func InitTestRouter(Router *gin.RouterGroup) {
 		//注册SSE路由
 		test.GET("/events", indexController.SSEService.Handler())
 
-		// 启动广播
+		// 启动系统监控广播
 		// go func() {
-		// 	ticker := time.NewTicker(5 * time.Second)
+		// 	ticker := time.NewTicker(1 * time.Second)
 		// 	for range ticker.C {
 		// 		indexController.SSEService.Broadcast(sse.Message{
-		// 			Event: "broadcast",
-		// 			Data:  time.Now().Format(time.RFC3339),
+		// 			Event: "system_status",
+		// 			Data: gin.H{
+		// 				"cpu":     16,
+		// 				"memory":  66,
+		// 				"clients": indexController.SSEService.ClientCount(),
+		// 			},
 		// 		})
 		// 	}
 		// }()
