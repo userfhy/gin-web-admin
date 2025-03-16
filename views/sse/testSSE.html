@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SSE Client Demo (优化版)</title>
+    <title>SSE Client Demo</title>
     <style>
         :root {
             --primary-color: #007bff;
@@ -74,13 +74,16 @@
             color: var(--info-color);
             margin-bottom: 12px;
         }
+        #clientId {
+            cursor:pointer;
+        }
     </style>
 </head>
 <body>
-    <h1>实时消息系统</h1>
+    <h1>SSE实时消息系统</h1>
     <div class="status-bar">
         <div>连接状态: <span id="connectionStatus">未连接</span></div>
-        <div>客户端ID: <span onclick="copyHandle(this.textContent)" id="clientId"></span></div>
+        <div>客户端ID: <span title="点击复制" onclick="copyHandle(this.textContent)" id="clientId"></span></div>
         <div>活跃客户端: <span id="clientCount">0</span></div>
     </div>
     
@@ -175,7 +178,7 @@
             es.addEventListener('system_status', (e) => {
                 try {
                     const data = JSON.parse(e.data);
-                    const content = `系统状态 - CPU: ${data.cpu}%, 内存: ${data.memory}MB`;
+                    const content = `服务器状态: ${data.SystemStats}`;
                     addMessage('system', content, 'broadcastMessages');
                 } catch (err) {
                     console.error('解析系统广播失败:', err);

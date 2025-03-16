@@ -16,6 +16,15 @@ import (
 	"go.uber.org/zap"
 )
 
+func init() {
+	// 初始化日志系统
+	logging.Setup("sse-service", &logging.Option{
+		LogLevel:   "debug",
+		Formatter:  "text",
+		OutputPath: "",
+	})
+}
+
 // 初始化SSE服务
 var SSEService = sse.NewSSE(
 	sse.WithConfig(sse.Config{
@@ -27,6 +36,7 @@ var SSEService = sse.NewSSE(
 	sse.WithSendFailHandler(func(clientID string, msg sse.Message) {
 		logging.Printf("重要消息发送失败: client=%s event=%s", clientID, msg.Event)
 	}),
+	sse.WithLogger(&sse.LogrusAdapter{}),
 )
 
 // @Summary		Ping

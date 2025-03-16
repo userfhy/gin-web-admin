@@ -174,6 +174,7 @@ func (s *sseImpl) Broadcast(msg Message) {
 
 // Send 发送消息到指定客户端
 func (s *sseImpl) Send(clientID string, msg Message) error {
+	// s.logger.Printf("Send MSG: %v", msg.Data)
 	s.mu.RLock()
 	client, exists := s.clients[clientID]
 	s.mu.RUnlock()

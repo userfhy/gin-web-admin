@@ -102,76 +102,72 @@ type logger struct {
 }
 
 func Infof(format string, args ...any) {
-	L().getEntry().Infof(format, args...)
+	L().GetEntry().Infof(format, args...)
 }
 
 func Warnf(format string, args ...any) {
-	L().getEntry().Warnf(format, args...)
+	L().GetEntry().Warnf(format, args...)
 }
 
 func Errorf(format string, args ...any) {
-	L().getEntry().Errorf(format, args...)
+	L().GetEntry().Errorf(format, args...)
 }
 
 func Printf(format string, args ...any) {
-	L().getEntry().Printf(format, args...)
+	L().GetEntry().Printf(format, args...)
 }
 
 func Println(args ...any) {
-	L().getEntry().Println(args...)
+	L().GetEntry().Println(args...)
 }
 
 func Fatalf(format string, args ...any) {
-	L().getEntry().Fatalf(format, args...)
+	L().GetEntry().Fatalf(format, args...)
 }
 
 func Fatalln(args ...any) {
-	L().getEntry().Fatalln(args...)
+	L().GetEntry().Fatalln(args...)
 }
 
 // 所有日志方法改为包级函数
 func Trace(args ...any) {
-	L().getEntry().Log(logrus.TraceLevel, args...)
+	L().GetEntry().Log(logrus.TraceLevel, args...)
 }
 
 func Debug(args ...any) {
-	L().getEntry().Debug(args...)
+	L().GetEntry().Debug(args...)
 }
 
 func Info(args ...any) {
-	L().getEntry().Info(args...)
+	L().GetEntry().Info(args...)
 }
 
 func Warn(args ...any) {
-	L().getEntry().Warn(args...)
+	L().GetEntry().Warn(args...)
 }
 
 func Error(args ...any) {
-	L().getEntry().Error(args...)
+	L().GetEntry().Error(args...)
 }
 
 // 带上下文的日志方法
 func WithContext(ctx context.Context) *logrus.Entry {
-	return L().getEntry().WithContext(ctx)
+	return L().GetEntry().WithContext(ctx)
 }
 
 func WithField(key string, value interface{}) *logrus.Entry {
-	return L().getEntry().WithField(key, value)
+	return L().GetEntry().WithField(key, value)
 }
 
 func WithFields(fields logrus.Fields) *logrus.Entry {
-	return L().getEntry().WithFields(fields)
+	return L().GetEntry().WithFields(fields)
 }
 
 func WithError(err error) *logrus.Entry {
-	return L().getEntry().WithError(err)
+	return L().GetEntry().WithError(err)
 }
 
-// 其他方法同理...
-// [保留原有 entry() 逻辑，但改为使用全局 entry]
-
-// 私有方法
-func (l *logger) getEntry() *logrus.Entry {
+func (l *logger) GetEntry() *logrus.Entry {
 	entry := l.entry_
 	if l.option.WithFunc {
 		entry = entry.WithField("caller", getCaller(4)) // 修正跳转层级
