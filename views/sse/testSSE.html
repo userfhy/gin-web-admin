@@ -1,81 +1,229 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SSE Client Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE实时消息系统</title>
     <style>
         :root {
-            --primary-color: #007bff;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --info-color: #6c757d;
+            --primary-color: #2563eb;
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+            --info-color: #4b5563;
+            --bg-color: #f3f4f6;
+            --surface-color: #ffffff;
+            --border-color: #e5e7eb;
         }
+        
         body { 
-            font-family: system-ui, -apple-system, sans-serif;
-            max-width: 1200px; 
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            max-width: 1600px; 
             margin: 0 auto; 
-            padding: 20px;
-            background: #f8f9fa;
+            padding: 1rem;
+            background: var(--bg-color);
+            line-height: 1.5;
         }
+        
         .container { 
             display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 24px; 
-            margin-top: 24px;
+            grid-template-columns: 1fr; 
+            gap: 1.5rem;
+            margin-top: 1.5rem;
         }
+        
         .panel {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            padding: 20px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 1.25rem;
+            transition: transform 0.2s;
         }
+        
         .messages {
-            height: 400px;
+            height: 50vh;
             overflow-y: auto;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 12px;
-            margin-top: 12px;
-            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            background: var(--bg-color);
+            scroll-behavior: smooth;
         }
+        
         .message {
-            padding: 8px 12px;
-            margin: 6px 0;
-            background: white;
-            border-radius: 4px;
-            border-left: 3px solid var(--primary-color);
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background: var(--surface-color);
+            border-radius: 0.375rem;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 0.75rem;
+            align-items: baseline;
         }
+        
         .form-group {
             display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
+        
         input[type="text"] {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
         }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
         button {
-            padding: 8px 16px;
+            padding: 0.75rem 1.5rem;
             background: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 0.5rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
         button:hover {
             opacity: 0.9;
         }
+        
         .status-bar {
             display: flex;
-            gap: 16px;
+            flex-wrap: wrap;
+            gap: 1rem;
             color: var(--info-color);
-            margin-bottom: 12px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
         }
+        
         #clientId {
-            cursor:pointer;
+            cursor: pointer;
+            position: relative;
+            padding-right: 1.25rem;
+        }
+        
+        #clientId::after {
+            content: "📋";
+            position: absolute;
+            right: 0;
+            opacity: 0.6;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .form-group {
+                flex-direction: row;
+            }
+            
+            button {
+                min-width: 6rem;
+            }
+            
+            .messages {
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 0.75rem;
+            }
+            
+            .panel {
+                padding: 1rem;
+                border-radius: 0.5rem;
+            }
+            
+            .message {
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            h2 {
+                font-size: 1.25rem;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4f46e5; /* 更明亮的颜色 */
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            z-index: 9999; /* 确保在最顶层 */
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            animation: toastPop 0.3s ease-out;
+        }
+
+        @keyframes toastPop {
+            0% {
+                transform: translateX(-50%) translateY(100%);
+                opacity: 0;
+            }
+            80% {
+                transform: translateX(-50%) translateY(-10%);
+            }
+            100% {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 添加图标 */
+        .toast::before {
+            content: ""; /* 可以替换为其他图标 */
+            display: inline-block;
+            font-size: 1.2em;
         }
     </style>
 </head>
@@ -86,24 +234,27 @@
         <div>客户端ID: <span title="点击复制" onclick="copyHandle(this.textContent)" id="clientId"></span></div>
         <div>活跃客户端: <span id="clientCount">0</span></div>
     </div>
-    
+
+    <div class="toast" id="toast"></div>
+
     <div class="container">
         <div class="panel">
-            <h2>我的消息中心</h2>
+            <h3>我的消息中心</h3>
             <div class="messages" id="myMessages"></div>
         </div>
 
         <div class="panel">
-            <h2>消息发送</h2>
+            <h3>消息发送</h3>
             <div class="form-group">
                 <input 
                     type="text" 
                     id="targetClient" 
                     placeholder="输入Client ID (留空则广播)"
                     list="clientList"
+                    autocapitalize="off"
                 >
                 <datalist id="clientList"></datalist>
-                <input type="text" id="message" placeholder="输入消息内容">
+                <input type="text" id="message" placeholder="输入消息内容" autocapitalize="off">
                 <button onclick="sendMessage()">发送</button>
             </div>
             
@@ -117,21 +268,27 @@
         let reconnectAttempts = 0;
         let es = null;
 
+        function showToast(message, duration = 2500) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), duration);
+        }
+
         function copyHandle(content){
             let copy = (e)=>{
-                e.preventDefault()
-                e.clipboardData.setData('text/plain',content)
-                // alert('复制成功')
-                document.removeEventListener('copy',copy)
+                e.preventDefault();
+                e.clipboardData.setData('text/plain',content);
+                showToast('复制成功');
+                document.removeEventListener('copy',copy);
             }
-            document.addEventListener('copy',copy)
+            document.addEventListener('copy',copy);
             document.execCommand("Copy");
         }
 
-        // 初始化连接
         function connectSSE() {
-            const es = new EventSource('/v1/api/test/events', {
-                withCredentials: false // 明确禁用凭据
+            es = new EventSource('/v1/api/test/events', {
+                withCredentials: false
             });
             
             es.addEventListener('open', () => {
@@ -139,7 +296,6 @@
                 reconnectAttempts = 0;
             });
 
-            // 处理注册事件
             es.addEventListener('register', (e) => {
                 try {
                     const data = JSON.parse(e.data);
@@ -153,7 +309,6 @@
                 }
             });
 
-            // 处理心跳事件
             es.addEventListener('heartbeat', (e) => {
                 try {
                     const data = JSON.parse(e.data);
@@ -164,7 +319,6 @@
                 }
             });
 
-            // 处理私有消息
             es.addEventListener('private', (e) => {
                 try {
                     const data = JSON.parse(e.data);
@@ -174,7 +328,6 @@
                 }
             });
 
-            // 处理系统广播
             es.addEventListener('system_status', (e) => {
                 try {
                     const data = JSON.parse(e.data);
@@ -185,27 +338,22 @@
                 }
             });
 
-            // 处理错误消息
             es.addEventListener('error', (e) => {
-                console.log(e)
                 if (es.readyState === EventSource.CLOSED) {
                     handleDisconnect();
                 }
 
                 try {
-                    if(!e.data) {
-                        return
+                    if(e.data) {
+                        const data = JSON.parse(e.data);
+                        addSystemMessage(`错误: ${data.message}`);
                     }
-                    const data = JSON.parse(e.data);
-                    addSystemMessage(`错误: ${data.message}`);
                 } catch(err) {
-                    console.log(err)
-                    addSystemMessage('发生未知错误');
+                    console.log(err);
                 }
             });
         }
 
-        // 自动重连逻辑
         function handleDisconnect() {
             updateStatus('连接断开，尝试重连...', 'var(--danger-color)');
             setTimeout(() => {
@@ -218,13 +366,12 @@
             }, Math.min(1000 * reconnectAttempts, 5000));
         }
 
-        // 发送消息
         async function sendMessage() {
             const targetClient = document.getElementById('targetClient').value.trim();
             const message = document.getElementById('message').value.trim();
 
             if (!message) {
-                alert('请输入消息内容');
+                showToast('⚠️请输入消息内容');
                 return;
             }
 
@@ -233,7 +380,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        clientId: targetClient || '*', // 空值表示广播
+                        clientId: targetClient || '*',
                         event: 'private',
                         data: {
                             from: clientId,
@@ -245,7 +392,8 @@
 
                 if (!response.ok) {
                     const error = await response.json();
-                    throw new Error(error.message || '发送失败');
+                    const errorMsg = error.message || '发送失败';
+                    throw new Error(errorMsg);
                 }
 
                 if (targetClient) {
@@ -254,13 +402,13 @@
                     addMessage('me', `广播消息: ${message}`, 'myMessages');
                 }
             } catch (err) {
-                addSystemMessage(`发送失败: ${err.message}`);
+                showToast(`⚠️发送失败: ${err.message}`);
+                // addSystemMessage(`发送失败: ${err.message}`);
             } finally {
                 document.getElementById('message').value = '';
             }
         }
 
-        // 更新客户端列表
         function updateClientList(clients) {
             const datalist = document.getElementById('clientList');
             datalist.innerHTML = clients
@@ -268,19 +416,16 @@
                 .join('');
         }
 
-        // 状态显示更新
         function updateStatus(text, color) {
             const statusEl = document.getElementById('connectionStatus');
             statusEl.textContent = text;
             statusEl.style.color = color;
         }
 
-        // 添加系统消息
         function addSystemMessage(text) {
             addMessage('system', text, 'myMessages');
         }
 
-        // 通用消息添加方法
         function addMessage(type, content, panelId) {
             const panel = document.getElementById(panelId);
             const div = document.createElement('div');
@@ -289,8 +434,6 @@
                 <span style="color: ${getColor(type)}">[${new Date().toLocaleTimeString()}]</span>
                 ${content}
             `;
-            
-            // 自动滚动到底部
             panel.appendChild(div);
             panel.scrollTop = panel.scrollHeight;
         }
@@ -305,7 +448,13 @@
             return colors[type] || 'var(--info-color)';
         }
 
-        // 初始化连接
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('touchstart', (e) => {
+                e.target.focus();
+                window.scrollTo(0, e.target.offsetTop - 100);
+            });
+        });
+
         connectSSE();
     </script>
 </body>
