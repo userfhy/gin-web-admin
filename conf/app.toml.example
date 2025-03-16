@@ -1,0 +1,35 @@
+[app]
+JwtSecret = ""
+# If there is a user record, please do not change it at will
+PasswordSalt = "fgyf"
+PrefixUrl = "http://0.0.0.0:8081"
+TimeFormat = "20060102"
+ExpireTimeFormat = "2006/01/02 15:04:05"
+EnabledCORS = True
+
+[server]
+# Running in "debug" mode. Switch to "release" mode in production.
+# Debug mode no routing authority verification.
+#debug or release
+RunMode = "debug"
+HttpPort = 8081
+ReadTimeout = 60
+WriteTimeout = 60
+
+[database]
+EchoSql = true
+Type = "mysql"
+User = "root"
+Password = "pass"
+Host = "127.0.0.1:3306"
+Name = "name"
+TablePrefix = "gin_"
+
+[redis]
+# Host not "" enable
+Host = ""
+DB = 3
+Password = ""
+MaxIdle = 30
+MaxActive = 30
+IdleTimeout = 200

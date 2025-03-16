@@ -7,7 +7,7 @@
 ## First Run
 
 ```bash
-cp conf/app.ini.example conf/app.ini
+cp conf/app.toml.example conf/app.toml
 go mod download
 go run main.go
 ```
@@ -36,6 +36,12 @@ $ go run main.go
  - using env:   export GIN_MODE=release
  - using code:  gin.SetMode(gin.ReleaseMode)
 
+INFO[2025-03-16 14:18:39] Redis connected 192.168.1.128:6379 DB: 3      caller="main.init.0:53" service=sse-service
+INFO[2025-03-16 14:18:39] PONG                                          caller="gin-web-admin/utils/gredis.Setup:49" service=sse-service
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:   export GIN_MODE=release
+ - using code:  gin.SetMode(gin.ReleaseMode)
+
 [GIN-debug] POST   /v1/api/login             --> gin-web-admin/app/controllers/v1/auth.UserLogin (4 handlers)
 [GIN-debug] POST   /v1/api/refresh_token     --> gin-web-admin/app/controllers/v1/auth.RefreshAccessToken (4 handlers)
 [GIN-debug] GET    /v1/api/user              --> gin-web-admin/app/controllers/v1/user.GetUsers (7 handlers)
@@ -52,14 +58,19 @@ $ go run main.go
 [GIN-debug] DELETE /v1/api/casbin/:id        --> gin-web-admin/app/controllers/v1/casbin.DeleteCasbin (7 handlers)
 [GIN-debug] GET    /v1/api/sys/router        --> gin-web-admin/app/controllers/v1/sys.GetRouterList (7 handlers)
 [GIN-debug] GET    /v1/api/sys/menu_list     --> gin-web-admin/app/controllers/v1/sys.GetMenuList (7 handlers)
+[GIN-debug] POST   /v1/api/test/ping         --> gin-web-admin/app/controllers/v1/index.Ping (5 handlers)
 [GIN-debug] GET    /v1/api/test/ping         --> gin-web-admin/app/controllers/v1/index.Ping (5 handlers)
 [GIN-debug] GET    /v1/api/test/font         --> gin-web-admin/app/controllers/v1/index.Test (5 handlers)
-[GIN-debug] POST   /v1/api/test/ping         --> gin-web-admin/app/controllers/v1/index.Ping (5 handlers)
+[GIN-debug] GET    /v1/api/test/sse          --> gin-web-admin/routers.InitTestRouter.func1 (5 handlers)
+[GIN-debug] GET    /v1/api/test/events       --> gin-web-admin/common/sse.(*sseImpl).Handler.func1 (5 handlers)
+[GIN-debug] POST   /v1/api/test/send         --> gin-web-admin/app/controllers/v1/index.SendStream (5 handlers)
+[GIN-debug] GET    /v1/api/test/count        --> gin-web-admin/app/controllers/v1/index.SSEClientCount (5 handlers)
 [GIN-debug] POST   /v1/api/report            --> gin-web-admin/app/controllers/v1/report.Report (5 handlers)
 [GIN-debug] GET    /swagger                  --> gin-web-admin/routers.InitSwaggerRouter.func1 (4 handlers)
 [GIN-debug] GET    /swagger/*any             --> github.com/swaggo/gin-swagger.CustomWrapHandler.func1 (4 handlers)
-INFO[0000] [info] start http server listening :8081      func="main.main:86" name=main-logger
-INFO[0000] [info] Actual pid is 1458812                  func="main.main:87" name=main-logger
+INFO[2025-03-16 14:18:39] start http server listening :8081             caller="runtime.main:283" service=sse-service
+INFO[2025-03-16 14:18:39] Actual pid is 2969363                         caller="runtime.main:283" service=sse-service
+
 
 ```
 
@@ -156,7 +167,7 @@ func GetPage(c *gin.Context) (error, string, int, int) {
 - [Gin-gonic](https://github.com/gin-gonic/gin)
 - [Gorm](https://github.com/go-gorm/gorm)
 - [Swagger(swag)](https://github.com/swaggo/swag)
-- [Go-ini](https://github.com/go-ini/ini)
+- [Toml](https://github.com/BurntSushi/toml)
 - [Redis](https://github.com/gomodule/redigo)
 - [Air](https://github.com/cosmtrek/air)
 - [JWT](https://github.com/golang-jwt/jwt)

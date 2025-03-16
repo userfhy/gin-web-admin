@@ -5,6 +5,7 @@ import (
 	"gin-web-admin/app/middleware"
 	"gin-web-admin/common/sse"
 	"gin-web-admin/utils/system_monitor"
+	"gin-web-admin/views"
 	"text/template"
 	"time"
 
@@ -20,9 +21,10 @@ func InitTestRouter(Router *gin.RouterGroup) {
 		test.GET("/ping", indexController.Ping)
 		test.GET("/font", indexController.Test)
 
-		//SSE HTML
+		// 修改SSE HTML模板加载方式
 		test.GET("/sse", func(c *gin.Context) {
-			t, err := template.ParseFiles("./views/sse/testSSE.html")
+			// 使用嵌入的模板文件
+			t, err := template.ParseFS(views.SSEStaticFS, "sse/testSSE.html")
 			if err != nil {
 				panic(err)
 			}

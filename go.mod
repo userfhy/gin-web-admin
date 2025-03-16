@@ -5,7 +5,6 @@ go 1.24
 require (
 	github.com/casbin/casbin/v2 v2.103.0
 	github.com/gin-gonic/gin v1.10.0
-	github.com/go-ini/ini v1.67.0
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
@@ -42,6 +41,7 @@ require (
 )
 
 require (
+	github.com/BurntSushi/toml v1.4.0
 	github.com/casbin/gorm-adapter/v3 v3.32.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
