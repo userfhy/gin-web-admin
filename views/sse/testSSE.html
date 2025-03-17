@@ -331,7 +331,7 @@
             es.addEventListener('system_status', (e) => {
                 try {
                     const data = JSON.parse(e.data);
-                    const content = `服务器状态: ${data.SystemStats}`;
+                    const content = `服务器状态: ${data.systemStats}`;
                     addMessage('system', content, 'broadcastMessages');
                 } catch (err) {
                     console.error('解析系统广播失败:', err);

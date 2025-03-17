@@ -47,7 +47,7 @@ func InitTestRouter(Router *gin.RouterGroup) {
 				indexController.SSEService.Broadcast(sse.Message{
 					Event: "system_status",
 					Data: gin.H{
-						"SystemStats": stats.String(),
+						"systemStats": stats.String(),
 						"clients":     indexController.SSEService.ClientCount(),
 					},
 				})
