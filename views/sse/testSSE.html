@@ -239,7 +239,7 @@
 
     <div class="container">
         <div class="panel">
-            <h3>我的消息中心</h3>
+            <h3>我的消息中心<span id="myMessagesCount"></span></h3>
             <div class="messages" id="myMessages"></div>
         </div>
 
@@ -258,7 +258,7 @@
                 <button onclick="sendMessage()">发送</button>
             </div>
             
-            <h3>系统广播</h3>
+            <h3>系统广播<span id="broadcastMessagesCount"></span></h3>
             <div class="messages" id="broadcastMessages"></div>
         </div>
     </div>
@@ -267,6 +267,26 @@
         let clientId = null;
         let reconnectAttempts = 0;
         let es = null;
+
+        // 定义各消息面板的配置参数
+        let broadcastMessagesCount = 0;
+        let myMessagesCount = 0;
+        const panelConfigs = {
+            broadcastMessages: {
+                getCount: () => broadcastMessagesCount,
+                setCount: (value) => { broadcastMessagesCount = value; },
+                threshold: 100,
+                contentId: 'broadcastMessages',
+                countId: 'broadcastMessagesCount'
+            },
+            myMessages: {
+                getCount: () => myMessagesCount,
+                setCount: (value) => { myMessagesCount = value; },
+                threshold: 1000,
+                contentId: 'myMessages',
+                countId: 'myMessagesCount'
+            }
+        };
 
         function showToast(message, duration = 2500) {
             const toast = document.getElementById('toast');
@@ -426,8 +446,38 @@
             addMessage('system', text, 'myMessages');
         }
 
+        /**
+         * 显示消息数量及清除消息内容
+         **/
+        async function changeMessagesCountAndContent(panelId) {
+            const config = panelConfigs[panelId];
+            
+            if (!config) {
+                console.error(`无效的面板ID: ${panelId}`);
+                return;
+            }
+
+            let currentCount = config.getCount();
+
+            // 达到阈值时重置计数并清空内容
+            if (currentCount >= config.threshold) {
+                config.setCount(0);
+                document.getElementById(config.contentId).innerHTML = '';
+                currentCount = 0; // 同步更新当前计数值
+            }
+
+            // 更新计数并显示
+            const newCount = currentCount + 1;
+            config.setCount(newCount);
+            document.getElementById(config.countId).textContent = newCount;
+        }
+
+
         function addMessage(type, content, panelId) {
             const panel = document.getElementById(panelId);
+
+            changeMessagesCountAndContent(panelId)
+
             const div = document.createElement('div');
             div.className = 'message';
             div.innerHTML = `
