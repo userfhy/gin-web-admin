@@ -1,0 +1,23 @@
+FROM golang:1.24-alpine
+
+ENV TIME_ZONE=Asia/Shanghai \
+    CODE_DIR=/code \
+    GOPROXY=https://goproxy.cn,direct \
+    GOFLAGS="-buildvcs=false"
+
+RUN apk add --no-cache git tzdata bash curl \
+ && ln -snf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime \
+ && echo ${TIME_ZONE} > /etc/timezone
+
+WORKDIR ${CODE_DIR}
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN go install github.com/air-verse/air@latest
+
+EXPOSE 8081
+
+CMD ["air", "-c", ".air.toml"]

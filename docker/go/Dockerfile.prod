@@ -1,0 +1,29 @@
+FROM golang:1.24-alpine AS builder
+
+ENV TIME_ZONE=Asia/Shanghai \
+    CODE_DIR=/app \
+    GOPROXY=https://goproxy.cn,direct
+
+RUN apk add --no-cache git tzdata \
+ && ln -snf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime \
+ && echo ${TIME_ZONE} > /etc/timezone
+
+WORKDIR ${CODE_DIR}
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server main.go
+
+# Final image
+FROM scratch
+
+COPY --from=builder /etc/localtime /etc/localtime
+COPY --from=builder /etc/timezone /etc/timezone
+COPY --from=builder /app/server /server
+
+EXPOSE 8081
+
+ENTRYPOINT ["/server"]

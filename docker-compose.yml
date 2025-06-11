@@ -1,18 +1,18 @@
-version: '3'
 services:
   web:
-    image: 'report-api-gin:1.0'
     build:
       context: .
-      dockerfile: docker/go/Dockerfile
+      dockerfile: docker/go/Dockerfile.prod
+    image: gin-web-admin:prod
+    restart: on-failure
     ports:
-      - '8080:8080'
+      - '8081:8081'
     volumes:
-      - .:/code/
-#    restart: always
+      - .:/code
     environment:
       - APP_ENV=live
     logging:
       driver: "json-file"
       options:
         max-size: "2G"
+    working_dir: /code
