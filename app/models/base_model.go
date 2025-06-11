@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -54,7 +55,8 @@ func Setup() {
 
 	var newLogger logger.Interface
 
-	if setting.DatabaseSetting.EchoSql {
+	log.Println("Connecting to database...")
+	if gin.Mode() == gin.DebugMode {
 		newLogger = logger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 			logger.Config{

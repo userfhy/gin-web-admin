@@ -30,8 +30,18 @@ func init() {
 	setting.Setup()
 
 	runMode = setting.ServerSetting.RunMode
-	logLevel := "debug"
-	if runMode != "debug" {
+
+	// 如果环境变量 RUN_MODE 存在，则使用它的值覆盖配置文件中的 run_mode
+	RUN_MODE := os.Getenv("RUN_MODE")
+	if RUN_MODE != "" {
+		runMode = RUN_MODE
+	}
+
+	// 设置 Gin 的运行模式
+	gin.SetMode(runMode)
+
+	logLevel := gin.DebugMode
+	if runMode != gin.DebugMode {
 		logLevel = "info"
 	}
 
@@ -41,6 +51,8 @@ func init() {
 		Formatter:  "text",
 		OutputPath: "",
 	})
+
+	logging.Info("runMode:", gin.Mode())
 
 	model.Setup()
 	common.InitValidate()
@@ -63,9 +75,7 @@ func init() {
 // @name						Authorization
 func main() {
 	//binding.Validator = new(validator.DefaultValidator)
-	gin.SetMode(runMode)
-
-	r := gin.New()
+	r := gin.Default()
 
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())

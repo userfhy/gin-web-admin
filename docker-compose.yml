@@ -2,15 +2,17 @@ services:
   web:
     build:
       context: .
-      dockerfile: docker/go/Dockerfile.prod
-    image: gin-web-admin:prod
+      dockerfile: docker/go/Dockerfile.dev
+    image: gin-web-admin
     restart: on-failure
     ports:
       - '8081:8081'
     volumes:
       - .:/code
     environment:
-      - APP_ENV=live
+      - RUN_MODE=debug  #debug or release
+      # - GIN_MODE=release
+      - TZ=Asia/Shanghai
     logging:
       driver: "json-file"
       options:
