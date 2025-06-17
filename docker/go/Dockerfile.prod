@@ -1,3 +1,4 @@
+# Build stage
 FROM golang:1.24-alpine AS builder
 
 ENV TIME_ZONE=Asia/Shanghai \
@@ -17,11 +18,15 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server main.go
 
-# Final image
-FROM scratch
+# Final image (runtime)
+FROM alpine:latest
 
-COPY --from=builder /etc/localtime /etc/localtime
-COPY --from=builder /etc/timezone /etc/timezone
+ENV TZ=Asia/Shanghai
+
+RUN apk add --no-cache tzdata \
+ && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+ && echo $TZ > /etc/timezone
+
 COPY --from=builder /app/server /server
 
 EXPOSE 8081
