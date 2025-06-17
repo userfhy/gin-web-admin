@@ -11,7 +11,7 @@
  Target Server Version : 80402 (8.4.2)
  File Encoding         : 65001
 
- Date: 03/01/2025 16:18:58
+ Date: 17/06/2025 10:35:51
 */
 
 SET NAMES utf8mb4;
@@ -26,16 +26,16 @@ CREATE TABLE `casbin_rule` (
   `created_at` datetime(3) DEFAULT NULL,
   `updated_at` datetime(3) DEFAULT NULL,
   `deleted_at` datetime(3) DEFAULT NULL,
-  `ptype` varchar(300) DEFAULT NULL,
-  `v0` varchar(100) DEFAULT NULL,
-  `v1` varchar(100) DEFAULT NULL,
-  `v2` varchar(100) DEFAULT NULL,
-  `v3` varchar(100) DEFAULT NULL,
-  `v4` varchar(100) DEFAULT NULL,
-  `v5` varchar(100) DEFAULT NULL,
+  `ptype` varchar(300) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `v0` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `v1` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `v2` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `v3` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `v4` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `v5` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_index` (`v0`,`v1`,`v2`,`v3`,`v4`,`v5`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of casbin_rule
@@ -58,23 +58,23 @@ CREATE TABLE `gin_auth` (
   `role_id` bigint unsigned NOT NULL DEFAULT '0',
   `status` int NOT NULL DEFAULT '0',
   `logged_in_at` datetime(3) DEFAULT NULL,
-  `username` varchar(20) NOT NULL,
-  `nickname` varchar(30) DEFAULT NULL,
-  `phone` varchar(30) DEFAULT NULL,
-  `email` varchar(40) DEFAULT NULL,
+  `username` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `nickname` varchar(30) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `phone` varchar(30) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `sex` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1-女 2-男',
-  `password` varchar(50) NOT NULL,
-  `refresh_token` varchar(600) DEFAULT '',
+  `password` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `refresh_token` varchar(600) COLLATE utf8mb4_general_ci DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni_gin_auth_username` (`username`),
   UNIQUE KEY `uni_gin_auth_refresh_token` (`refresh_token`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of gin_auth
 -- ----------------------------
 BEGIN;
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2024-12-31 11:41:42.832', NULL, 1, 1, '2024-12-31 11:41:42.831', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTczNjE3OTIwMCwiaWF0IjoxNzM1NjE2NTAyfQ.tu6YlMj33bKjH-IhDXTFQ1PPCAajxFVf7zeKTdzf0nI');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2025-04-14 15:26:15.446', NULL, 1, 1, '2025-04-14 15:26:15.446', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQ1MTY0ODAwLCJpYXQiOjE3NDQ2MTU1NzV9.LLLDbntgYrMow0oWnkTtrUleA1WS9Y6Vr90zFdyWR_s');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2024-08-27 11:36:07.524', NULL, 2, 1, '2024-08-27 11:34:54.024', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '2');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (3, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor2', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '3');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (4, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor3', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '4');
@@ -92,30 +92,29 @@ CREATE TABLE `gin_jwt_blacklist` (
   `updated_at` datetime(3) DEFAULT NULL,
   `deleted_at` datetime(3) DEFAULT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
-  `jwt` text,
+  `jwt` text COLLATE utf8mb4_general_ci,
   PRIMARY KEY (`id`),
   KEY `idx_blog_jwt_blacklist_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of gin_jwt_blacklist
 -- ----------------------------
 BEGIN;
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (32, '2024-05-24 15:39:29.863', '2024-05-24 15:39:29.863', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzE2NTQxOTc2LCJpYXQiOjE3MTY1MzQ3NzZ9.TyZ7wLxGSKBLN9CHXjx5qhaxQQ_ErMEoo_ARbjRmwdY');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (33, '2024-05-24 16:49:32.059', '2024-05-24 16:49:32.059', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNjU0MzU3MywiaWF0IjoxNzE2NTM2MzczfQ.ibNNusn6Lv__AJQtK6Lp_8HuPomrarOdugCGInzsWlM');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (34, '2024-05-24 16:56:08.396', '2024-05-24 16:56:08.396', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNjU0ODEyMiwiaWF0IjoxNzE2NTQwOTIyfQ.kKnjAPMkVpgATyCzCIg3pF_hYkxoxTHtdHgIKwbqPEE');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (35, '2024-05-27 10:35:42.441', '2024-05-27 10:35:42.441', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzE2NzgxNzUwLCJpYXQiOjE3MTY3NzQ1NTB9.sdjry8xX2UNHlK4Ha05VZu0LVme_zcbjqp0yQqISwhQ');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (36, '2024-05-27 15:02:03.164', '2024-05-27 15:02:03.164', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzE2Nzk5NzI1LCJpYXQiOjE3MTY3OTI1MjV9.VovJoBLTgs13cJDAflfng3V3oJEOFrkApMHBZ9Q8LmY');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (37, '2024-05-27 16:30:20.148', '2024-05-27 16:30:20.148', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNjgwMDYzNywiaWF0IjoxNzE2NzkzNDM3fQ.3OYA_B4dHQcO5p6OOm3EcvwkBOhmcBYNXne2Sdvkw7c');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (38, '2024-06-08 08:59:33.010', '2024-06-08 08:59:33.010', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNzgxMzA4NSwiaWF0IjoxNzE3ODA1ODg1fQ.8VmyLhQZRBrUdn3_5_YiMfDuazg0i70GNhsK4P8VQ4M');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (39, '2024-06-08 09:01:22.238', '2024-06-08 09:01:22.238', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNzgxNTY4MiwiaWF0IjoxNzE3ODA4NDgyfQ.tYpbx7Je0MVTqpsEv4Zhvt7fpk4PkOGhv-4SPqVKqoU');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (40, '2024-06-08 09:07:33.350', '2024-06-08 09:07:33.350', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNzgxNjA1MywiaWF0IjoxNzE3ODA4ODUzfQ.dK0Yh8kwgBagXy_yL06XdcLE0TtkfN0lwAh-fWVwTHo');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (41, '2024-06-08 09:31:13.986', '2024-06-08 09:31:13.986', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcxNzgxNjA1NiwiaWF0IjoxNzE3ODA4ODU2fQ.iwsEhR2CxiOzmYiq7VSRSh8gUT-VlN3fbGGywiqCZGg');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (42, '2024-08-27 11:25:42.846', '2024-08-27 11:25:42.846', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNDczNTczNywiaWF0IjoxNzI0NzI4NTM3fQ.DSRSOMahNBeagYUr3cQwIt3tVkDYt172iozcJQ-o8ho');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (43, '2024-08-27 11:34:04.007', '2024-08-27 11:34:04.007', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX25hbWUiOiJlZGl0b3IiLCJyb2xlX2tleSI6ImVkaXRvciIsImlzX2FkbWluIjpmYWxzZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNDczNjQ5MywiaWF0IjoxNzI0NzI5MjkzfQ.6GYn3-_yrrpJa5E1xD6E4lwZiLfgnh7j375lmGcfYOU');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (44, '2024-08-27 11:36:07.523', '2024-08-27 11:36:07.523', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX25hbWUiOiJlZGl0b3IiLCJyb2xlX2tleSI6ImVkaXRvciIsImlzX2FkbWluIjpmYWxzZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNDczNjg5NCwiaWF0IjoxNzI0NzI5Njk0fQ.ALKb5uN-VOdGzBsJ067cArLhOEcHuA9Uuf04lkhhiSI');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (45, '2024-08-27 11:39:17.727', '2024-08-27 11:39:17.727', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNDczNjk3MiwiaWF0IjoxNzI0NzI5NzcyfQ.VntUeYfRWSMcXrUAlOYruXABsVadbOa2-q0cJjPzk20');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (46, '2024-09-23 11:15:16.421', '2024-09-23 11:15:16.421', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInJvbGVfa2V5IjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiaXNzIjoiZ2luLXdlYi1hZG1pbiIsImV4cCI6MTcyNzA2ODAwMywiaWF0IjoxNzI3MDYwODAzfQ.e_JYdURCrBV-IN1u6Saqe6tf7v-epO2hfYGjQ6eMAKs');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (53, '2025-03-09 16:20:06.457', '2025-03-09 16:20:06.457', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNTEyMzM5LCJpYXQiOjE3NDE1MDUxMzl9.ZQ3GcKcFTViabKxEE4UN8MDyJ_P3zk6ANpV8FOJQQ3s');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (54, '2025-03-10 15:49:37.684', '2025-03-10 15:49:37.684', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNTk1NzQ4LCJpYXQiOjE3NDE1ODg1NDh9.mBnz1WfSU3RFwRci0QTKuB_zpcX3J2MMqJbp1bMt9lk');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (55, '2025-03-10 15:55:15.811', '2025-03-10 15:55:15.811', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwMTgxLCJpYXQiOjE3NDE1OTI5ODF9.8wN8UeYPxOlaorjEnLxHm0xxlbH9hRhDlNTDBw_-wt0');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (56, '2025-03-10 15:56:35.592', '2025-03-10 15:56:35.592', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwNTE4LCJpYXQiOjE3NDE1OTMzMTh9.dKNrdibPC98tjgadSZ6F4ua9_MHDaoyroU4GjZREgFY');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (57, '2025-03-10 15:57:49.024', '2025-03-10 15:57:49.024', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwNTk5LCJpYXQiOjE3NDE1OTMzOTl9.5IEJMUG6WpJPRwYMcHVSL-iYfOejUloRHvV-mhaOfsY');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (58, '2025-03-10 15:58:33.418', '2025-03-10 15:58:33.418', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwNjczLCJpYXQiOjE3NDE1OTM0NzN9.E2b9gPfkrebnV5kwrvXkd4cok2X1oD-ihpxVnXN4UaU');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (59, '2025-03-10 15:59:14.634', '2025-03-10 15:59:14.634', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwNzE3LCJpYXQiOjE3NDE1OTM1MTd9.Jivy3Z8E7vNCUPXCljef6GqFn2UhgX2n4Y00ChmtceM');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (60, '2025-03-10 16:15:16.614', '2025-03-10 16:15:16.614', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxNTU2LCJpYXQiOjE3NDE1OTQzNTZ9.8LjrKDC_Nob9Q1vJZRITUj8Dyjw3BaccgogDwiFCYoI');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (61, '2025-03-10 16:16:29.314', '2025-03-10 16:16:29.314', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxNzI0LCJpYXQiOjE3NDE1OTQ1MjR9.ZWBsS6bXvqR0efZFxu6uWUIv4LjPeQaDP7XayXX-CNo');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (62, '2025-03-10 16:17:36.074', '2025-03-10 16:17:36.074', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxODI0LCJpYXQiOjE3NDE1OTQ2MjR9.Af17NI-8xhGfKapPSm_C6VtJEL1vgiYL3b8gHFMSVd8');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (63, '2025-03-10 16:18:03.198', '2025-03-10 16:18:03.198', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxODYwLCJpYXQiOjE3NDE1OTQ2NjB9.0XSpn4xt6bLJhFkQ-C8r-BJe-MD2XaalQbpaIUsG7FU');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (64, '2025-03-10 16:22:34.045', '2025-03-10 16:22:34.045', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxODg2LCJpYXQiOjE3NDE1OTQ2ODZ9.6cg898mZBtQ1aXP96atXK2w7FfRFhUhEAeSL283jnXs');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (65, '2025-03-10 16:47:26.300', '2025-03-10 16:47:26.300', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAyNTQ5LCJpYXQiOjE3NDE1OTUzNDl9.L4l5Na16nm61MkXNFpJSQnpS14Ntl6GT427vhXoMVMo');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (66, '2025-04-14 15:26:10.615', '2025-04-14 15:26:10.615', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQ0NjIyNzYyLCJpYXQiOjE3NDQ2MTU1NjJ9.aNt7hq5hDr2MT0p1K9gcOWuRoQDZ87FKUn9ZdkOf6zc');
 COMMIT;
 
 -- ----------------------------
@@ -123,34 +122,29 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `gin_menu`;
 CREATE TABLE `gin_menu` (
-  `menu_id` int NOT NULL AUTO_INCREMENT,
+  `menu_id` bigint NOT NULL AUTO_INCREMENT,
   `parent_id` int DEFAULT NULL,
   `sort` int DEFAULT NULL,
-  `menu_name` varchar(11) DEFAULT NULL COMMENT '''路由名称''',
-  `path` varchar(128) DEFAULT NULL COMMENT '''路由路径''',
-  `paths` varchar(128) DEFAULT NULL,
-  `component` varchar(255) DEFAULT NULL COMMENT '''组件路径''',
-  `title` varchar(64) DEFAULT NULL COMMENT '''菜单标题''',
-  `icon` varchar(128) DEFAULT NULL,
-  `menu_type` varchar(1) DEFAULT NULL,
-  `permission` varchar(32) DEFAULT NULL,
+  `menu_name` varchar(11) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '''路由名称''',
+  `path` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '''路由路径''',
+  `paths` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `component` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '''组件路径''',
+  `title` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '''菜单标题''',
+  `icon` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `menu_type` varchar(1) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `permission` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `visible` int DEFAULT '0',
   `is_frame` int DEFAULT '0',
   `created_at` datetime(3) DEFAULT NULL,
   `updated_at` datetime(3) DEFAULT NULL,
   `deleted_at` datetime(3) DEFAULT NULL,
-  PRIMARY KEY (`menu_id`),
-  KEY `idx_blog_menu_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`menu_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of gin_menu
 -- ----------------------------
 BEGIN;
-INSERT INTO `gin_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (1, 0, 1, 'Upms', '/upms', NULL, 'Layout', '系统管理', 'example', 'M', NULL, 0, 0, '2021-11-05 15:49:22.000', '2021-11-05 15:49:30.000', NULL);
-INSERT INTO `gin_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (2, 1, 1, 'SysRole', '/permission/role', NULL, '/permission/role', '角色管理', NULL, 'M', NULL, 0, 0, '2021-11-05 15:51:53.000', '2021-11-05 15:51:57.000', NULL);
-INSERT INTO `gin_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (3, 1, 2, 'SysUser', '/permission/user', NULL, '/permission/user', '用户管理', NULL, 'M', NULL, 0, 0, '2021-11-05 16:01:20.000', '2021-11-05 16:01:24.000', NULL);
-INSERT INTO `gin_menu` (`menu_id`, `parent_id`, `sort`, `menu_name`, `path`, `paths`, `component`, `title`, `icon`, `menu_type`, `permission`, `visible`, `is_frame`, `created_at`, `updated_at`, `deleted_at`) VALUES (4, 0, 1, 'dict', NULL, NULL, NULL, '字典管理', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -163,12 +157,12 @@ CREATE TABLE `gin_report` (
   `updated_at` datetime(3) DEFAULT NULL,
   `deleted_at` datetime(3) DEFAULT NULL,
   `activity_id` bigint DEFAULT NULL,
-  `name` varchar(20) DEFAULT NULL,
-  `phone` varchar(30) DEFAULT NULL,
-  `ip` varchar(80) DEFAULT NULL,
+  `name` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `phone` varchar(30) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `ip` varchar(80) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_phone` (`phone`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of gin_report
@@ -185,16 +179,16 @@ CREATE TABLE `gin_role` (
   `created_at` datetime(3) DEFAULT NULL,
   `updated_at` datetime(3) DEFAULT NULL,
   `deleted_at` datetime(3) DEFAULT NULL,
-  `role_name` varchar(128) DEFAULT NULL,
+  `role_name` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `is_admin` int NOT NULL DEFAULT '0',
   `status` int NOT NULL DEFAULT '0',
-  `role_key` varchar(128) DEFAULT NULL,
+  `role_key` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `role_sort` int DEFAULT NULL,
-  `remark` varchar(255) DEFAULT NULL,
+  `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`role_id`),
   UNIQUE KEY `uni_gin_role_role_key` (`role_key`),
   CONSTRAINT `fk_gin_auth_role` FOREIGN KEY (`role_id`) REFERENCES `gin_auth` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of gin_role
@@ -202,6 +196,41 @@ CREATE TABLE `gin_role` (
 BEGIN;
 INSERT INTO `gin_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (1, NULL, '2024-05-21 11:03:04.239', NULL, '超管2233', 1, 0, 'admin', NULL, '超级管理员2');
 INSERT INTO `gin_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (2, '2021-10-27 16:49:28.000', '2024-05-21 11:03:06.172', NULL, '编辑角色', 0, 0, 'editor', 0, '1111111111');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_sys_menu
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_sys_menu`;
+CREATE TABLE `gin_sys_menu` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  `deleted_at` datetime(3) DEFAULT NULL,
+  `parent_id` bigint unsigned DEFAULT NULL COMMENT '父菜单ID',
+  `path` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '路由路径',
+  `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '路由名称',
+  `component` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组件路径',
+  `icon` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '菜单图标',
+  `title` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单标题',
+  `sort` bigint DEFAULT NULL COMMENT '排序',
+  `show_link` tinyint(1) DEFAULT '1' COMMENT '是否显示',
+  `frame_src` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'iframe外链地址',
+  `keep_alive` tinyint(1) DEFAULT NULL COMMENT '是否缓存',
+  `auths` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '权限标识（逗号分隔）',
+  `roles` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '允许角色（逗号分隔）',
+  `active_path` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '激活路径',
+  `rank` bigint DEFAULT NULL COMMENT '菜单分类等级',
+  PRIMARY KEY (`id`),
+  KEY `idx_gin_sys_menu_deleted_at` (`deleted_at`),
+  KEY `idx_gin_sys_menu_parent_id` (`parent_id`),
+  KEY `idx_gin_sys_menu_sort` (`sort`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ----------------------------
+-- Records of gin_sys_menu
+-- ----------------------------
+BEGIN;
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

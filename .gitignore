@@ -1,6 +1,5 @@
 .vscode
 .idea/
-go.sum
 main
 conf/app.ini
 conf/app.toml
