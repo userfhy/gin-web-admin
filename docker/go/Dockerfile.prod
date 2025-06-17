@@ -10,7 +10,7 @@ RUN apk add --no-cache git tzdata \
 
 WORKDIR ${CODE_DIR}
 
-COPY go.mod go.sum ./
+COPY go.mod ./
 RUN go mod download
 
 COPY . .
