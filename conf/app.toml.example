@@ -5,7 +5,7 @@ PasswordSalt = "fgyf"
 PrefixUrl = "http://0.0.0.0:8081"
 TimeFormat = "20060102"
 ExpireTimeFormat = "2006/01/02 15:04:05"
-EnabledCORS = True
+EnabledCORS = true
 
 [server]
 # Running in "debug" mode. Switch to "release" mode in production.

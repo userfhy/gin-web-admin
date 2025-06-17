@@ -2,7 +2,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: docker/go/Dockerfile.dev
+      dockerfile: docker/go/Dockerfile.prod
     image: gin-web-admin
     restart: on-failure
     ports:
@@ -10,7 +10,7 @@ services:
     volumes:
       - .:/code
     environment:
-      - RUN_MODE=debug  #debug or release
+      - RUN_MODE=release  #debug or release
       # - GIN_MODE=release
       - TZ=Asia/Shanghai
     logging:
