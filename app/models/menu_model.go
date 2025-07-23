@@ -84,7 +84,7 @@ func DeleteMenu(id int) error {
 // 获取所有菜单（不分页）
 func GetAllMenus(where map[string]any) ([]*Menu, error) {
 	var menus []*Menu
-	err := db.Where(where).Order("rank ASC").Find(&menus).Error
+	err := db.Where(where).Order("`rank` ASC").Find(&menus).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}

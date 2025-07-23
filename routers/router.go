@@ -15,6 +15,7 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 		InitSysRouter(v1)    // 系统设置
 		InitTestRouter(v1)   // 测试路由
 		InitReportRouter(v1) // 上报
+		InitMenuRouter(v1)   // 菜单管理
 	}
 
 	if gin.Mode() == gin.DebugMode {

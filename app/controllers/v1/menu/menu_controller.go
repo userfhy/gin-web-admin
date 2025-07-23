@@ -81,7 +81,7 @@ func GetMenuList(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 
 	// 构建查询条件，可根据你前端传参处理
-	where := make(map[string]interface{})
+	where := make(map[string]any)
 	if menuType := c.Query("menu_type"); menuType != "" {
 		where["menu_type"] = menuType
 	}
@@ -95,7 +95,14 @@ func GetMenuList(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "查询成功", menus)
 }
 
-// 获取全部菜单（无分页）
+// @Summary		菜单列表
+// @Description	get menu list
+// @Accept			json
+// @Produce		json
+// @Security		ApiKeyAuth
+// @Tags			SYS
+// @Success		200	{object}	common.Response
+// @Router			/menu/menu_list [get]
 func GetAllMenus(c *gin.Context) {
 	appG := common.Gin{C: c}
 
