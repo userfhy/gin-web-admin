@@ -22,8 +22,8 @@ type AuthStruct struct {
 }
 
 type ChangePasswordStruct struct {
-	OldPassword string `json:"oldpassword" form:"oldpassword" validate:"required,min=4,max=20" minLength:"4",maxLength:"20"`
-	NewPassword string `json:"newpassword" form:"newpassword" validate:"required,min=6,max=20" minLength:"6",maxLength:"20"`
+	OldPassword string `json:"oldpassword" form:"oldpassword" validate:"required,min=4,max=20" minLength:"4" maxLength:"20"`
+	NewPassword string `json:"newpassword" form:"newpassword" validate:"required,min=6,max=20" minLength:"6" maxLength:"20"`
 }
 
 // 添加用户

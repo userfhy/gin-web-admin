@@ -1,26 +1,92 @@
 package model
 
+import (
+	"errors"
+
+	"gorm.io/gorm"
+)
+
 type Menu struct {
-	MenuId     int    `json:"menu_id" gorm:"primary_key;AUTO_INCREMENT"`
-	ParentId   int    `json:"parent_id" gorm:"type:int(11);"`
-	Sort       int    `json:"sort" gorm:"type:int(4);"`
-	MenuName   string `json:"menu_name" gorm:"type:varchar(11);comment:'路由名称'"`
-	Path       string `json:"path" gorm:"type:varchar(128);comment:'路由路径'"`
-	Paths      string `json:"paths" gorm:"type:varchar(128);"`
-	Component  string `json:"component" gorm:"type:varchar(255);comment:'组件路径'"`
-	Title      string `json:"title" gorm:"type:varchar(64);comment:'菜单标题'"`
-	Icon       string `json:"icon" gorm:"type:varchar(128);"`
-	MenuType   string `json:"menu_type" gorm:"type:varchar(1);"` //"M"：目录 "C"：菜单 "F"：按钮
-	Permission string `json:"permission" gorm:"type:varchar(32);"`
-	Visible    string `json:"visible" gorm:"type:int(1);DEFAULT:0;"`
-	IsFrame    string `json:"is_frame" gorm:"type:int(1);DEFAULT:0;"` // 是否是外链
-	Params     string `json:"params" gorm:"-"`
-	RoleId     int    `gorm:"-"`
-	Children   []Menu `json:"children" gorm:"-"`
-	IsSelect   bool   `json:"is_select" gorm:"-"`
-	BaseModelNoId
+	ID              int    `gorm:"primaryKey;comment:主键ID" json:"id"`                      // 主键ID
+	ParentID        int    `gorm:"comment:父菜单ID" json:"parentId"`                          // 父菜单ID
+	MenuType        int    `gorm:"comment:菜单类型（0:目录 1:菜单 2:按钮）" json:"menuType"`           // 菜单类型
+	Title           string `gorm:"type:varchar(100);comment:菜单标题" json:"title"`            // 菜单标题
+	Name            string `gorm:"type:varchar(100);comment:菜单名称（唯一值）" json:"name"`        // 菜单名称
+	Path            string `gorm:"type:varchar(255);comment:路由地址" json:"path"`             // 路由地址
+	Component       string `gorm:"type:varchar(255);comment:组件路径" json:"component"`        // 组件路径
+	Rank            *int   `gorm:"comment:排序序号" json:"rank"`                               // 排序序号
+	Redirect        string `gorm:"type:varchar(255);comment:重定向地址" json:"redirect"`        // 重定向地址
+	Icon            string `gorm:"type:varchar(100);comment:图标" json:"icon"`               // 图标
+	ExtraIcon       string `gorm:"type:varchar(100);comment:额外图标" json:"extraIcon"`        // 额外图标
+	EnterTransition string `gorm:"type:varchar(100);comment:进入动画" json:"enterTransition"`  // 进入动画
+	LeaveTransition string `gorm:"type:varchar(100);comment:离开动画" json:"leaveTransition"`  // 离开动画
+	ActivePath      string `gorm:"type:varchar(255);comment:激活路径" json:"activePath"`       // 激活路径
+	Auths           string `gorm:"type:varchar(255);comment:权限标识,逗号分隔" json:"auths"`       // 权限标识
+	FrameSrc        string `gorm:"type:varchar(255);comment:内嵌 iframe 地址" json:"frameSrc"` // iframe 地址
+	FrameLoading    bool   `gorm:"comment:是否显示 iframe 加载动画" json:"frameLoading"`           // 是否加载动画
+	KeepAlive       bool   `gorm:"comment:是否缓存组件" json:"keepAlive"`                        // 是否缓存
+	HiddenTag       bool   `gorm:"comment:是否隐藏标签" json:"hiddenTag"`                        // 是否隐藏标签
+	FixedTag        bool   `gorm:"comment:是否固定标签" json:"fixedTag"`                         // 是否固定标签
+	ShowLink        bool   `gorm:"comment:是否显示链接" json:"showLink"`                         // 是否显示链接
+	ShowParent      bool   `gorm:"comment:是否显示父级菜单" json:"showParent"`                     // 是否显示父级
 }
 
 func (Menu) TableName() string {
 	return TablePrefix + "menu"
+}
+
+// 获取单个菜单（条件查询）
+func GetMenu(where map[string]any) (*Menu, error) {
+	var menu Menu
+	err := db.Where(where).First(&menu).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return &menu, nil
+}
+
+// 获取菜单列表（条件+分页）
+func GetMenuList(pageNum, pageSize int, where map[string]any) ([]*Menu, error) {
+	var menus []*Menu
+
+	query := db.Model(&Menu{})
+	if len(where) > 0 {
+		query = query.Where(where)
+	}
+
+	err := query.Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
+		Order("rank ASC").
+		Find(&menus).Error
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+
+	return menus, nil
+}
+
+// 创建菜单
+func CreateMenu(menu Menu) error {
+	return db.Create(&menu).Error
+}
+
+// 更新菜单（通过ID）
+func UpdateMenu(id int, data map[string]any) error {
+	return db.Model(&Menu{}).Where("id = ?", id).Updates(data).Error
+}
+
+// 删除菜单（单个）
+func DeleteMenu(id int) error {
+	return db.Delete(&Menu{}, id).Error
+}
+
+// 获取所有菜单（不分页）
+func GetAllMenus(where map[string]any) ([]*Menu, error) {
+	var menus []*Menu
+	err := db.Where(where).Order("rank ASC").Find(&menus).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return menus, nil
 }
