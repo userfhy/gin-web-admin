@@ -78,7 +78,28 @@ func UpdateMenu(id int, data map[string]any) error {
 
 // 删除菜单（单个）
 func DeleteMenu(id int) error {
-	return db.Delete(&Menu{}, id).Error
+	// 先查询出所有菜单，用于计算要删除的子节点
+	var menus []Menu
+	if err := db.Find(&menus).Error; err != nil {
+		return err
+	}
+
+	idsToDelete := []int{id}
+	queue := []int{id}
+
+	for len(queue) > 0 {
+		currentID := queue[0]
+		queue = queue[1:]
+
+		for _, m := range menus {
+			if m.ParentID == currentID {
+				idsToDelete = append(idsToDelete, m.ID)
+				queue = append(queue, m.ID)
+			}
+		}
+	}
+
+	return db.Where("id IN ?", idsToDelete).Delete(&Menu{}).Error
 }
 
 // 获取所有菜单（不分页）
