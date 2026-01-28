@@ -23,7 +23,7 @@ import (
 type StrTo string
 
 func (f StrTo) Exist() bool {
-	return string(f) != string(0x1E)
+	return string(f) != string(rune(0x1E))
 }
 
 func (f StrTo) Uint8() (uint8, error) {
@@ -159,13 +159,13 @@ func Int2HexStr(num int) (hex string) {
 	for num > 0 {
 		r := num % 16
 
-		c := "?"
+		var c rune
 		if r >= 0 && r <= 9 {
-			c = string(r + '0')
+			c = rune(r) + '0'
 		} else {
-			c = string(r + 'a' - 10)
+			c = rune(r-10) + 'a'
 		}
-		hex = c + hex
+		hex = string(c) + hex
 		num = num / 16
 	}
 	return hex
