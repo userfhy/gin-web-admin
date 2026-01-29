@@ -3,15 +3,15 @@
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 80402 (8.4.2)
+ Source Server Version : 80407 (8.4.7)
  Source Host           : 192.168.1.128:3306
  Source Schema         : blog
 
  Target Server Type    : MySQL
- Target Server Version : 80402 (8.4.2)
+ Target Server Version : 80407 (8.4.7)
  File Encoding         : 65001
 
- Date: 14/08/2025 09:27:30
+ Date: 29/01/2026 11:03:50
 */
 
 SET NAMES utf8mb4;
@@ -74,7 +74,7 @@ CREATE TABLE `gin_auth` (
 -- Records of gin_auth
 -- ----------------------------
 BEGIN;
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2025-04-14 15:26:15.446', NULL, 1, 1, '2025-04-14 15:26:15.446', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQ1MTY0ODAwLCJpYXQiOjE3NDQ2MTU1NzV9.LLLDbntgYrMow0oWnkTtrUleA1WS9Y6Vr90zFdyWR_s');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2026-01-29 10:41:10.533', NULL, 1, 1, '2026-01-29 10:41:10.533', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMjIwODAwLCJpYXQiOjE3Njk2NTQ0NzB9.PwKg-If4B0lPmplxXBZOJN-vYXKXBVi_ZenLzqbZtR8');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2024-08-27 11:36:07.524', NULL, 2, 1, '2024-08-27 11:34:54.024', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '2');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (3, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor2', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '3');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (4, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor3', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '4');
@@ -122,29 +122,68 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `gin_menu`;
 CREATE TABLE `gin_menu` (
-  `menu_id` bigint NOT NULL AUTO_INCREMENT,
-  `parent_id` int DEFAULT NULL,
-  `sort` int DEFAULT NULL,
-  `menu_name` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '''路由名称''',
-  `path` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '''路由路径''',
-  `paths` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `component` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '''组件路径''',
-  `title` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '''菜单标题''',
-  `icon` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `menu_type` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `permission` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `visible` int DEFAULT '0',
-  `is_frame` int DEFAULT '0',
-  `created_at` datetime(3) DEFAULT NULL,
-  `updated_at` datetime(3) DEFAULT NULL,
-  `deleted_at` datetime(3) DEFAULT NULL,
-  PRIMARY KEY (`menu_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `parent_id` bigint DEFAULT NULL COMMENT '父菜单ID',
+  `menu_type` bigint DEFAULT NULL COMMENT '菜单类型（0:目录 1:菜单 2:按钮）',
+  `title` varchar(100) DEFAULT NULL COMMENT '菜单标题',
+  `name` varchar(100) DEFAULT NULL COMMENT '菜单名称（唯一值）',
+  `path` varchar(255) DEFAULT NULL COMMENT '路由地址',
+  `component` varchar(255) DEFAULT NULL COMMENT '组件路径',
+  `rank` bigint DEFAULT NULL COMMENT '排序序号',
+  `redirect` varchar(255) DEFAULT NULL COMMENT '重定向地址',
+  `icon` varchar(100) DEFAULT NULL COMMENT '图标',
+  `extra_icon` varchar(100) DEFAULT NULL COMMENT '额外图标',
+  `enter_transition` varchar(100) DEFAULT NULL COMMENT '进入动画',
+  `leave_transition` varchar(100) DEFAULT NULL COMMENT '离开动画',
+  `active_path` varchar(255) DEFAULT NULL COMMENT '激活路径',
+  `auths` varchar(255) DEFAULT NULL COMMENT '权限标识,逗号分隔',
+  `frame_src` varchar(255) DEFAULT NULL COMMENT '内嵌 iframe 地址',
+  `frame_loading` tinyint(1) DEFAULT NULL COMMENT '是否显示 iframe 加载动画',
+  `keep_alive` tinyint(1) DEFAULT NULL COMMENT '是否缓存组件',
+  `hidden_tag` tinyint(1) DEFAULT NULL COMMENT '是否隐藏标签',
+  `fixed_tag` tinyint(1) DEFAULT NULL COMMENT '是否固定标签',
+  `show_link` tinyint(1) DEFAULT NULL COMMENT '是否显示链接',
+  `show_parent` tinyint(1) DEFAULT NULL COMMENT '是否显示父级菜单',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of gin_menu
 -- ----------------------------
 BEGIN;
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (1, 0, 0, 'menus.pureSysManagement', '', '/system', NULL, 1, NULL, 'ri:settings-3-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (2, 1, 1, 'menus.pureUser', 'SystemUser', '/system/user/index', 'system/user/index', 0, NULL, 'ri:admin-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (3, 1, 1, 'menus.pureRole', 'SystemRole', '/system/role/index', 'system/role/index', 0, NULL, 'ri:admin-fill', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (4, 1, 1, 'menus.pureSystemMenu', 'SystemMenu', '/system/menu/index', 'system/menu/index', 0, NULL, 'ep:menu', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (5, 1, 1, 'menus.pureSystemApi', 'SystemAPI', '/system/api/index', 'system/api/index', 0, NULL, 'ep:list', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (6, 1, 1, 'menus.pureDept', 'SystemDept', '/system/dept/index', 'system/dept/index', 0, NULL, 'ri:git-branch-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (7, 0, 0, 'menus.pureSysMonitor', '', '/monitor', NULL, 2, NULL, 'ep:monitor', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (8, 7, 1, 'menus.pureOnlineUser', 'OnlineUser', '/monitor/online-user', 'monitor/online/index', 0, NULL, 'ri:user-voice-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (9, 7, 1, 'menus.pureLoginLog', 'LoginLog', '/monitor/login-logs', 'monitor/logs/login/index', 0, NULL, 'ri:window-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (10, 7, 1, 'menus.pureOperationLog', 'OperationLog', '/monitor/operation-logs', 'monitor/logs/operation/index', 0, NULL, 'ri:history-fill', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (11, 7, 1, 'menus.pureSystemLog', 'SystemLog', '/monitor/system-logs', 'monitor/logs/system/index', 0, NULL, 'ri:file-search-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (12, 0, 0, 'menus.purePermission', '', '/permission', NULL, 3, NULL, 'ep:lollipop', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (13, 12, 1, 'menus.purePermissionPage', 'PermissionPage', '/permission/page/index', 'permission/page/index', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (14, 12, 0, 'menus.purePermissionButton', '', '/permission/button', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (15, 14, 1, 'menus.purePermissionButtonRouter', 'PermissionButtonRouter', '/permission/button/router', 'permission/button/index', 0, NULL, '', NULL, NULL, NULL, '', 'permission:btn:add,permission:btn:edit,permission:btn:delete', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (16, 14, 1, 'menus.purePermissionButtonLogin', 'PermissionButtonLogin', '/permission/button/login', 'permission/button/perms', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (17, 0, 0, 'menus.pureExternalPage', '', '/iframe', NULL, 4, NULL, 'ri:links-fill', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (18, 17, 0, 'menus.pureEmbeddedDoc', '', '/iframe/embedded', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (19, 18, 1, 'menus.pureColorHuntDoc', 'FrameColorHunt', '/iframe/colorhunt', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://colorhunt.co/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (20, 18, 1, 'menus.pureUiGradients', 'FrameUiGradients', '/iframe/uigradients', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://uigradients.com/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (21, 18, 1, 'menus.pureEpDoc', 'FrameEp', '/iframe/ep', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://element-plus.org/zh-CN/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (22, 18, 1, 'menus.pureTailwindcssDoc', 'FrameTailwindcss', '/iframe/tailwindcss', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://tailwindcss.com/docs/installation', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (23, 18, 1, 'menus.pureVueDoc', 'FrameVue', '/iframe/vue3', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://cn.vuejs.org/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (24, 18, 1, 'menus.pureViteDoc', 'FrameVite', '/iframe/vite', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://cn.vitejs.dev/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (25, 18, 1, 'menus.purePiniaDoc', 'FramePinia', '/iframe/pinia', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://pinia.vuejs.org/zh/index.html', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (26, 18, 1, 'menus.pureRouterDoc', 'FrameRouter', '/iframe/vue-router', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://router.vuejs.org/zh/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (27, 17, 0, 'menus.pureExternalDoc', '', '/iframe/external', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (28, 27, 1, 'menus.pureExternalLink', 'https://pure-admin.cn/', '/external', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (29, 27, 1, 'menus.pureUtilsLink', 'https://pure-admin-utils.netlify.app/', '/pureUtilsLink', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (30, 0, 0, 'menus.pureTabs', '', '/tabs', NULL, 5, NULL, 'ri:bookmark-2-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (31, 30, 1, 'menus.pureTabs', 'Tabs', '/tabs/index', 'tabs/index', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (32, 30, 1, '', 'TabQueryDetail', '/tabs/query-detail', NULL, 0, NULL, '', NULL, NULL, NULL, '/tabs/index', '', '', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (33, 30, 1, '', 'TabParamsDetail', '/tabs/params-detail/:id', 'params-detail', 0, NULL, '', NULL, NULL, NULL, '/tabs/index', '', '', NULL, 0, NULL, NULL, 0, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -196,41 +235,6 @@ CREATE TABLE `gin_role` (
 BEGIN;
 INSERT INTO `gin_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (1, NULL, '2024-05-21 11:03:04.239', NULL, '超管2233', 1, 0, 'admin', NULL, '超级管理员2');
 INSERT INTO `gin_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (2, '2021-10-27 16:49:28.000', '2024-05-21 11:03:06.172', NULL, '编辑角色', 0, 0, 'editor', 0, '1111111111');
-COMMIT;
-
--- ----------------------------
--- Table structure for gin_sys_menu
--- ----------------------------
-DROP TABLE IF EXISTS `gin_sys_menu`;
-CREATE TABLE `gin_sys_menu` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` datetime(3) DEFAULT NULL,
-  `updated_at` datetime(3) DEFAULT NULL,
-  `deleted_at` datetime(3) DEFAULT NULL,
-  `parent_id` bigint unsigned DEFAULT NULL COMMENT '父菜单ID',
-  `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '路由路径',
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '路由名称',
-  `component` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组件路径',
-  `icon` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '菜单图标',
-  `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单标题',
-  `sort` bigint DEFAULT NULL COMMENT '排序',
-  `show_link` tinyint(1) DEFAULT '1' COMMENT '是否显示',
-  `frame_src` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'iframe外链地址',
-  `keep_alive` tinyint(1) DEFAULT NULL COMMENT '是否缓存',
-  `auths` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '权限标识（逗号分隔）',
-  `roles` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '允许角色（逗号分隔）',
-  `active_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '激活路径',
-  `rank` bigint DEFAULT NULL COMMENT '菜单分类等级',
-  PRIMARY KEY (`id`),
-  KEY `idx_gin_sys_menu_deleted_at` (`deleted_at`),
-  KEY `idx_gin_sys_menu_parent_id` (`parent_id`),
-  KEY `idx_gin_sys_menu_sort` (`sort`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- ----------------------------
--- Records of gin_sys_menu
--- ----------------------------
-BEGIN;
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
