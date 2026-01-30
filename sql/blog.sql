@@ -11,7 +11,7 @@
  Target Server Version : 80407 (8.4.7)
  File Encoding         : 65001
 
- Date: 29/01/2026 11:03:50
+ Date: 30/01/2026 10:18:18
 */
 
 SET NAMES utf8mb4;
@@ -35,7 +35,7 @@ CREATE TABLE `casbin_rule` (
   `v5` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_index` (`v0`,`v1`,`v2`,`v3`,`v4`,`v5`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of casbin_rule
@@ -44,6 +44,7 @@ BEGIN;
 INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (1, '2021-10-27 16:52:33.000', '2024-05-15 13:02:07.100', NULL, 'p', 'editor', '/v1/api/user/change_password', 'PUT', '', '', '');
 INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (2, '2021-10-27 17:00:15.000', '2021-10-27 17:00:29.000', NULL, 'p', 'editor', '/v1/api/user/logged_in', 'GET', '', '', '');
 INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (4, '2024-05-14 11:57:08.044', '2024-05-14 11:57:08.044', NULL, 'p', 'editor', '/v1/api/role', 'POST', '', '', '');
+INSERT INTO `casbin_rule` (`id`, `created_at`, `updated_at`, `deleted_at`, `ptype`, `v0`, `v1`, `v2`, `v3`, `v4`, `v5`) VALUES (8, '2026-01-29 16:17:07.042', '2026-01-29 16:17:07.042', NULL, 'p', 'editor', '/v1/api/refresh_token', 'POST', '', '', '');
 COMMIT;
 
 -- ----------------------------
@@ -74,12 +75,38 @@ CREATE TABLE `gin_auth` (
 -- Records of gin_auth
 -- ----------------------------
 BEGIN;
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2026-01-29 10:41:10.533', NULL, 1, 1, '2026-01-29 10:41:10.533', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMjIwODAwLCJpYXQiOjE3Njk2NTQ0NzB9.PwKg-If4B0lPmplxXBZOJN-vYXKXBVi_ZenLzqbZtR8');
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2024-08-27 11:36:07.524', NULL, 2, 1, '2024-08-27 11:34:54.024', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '2');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2026-01-30 10:14:41.089', NULL, 1, 1, '2026-01-30 10:14:41.089', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMzA3MjAwLCJpYXQiOjE3Njk3MzkyODF9.P_rWslJ9DAZrwuhWaNR_dATwACMuLAJE8EQK1gR9xJ8');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2026-01-30 10:12:56.283', NULL, 2, 1, '2026-01-30 10:12:56.282', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMzA3MjAwLCJpYXQiOjE3Njk3MzkxNzZ9.ZHVP-Fu7JDYVM2gaf0CgSG7vPJuc3fDt10xNvU3M0D0');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (3, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor2', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '3');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (4, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor3', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '4');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (5, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor4', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '5');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (6, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor5', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '6');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_dept
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_dept`;
+CREATE TABLE `gin_dept` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `parent_id` bigint DEFAULT NULL COMMENT '父部门ID',
+  `dept_name` varchar(128) DEFAULT NULL COMMENT '部门名称',
+  `order_num` bigint DEFAULT NULL COMMENT '排序',
+  `leader` varchar(64) DEFAULT NULL COMMENT '负责人',
+  `phone` varchar(32) DEFAULT NULL COMMENT '联系电话',
+  `email` varchar(128) DEFAULT NULL COMMENT '邮箱',
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态(1启用0停用)',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_dept
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_dept` (`id`, `parent_id`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `remark`) VALUES (1, 0, '总部', 0, '', '', '', 1, '');
+INSERT INTO `gin_dept` (`id`, `parent_id`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `remark`) VALUES (2, 1, '郑州分公司', 0, '', '', '', 1, '');
+INSERT INTO `gin_dept` (`id`, `parent_id`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `remark`) VALUES (3, 1, '开封分公司', 0, '', '', '', 1, '');
 COMMIT;
 
 -- ----------------------------
@@ -95,7 +122,7 @@ CREATE TABLE `gin_jwt_blacklist` (
   `jwt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   PRIMARY KEY (`id`),
   KEY `idx_blog_jwt_blacklist_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of gin_jwt_blacklist
@@ -115,6 +142,10 @@ INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`,
 INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (64, '2025-03-10 16:22:34.045', '2025-03-10 16:22:34.045', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxODg2LCJpYXQiOjE3NDE1OTQ2ODZ9.6cg898mZBtQ1aXP96atXK2w7FfRFhUhEAeSL283jnXs');
 INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (65, '2025-03-10 16:47:26.300', '2025-03-10 16:47:26.300', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAyNTQ5LCJpYXQiOjE3NDE1OTUzNDl9.L4l5Na16nm61MkXNFpJSQnpS14Ntl6GT427vhXoMVMo');
 INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (66, '2025-04-14 15:26:10.615', '2025-04-14 15:26:10.615', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQ0NjIyNzYyLCJpYXQiOjE3NDQ2MTU1NjJ9.aNt7hq5hDr2MT0p1K9gcOWuRoQDZ87FKUn9ZdkOf6zc');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (67, '2026-01-30 10:00:03.349', '2026-01-30 10:00:03.349', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzY5NzM5NzcxLCJpYXQiOjE3Njk3MzI1NzF9.rzRzoJ82RDR-pZUiLXB08lgAGIRUmxJPRLnInJZiCpE');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (68, '2026-01-30 10:01:25.828', '2026-01-30 10:01:25.828', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzY5NzQ1NjA5LCJpYXQiOjE3Njk3Mzg0MDl9.7sjuc6jrh9qqdFcs2XAtNVemxkd9Ea0N_WG43mlm_ds');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (69, '2026-01-30 10:12:34.489', '2026-01-30 10:12:34.489', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzY5NzQ2MzExLCJpYXQiOjE3Njk3MzkxMTF9.vCVaXFJaXh8PvyzLDI5POWXNpfnGP2XANp4TzroNwJg');
+INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (70, '2026-01-30 10:12:49.615', '2026-01-30 10:12:49.615', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzY5NzQ2MzYyLCJpYXQiOjE3Njk3MzkxNjJ9.0trEEWa1NhUyLnrFQJDU1urPZuLf5bgQV21zDMxB8y4');
 COMMIT;
 
 -- ----------------------------
@@ -235,6 +266,77 @@ CREATE TABLE `gin_role` (
 BEGIN;
 INSERT INTO `gin_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (1, NULL, '2024-05-21 11:03:04.239', NULL, '超管2233', 1, 0, 'admin', NULL, '超级管理员2');
 INSERT INTO `gin_role` (`role_id`, `created_at`, `updated_at`, `deleted_at`, `role_name`, `is_admin`, `status`, `role_key`, `role_sort`, `remark`) VALUES (2, '2021-10-27 16:49:28.000', '2024-05-21 11:03:06.172', NULL, '编辑角色', 0, 0, 'editor', 0, '1111111111');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_role_menu
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_role_menu`;
+CREATE TABLE `gin_role_menu` (
+  `role_id` bigint unsigned NOT NULL,
+  `menu_id` bigint NOT NULL,
+  PRIMARY KEY (`role_id`,`menu_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_role_menu
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 1);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 2);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 3);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 4);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 5);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 6);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 7);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 8);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 9);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 10);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 11);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 12);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 13);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 14);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 15);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 16);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 17);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 18);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 19);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 20);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 21);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 22);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 23);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 24);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 25);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 26);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 27);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 28);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 29);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 30);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 31);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 32);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 33);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 12);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 13);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 14);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 15);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 16);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 17);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 18);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 19);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 20);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 21);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 22);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 23);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 24);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 25);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 26);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 27);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 28);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 29);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 30);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 31);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 32);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 33);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
