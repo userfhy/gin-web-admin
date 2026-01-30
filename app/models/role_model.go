@@ -10,9 +10,9 @@ type Role struct {
 	RoleName  string    `gorm:"type:varchar(128);" json:"role_name"` // 角色名称
 	IsAdmin   bool      `gorm:"type:int(1);DEFAULT:0;NOT NULL;" json:"is_admin"`
 	Status    int       `gorm:"type:int(1);DEFAULT:0;NOT NULL;" json:"status"`
-	RoleKey   string    `gorm:"type:varchar(128);unique;" json:"role_key"` //角色代码
-	RoleSort  int       `gorm:"type:int(4);" json:"role_sort"`             //角色排序
-	Remark    string    `gorm:"type:varchar(255);" json:"remark"`          //备注
+	RoleKey   string    `gorm:"type:varchar(128);unique;" json:"role_key"` // 角色代码
+	RoleSort  int       `gorm:"type:int(4);" json:"role_sort"`             // 角色排序
+	Remark    string    `gorm:"type:varchar(255);" json:"remark"`          // 备注
 	Params    string    `gorm:"-" json:"params"`
 	MenuIds   []int     `gorm:"-" json:"menu_ids"`
 }
@@ -29,26 +29,24 @@ func CreateRole(role Role) error {
 	return nil
 }
 
-// func GetRoles(pageNum int, pageSize int, whereSql string, where []any) ([]*Role, error) {
-// 	var role []*Role
-// 	err := db.Select("*").Where(whereSql, values...).Offset(pageNum).Limit(pageSize).Find(&role).Error
-
-// 	if err != nil && err != gorm.ErrRecordNotFound {
-// 		return nil, err
-// 	}
-
-// 	return role, nil
-// }
-
 func GetRoles(pageNum int, pageSize int, where map[string]any) ([]*Role, error) {
 	var role []*Role
 
-	db, _ := BuildCondition(db, where)
-	err := db.Select("*").Offset(pageNum).Limit(pageSize).Find(&role).Error
+	db2, _ := BuildCondition(db, where)
+	err := db2.Select("*").Offset(pageNum).Limit(pageSize).Find(&role).Error
 
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
 	}
 
 	return role, nil
+}
+
+func GetRoleByKey(roleKey string) (*Role, error) {
+	var role Role
+	err := db.Where("role_key = ?", roleKey).First(&role).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	return &role, nil
 }
