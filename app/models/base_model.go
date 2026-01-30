@@ -109,6 +109,7 @@ func Setup() {
 		// &CasbinRule{},
 		&Menu{},
 		&Dept{},
+		&RoleMenu{},
 	)
 }
 
