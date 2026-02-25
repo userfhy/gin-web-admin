@@ -2,6 +2,7 @@ package setting
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -72,6 +73,26 @@ func Setup() {
 	ServerSetting = &cfg.Server
 	DatabaseSetting = &cfg.Database
 	RedisSetting = &cfg.Redis
+
+	// 从环境变量覆盖敏感配置
+	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret != "" {
+		AppSetting.JwtSecret = jwtSecret
+	}
+	if dbUser := os.Getenv("DB_USER"); dbUser != "" {
+		DatabaseSetting.User = dbUser
+	}
+	if dbPassword := os.Getenv("DB_PASSWORD"); dbPassword != "" {
+		DatabaseSetting.Password = dbPassword
+	}
+	if dbHost := os.Getenv("DB_HOST"); dbHost != "" {
+		DatabaseSetting.Host = dbHost
+	}
+	if redisHost := os.Getenv("REDIS_HOST"); redisHost != "" {
+		RedisSetting.Host = redisHost
+	}
+	if redisPassword := os.Getenv("REDIS_PASSWORD"); redisPassword != "" {
+		RedisSetting.Password = redisPassword
+	}
 
 	// 转换时间单位（TOML解析可以直接处理time.Duration类型，但需要确保配置文件中的数值单位）
 	// 如果配置文件中是秒数，需要手动转换

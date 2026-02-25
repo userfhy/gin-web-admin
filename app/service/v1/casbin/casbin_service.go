@@ -14,9 +14,9 @@ type CasbinStruct struct {
 }
 
 type AddCasbinStruct struct {
-	V0 string `json:"v0" form:"v0" validate:"required,min=3,max=20" minLength:"3",maxLength:"20"` // role_key
-	V1 string `json:"v1" form:"v1" validate:"required,min=4,max=30" minLength:"4",maxLength:"30"` // path
-	V2 string `json:"v2" form:"v2" validate:"required,min=2,max=8" minLength:"2",maxLength:"8"`   // method
+	V0 string `json:"v0" form:"v0" validate:"required,min=3,max=20" minLength:"3" maxLength:"20"` // role_key
+	V1 string `json:"v1" form:"v1" validate:"required,min=4,max=30" minLength:"4" maxLength:"30"` // path
+	V2 string `json:"v2" form:"v2" validate:"required,min=2,max=8" minLength:"2" maxLength:"8"`   // method
 }
 
 func CreateCasbin(n AddCasbinStruct) error {
