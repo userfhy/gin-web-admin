@@ -75,7 +75,7 @@ func init() {
 // @name						Authorization
 func main() {
 	//binding.Validator = new(validator.DefaultValidator)
-	r := gin.Default()
+	r := gin.New()
 
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
