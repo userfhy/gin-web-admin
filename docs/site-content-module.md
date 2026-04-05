@@ -150,7 +150,8 @@
   - 去除控制字符
   - 去除危险标签（`script/style/iframe/object/embed/link/meta`）
   - 去除危险协议（`javascript:`、`vbscript:`、`data:`）
-  - Markdown 内容中原始 HTML 标签转义（`<`/`>` -> `&lt;`/`&gt;`）
+  - Markdown 内容做 HTML 实体转义后入库（更强防护）
+  - 清洗前先执行一次反转义，避免二次编辑导致重复转义（如 `&amp;lt;`）
 - 公开列表接口中的 `summary` 会强制截断，避免返回完整正文。
 - 建议：前端在渲染 Markdown 为 HTML 时继续启用渲染层白名单策略（双层防护）。
 

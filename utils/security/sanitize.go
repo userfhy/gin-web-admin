@@ -8,51 +8,54 @@ import (
 )
 
 var (
-	reScriptTag = regexp.MustCompile(`(?is)<\s*(script|style|iframe|object|embed|link|meta)[^>]*>.*?<\s*/\s*(script|style|iframe|object|embed|link|meta)\s*>`)
-	reTag       = regexp.MustCompile(`(?is)<[^>]+>`)
-	reEvtAttr   = regexp.MustCompile(`(?is)\son[a-z]+\s*=\s*(".*?"|'.*?'|[^\s>]+)`)
-	reJSProto   = regexp.MustCompile(`(?is)(javascript|vbscript|data)\s*:`)
-	reCtrlChar  = regexp.MustCompile(`[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]`)
-	reSpaces    = regexp.MustCompile(`[ \t]+`)
+	reCtrlChar = regexp.MustCompile(`[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]`)
+	reSpaces   = regexp.MustCompile(`[ \t]+`)
 )
 
-// SanitizePlainText cleans a plain text field and escapes html entities.
-func SanitizePlainText(s string, maxLen int) string {
+func normalizeInput(s string) string {
 	s = strings.TrimSpace(s)
 	if s == "" {
 		return ""
 	}
+	// avoid double-escaping on repeated edit/save
+	s = html.UnescapeString(s)
+	s = strings.ReplaceAll(s, "\r\n", "\n")
+	s = strings.ReplaceAll(s, "\r", "\n")
 	s = reCtrlChar.ReplaceAllString(s, "")
-	s = reScriptTag.ReplaceAllString(s, "")
-	s = reTag.ReplaceAllString(s, "")
-	s = reJSProto.ReplaceAllString(s, "")
-	s = reSpaces.ReplaceAllString(s, " ")
-	s = strings.TrimSpace(s)
-	s = html.EscapeString(s)
-	if maxLen > 0 && utf8.RuneCountInString(s) > maxLen {
-		r := []rune(s)
-		s = string(r[:maxLen])
-	}
-	return s
+	return strings.TrimSpace(s)
 }
 
-// SanitizeMarkdown removes dangerous html/script payload while keeping markdown text.
-func SanitizeMarkdown(s string, maxLen int) string {
-	s = strings.TrimSpace(s)
+func cutRunes(s string, maxLen int) string {
+	if maxLen <= 0 {
+		return s
+	}
+	if utf8.RuneCountInString(s) <= maxLen {
+		return s
+	}
+	r := []rune(s)
+	return string(r[:maxLen])
+}
+
+// SanitizePlainText keeps full text semantics and stores HTML-escaped content.
+func SanitizePlainText(s string, maxLen int) string {
+	s = normalizeInput(s)
 	if s == "" {
 		return ""
 	}
-	s = reCtrlChar.ReplaceAllString(s, "")
-	s = reScriptTag.ReplaceAllString(s, "")
-	s = reEvtAttr.ReplaceAllString(s, "")
-	s = reJSProto.ReplaceAllString(s, "")
-	// block inline raw html in markdown
-	s = strings.ReplaceAll(s, "<", "&lt;")
-	s = strings.ReplaceAll(s, ">", "&gt;")
+	s = strings.ReplaceAll(s, "\n", " ")
+	s = reSpaces.ReplaceAllString(s, " ")
 	s = strings.TrimSpace(s)
-	if maxLen > 0 && utf8.RuneCountInString(s) > maxLen {
-		r := []rune(s)
-		s = string(r[:maxLen])
+	s = cutRunes(s, maxLen)
+	return html.EscapeString(s)
+}
+
+// SanitizeMarkdown preserves markdown/code text but neutralizes all raw HTML by escaping it.
+func SanitizeMarkdown(s string, maxLen int) string {
+	s = normalizeInput(s)
+	if s == "" {
+		return ""
 	}
-	return s
+	s = strings.TrimSpace(s)
+	s = cutRunes(s, maxLen)
+	return html.EscapeString(s)
 }
