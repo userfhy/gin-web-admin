@@ -110,6 +110,9 @@ func Setup() {
 		&Menu{},
 		&Dept{},
 		&RoleMenu{},
+		&SiteContent{},
+		&SiteCategory{},
+		&SiteContentCategory{},
 	)
 }
 
@@ -176,6 +179,10 @@ func validateUpdateFields(updates map[string]any) error {
 }
 
 func Update(tableStruct any, where map[string]any, updates map[string]any) (error, int64) {
+	if len(updates) == 0 {
+		return fmt.Errorf("updates cannot be empty"), 0
+	}
+
 	// 验证更新字段名
 	if err := validateUpdateFields(updates); err != nil {
 		return err, 0
@@ -242,13 +249,15 @@ func BuildCondition(d *gorm.DB, where map[string]any) (*gorm.DB, error) {
 			return nil, fmt.Errorf("unsupported operator: %q", operator)
 		}
 
+		quotedColumn := quoteColumnName(column)
+
 		// 安全处理不同操作符
 		switch safeOperator {
 		case "IN":
 			if err := validateInClauseValues(value); err != nil {
 				return nil, fmt.Errorf("invalid IN clause values: %v", err)
 			}
-			d = d.Where(column+" IN (?)", value)
+			d = d.Where(quotedColumn+" IN ?", value)
 
 		case "LIKE":
 			pattern, ok := value.(string)
@@ -256,18 +265,18 @@ func BuildCondition(d *gorm.DB, where map[string]any) (*gorm.DB, error) {
 				return nil, fmt.Errorf("LIKE operator requires string value")
 			}
 			escapedPattern := escapeLikePattern(pattern)
-			d = d.Where(column+" LIKE ? ESCAPE '\\'", escapedPattern)
+			d = d.Where(quotedColumn+" LIKE ? ESCAPE '\\'", escapedPattern)
 
 		case "IS":
 			// 严格处理IS操作符，只允许NULL/NOT NULL
 			if value == nil {
-				d = d.Where(column + " IS NULL")
+				d = d.Where(quotedColumn + " IS NULL")
 			} else if s, ok := value.(string); ok {
 				switch strings.ToUpper(s) {
 				case "NULL":
-					d = d.Where(column + " IS NULL")
+					d = d.Where(quotedColumn + " IS NULL")
 				case "NOT NULL":
-					d = d.Where(column + " IS NOT NULL")
+					d = d.Where(quotedColumn + " IS NOT NULL")
 				default:
 					return nil, fmt.Errorf("invalid value for IS operator: %q", s)
 				}
@@ -277,10 +286,14 @@ func BuildCondition(d *gorm.DB, where map[string]any) (*gorm.DB, error) {
 
 		default:
 			// 标准比较操作符
-			d = d.Where(column+" "+safeOperator+" ?", value)
+			d = d.Where(quotedColumn+" "+safeOperator+" ?", value)
 		}
 	}
 	return d, nil
+}
+
+func quoteColumnName(name string) string {
+	return "`" + name + "`"
 }
 
 func isLetter(c rune) bool {
@@ -339,9 +352,9 @@ func validateInClauseValues(value any) error {
 func escapeLikePattern(pattern string) string {
 	escapeChar := "\\"
 	replacer := strings.NewReplacer(
+		escapeChar, escapeChar+escapeChar,
 		"%", escapeChar+"%",
 		"_", escapeChar+"_",
-		escapeChar, escapeChar+escapeChar,
 	)
 	return replacer.Replace(pattern)
 }

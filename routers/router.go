@@ -12,12 +12,14 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 		InitUserRouter(v1) // 用户管理
 		InitRoleRouter(v1) // 角色
 		InitCasbinRouter(v1)
-		InitSysRouter(v1)    // 系统设置
-		InitTestRouter(v1)   // 测试路由
-		InitReportRouter(v1) // 上报
-		InitMenuRouter(v1)       // 菜单管理
-		InitDeptRouter(v1)       // 部门管理
-		InitAsyncRoutesRouter(v1) // 动态路由
+		InitSysRouter(v1)          // 系统设置
+		InitTestRouter(v1)         // 测试路由
+		InitReportRouter(v1)       // 上报
+		InitMenuRouter(v1)         // 菜单管理
+		InitDeptRouter(v1)         // 部门管理
+		InitSiteContentRouter(v1)  // 企业官网内容管理
+		InitSiteCategoryRouter(v1) // 企业官网分类管理
+		InitAsyncRoutesRouter(v1)  // 动态路由
 	}
 
 	if gin.Mode() == gin.DebugMode {

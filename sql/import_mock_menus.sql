@@ -39,4 +39,7 @@ INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`,
 (30, 0, 0, 'menus.pureTabs', '', '/tabs', NULL, 5, 'ri:bookmark-2-line', '', '', 0, 1, ''),
 (31, 30, 1, 'menus.pureTabs', 'Tabs', '/tabs/index', 'tabs/index', 0, '', '', '', 0, 1, ''),
 (32, 30, 1, '', 'TabQueryDetail', '/tabs/query-detail', NULL, 0, '', '', '', 0, 0, '/tabs/index'),
-(33, 30, 1, '', 'TabParamsDetail', '/tabs/params-detail/:id', 'params-detail', 0, '', '', '', 0, 0, '/tabs/index');
+(33, 30, 1, '', 'TabParamsDetail', '/tabs/params-detail/:id', 'params-detail', 0, '', '', '', 0, 0, '/tabs/index'),
+(34, 0, 0, '官网管理', '', '/site', NULL, 6, 'ri:global-line', '', '', 0, 1, ''),
+(35, 34, 1, '内容管理', 'SiteContent', '/site/content/index', 'site/content/index', 0, 'ri:article-line', '', '', 1, 1, ''),
+(36, 34, 1, '类别管理', 'SiteCategory', '/site/category/index', 'site/category/index', 0, 'ri:price-tag-3-line', '', '', 0, 1, '');
