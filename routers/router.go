@@ -19,6 +19,8 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 		InitDeptRouter(v1)         // 部门管理
 		InitSiteContentRouter(v1)  // 企业官网内容管理
 		InitSiteCategoryRouter(v1) // 企业官网分类管理
+		InitSiteTagRouter(v1)      // 企业官网标签管理
+		InitSitePublicRouter(v1)   // 企业官网公开接口
 		InitAsyncRoutesRouter(v1)  // 动态路由
 	}
 

@@ -113,6 +113,8 @@ func Setup() {
 		&SiteContent{},
 		&SiteCategory{},
 		&SiteContentCategory{},
+		&SiteTag{},
+		&SiteContentTag{},
 	)
 }
 

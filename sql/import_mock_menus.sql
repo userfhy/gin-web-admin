@@ -4,6 +4,8 @@
 -- Clear existing menu data to avoid conflicts
 DELETE FROM `gin_menu`;
 ALTER TABLE `gin_menu` AUTO_INCREMENT = 1;
+-- Rebuild admin role menu relation (role_id=1) to avoid missing menus after import
+DELETE FROM `gin_role_menu` WHERE `role_id` = 1;
 
 -- Insert new menu data
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `icon`, `auths`, `frame_src`, `keep_alive`, `show_link`, `active_path`) VALUES
@@ -42,4 +44,9 @@ INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`,
 (33, 30, 1, '', 'TabParamsDetail', '/tabs/params-detail/:id', 'params-detail', 0, '', '', '', 0, 0, '/tabs/index'),
 (34, 0, 0, '官网管理', '', '/site', NULL, 6, 'ri:global-line', '', '', 0, 1, ''),
 (35, 34, 1, '内容管理', 'SiteContent', '/site/content/index', 'site/content/index', 0, 'ri:article-line', '', '', 1, 1, ''),
-(36, 34, 1, '类别管理', 'SiteCategory', '/site/category/index', 'site/category/index', 0, 'ri:price-tag-3-line', '', '', 0, 1, '');
+(36, 34, 1, '类别管理', 'SiteCategory', '/site/category/index', 'site/category/index', 0, 'ri:price-tag-3-line', '', '', 0, 1, ''),
+(37, 34, 1, '标签管理', 'SiteTag', '/site/tag/index', 'site/tag/index', 0, 'ri:price-tag-2-line', '', '', 0, 1, '');
+
+-- Grant all imported menus to admin role
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`)
+SELECT 1, `id` FROM `gin_menu`;

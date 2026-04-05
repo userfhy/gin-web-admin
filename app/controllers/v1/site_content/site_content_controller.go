@@ -44,6 +44,15 @@ func GetSiteContentList(c *gin.Context) {
 		}
 		categoryID = &categoryInt
 	}
+	var tagID *int
+	if tagStr := c.Query("tagId"); tagStr != "" {
+		tagInt, err := strconv.Atoi(tagStr)
+		if err != nil || tagInt <= 0 {
+			appG.Response(http.StatusBadRequest, code.InvalidParams, "tagId 参数无效", nil)
+			return
+		}
+		tagID = &tagInt
+	}
 
 	data, err := siteContentService.GetSiteContentList(siteContentService.SiteContentQuery{
 		PageNum:    pageNum,
@@ -51,6 +60,7 @@ func GetSiteContentList(c *gin.Context) {
 		Keyword:    c.Query("keyword"),
 		Status:     status,
 		CategoryID: categoryID,
+		TagID:      tagID,
 	})
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "获取官网内容列表失败", nil)
@@ -137,4 +147,27 @@ func DeleteSiteContent(c *gin.Context) {
 	}
 
 	appG.Response(http.StatusOK, code.SUCCESS, "删除成功", nil)
+}
+
+func UpdateSiteContentStatus(c *gin.Context) {
+	appG := common.Gin{C: c}
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil || id <= 0 {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, "无效ID", nil)
+		return
+	}
+
+	var payload siteContentService.UpdateSiteContentStatusStruct
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
+	}
+
+	if err := siteContentService.UpdateSiteContentStatus(id, payload); err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, code.SUCCESS, "状态更新成功", nil)
 }

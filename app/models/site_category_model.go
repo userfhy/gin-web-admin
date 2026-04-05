@@ -35,6 +35,18 @@ func GetSiteCategoryByID(id int) (*SiteCategory, error) {
 	return &category, nil
 }
 
+func GetSiteCategoryBySlug(slug string) (*SiteCategory, error) {
+	var category SiteCategory
+	err := db.Where("slug = ?", slug).First(&category).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &category, nil
+}
+
 func GetSiteCategoryList(pageNum, pageSize int, keyword string, status *int) ([]*SiteCategory, int64, error) {
 	var (
 		list  []*SiteCategory
@@ -120,4 +132,29 @@ func GetSiteCategoriesByIDs(ids []int) ([]*SiteCategory, error) {
 		return nil, err
 	}
 	return list, nil
+}
+
+func CountSiteContentByCategoryIDs(ids []int) (map[int]int64, error) {
+	result := make(map[int]int64, len(ids))
+	if len(ids) == 0 {
+		return result, nil
+	}
+
+	type row struct {
+		CategoryID int   `gorm:"column:category_id"`
+		Total      int64 `gorm:"column:total"`
+	}
+	var rows []row
+	err := db.Model(&SiteContentCategory{}).
+		Select("category_id, COUNT(*) AS total").
+		Where("category_id IN ?", ids).
+		Group("category_id").
+		Find(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+	for _, r := range rows {
+		result[r.CategoryID] = r.Total
+	}
+	return result, nil
 }

@@ -3,6 +3,7 @@ package siteCategoryService
 import (
 	"fmt"
 	model "gin-web-admin/app/models"
+	"gin-web-admin/utils/security"
 	"regexp"
 	"strings"
 )
@@ -14,6 +15,18 @@ type SiteCategoryQuery struct {
 	PageSize int
 	Keyword  string
 	Status   *int
+}
+
+type SiteCategoryVO struct {
+	ID           int    `json:"id"`
+	Name         string `json:"name"`
+	Slug         string `json:"slug"`
+	Description  string `json:"description"`
+	Status       int    `json:"status"`
+	Sort         int    `json:"sort"`
+	ContentCount int64  `json:"contentCount"`
+	CreatedAt    any    `json:"createdAt"`
+	UpdatedAt    any    `json:"updatedAt"`
 }
 
 type CreateSiteCategoryStruct struct {
@@ -37,8 +50,30 @@ func GetSiteCategoryList(query SiteCategoryQuery) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
+	ids := make([]int, 0, len(list))
+	for _, item := range list {
+		ids = append(ids, item.ID)
+	}
+	countMap, err := model.CountSiteContentByCategoryIDs(ids)
+	if err != nil {
+		return nil, err
+	}
+	vos := make([]SiteCategoryVO, 0, len(list))
+	for _, item := range list {
+		vos = append(vos, SiteCategoryVO{
+			ID:           item.ID,
+			Name:         item.Name,
+			Slug:         item.Slug,
+			Description:  item.Description,
+			Status:       item.Status,
+			Sort:         item.Sort,
+			ContentCount: countMap[item.ID],
+			CreatedAt:    item.CreatedAt,
+			UpdatedAt:    item.UpdatedAt,
+		})
+	}
 	return map[string]any{
-		"list":        list,
+		"list":        vos,
 		"total":       total,
 		"currentPage": query.PageNum,
 		"pageSize":    query.PageSize,
@@ -50,7 +85,7 @@ func GetAllSiteCategories(status *int) ([]*model.SiteCategory, error) {
 }
 
 func CreateSiteCategory(payload CreateSiteCategoryStruct) error {
-	name := strings.TrimSpace(payload.Name)
+	name := security.SanitizePlainText(payload.Name, 100)
 	slug := normalizeSlug(payload.Slug)
 	if name == "" {
 		return fmt.Errorf("name is required")
@@ -70,14 +105,14 @@ func CreateSiteCategory(payload CreateSiteCategoryStruct) error {
 	return model.CreateSiteCategory(model.SiteCategory{
 		Name:        name,
 		Slug:        slug,
-		Description: strings.TrimSpace(payload.Description),
+		Description: security.SanitizePlainText(payload.Description, 500),
 		Status:      payload.Status,
 		Sort:        payload.Sort,
 	})
 }
 
 func UpdateSiteCategory(id int, payload UpdateSiteCategoryStruct) error {
-	name := strings.TrimSpace(payload.Name)
+	name := security.SanitizePlainText(payload.Name, 100)
 	slug := normalizeSlug(payload.Slug)
 	if name == "" {
 		return fmt.Errorf("name is required")
@@ -97,7 +132,7 @@ func UpdateSiteCategory(id int, payload UpdateSiteCategoryStruct) error {
 	data := map[string]any{
 		"name":        name,
 		"slug":        slug,
-		"description": strings.TrimSpace(payload.Description),
+		"description": security.SanitizePlainText(payload.Description, 500),
 		"status":      payload.Status,
 		"sort":        payload.Sort,
 	}

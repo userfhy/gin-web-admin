@@ -18,6 +18,7 @@ func InitSiteContentRouter(Router *gin.RouterGroup) {
 		siteContent.GET("/:id", siteContentController.GetSiteContent)
 		siteContent.POST("", siteContentController.CreateSiteContent)
 		siteContent.PUT("/:id", siteContentController.UpdateSiteContent)
+		siteContent.PATCH("/:id/status", siteContentController.UpdateSiteContentStatus)
 		siteContent.DELETE("/:id", siteContentController.DeleteSiteContent)
 	}
 }
