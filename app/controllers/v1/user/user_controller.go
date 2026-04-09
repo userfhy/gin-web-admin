@@ -10,16 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//	@Summary		创建用户
-//	@Description	创建新用户
-//	@Accept			json
-//	@Produce		json
-//	@Security		ApiKeyAuth
-//	@Tags			User
-//	@Param			payload	body		userService.AddUserStruct	true	"create new user"
-//	@Success		200		{object}	common.Response
-//	@Failure		500		{object}	common.Response
-//	@Router			/user [post]
+// @Summary		创建用户
+// @Description	创建新用户
+// @Accept			json
+// @Produce		json
+// @Security		ApiKeyAuth
+// @Tags			User
+// @Param			payload	body		userService.AddUserStruct	true	"create new user"
+// @Success		200		{object}	common.Response
+// @Failure		500		{object}	common.Response
+// @Router			/user [post]
 func CreateUser(c *gin.Context) {
 	appG := common.Gin{C: c}
 
@@ -42,32 +42,32 @@ func CreateUser(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "用户添加成功", nil)
 }
 
-//	@Summary		用户列表
-//	@Description	获取用户列表
-//	@Accept			json
-//	@Produce		json
-//	@Security		ApiKeyAuth
-//	@Tags			User
-//	@Param			p	query		int	true	"page number"
-//	@Param			n	query		int	true	"page limit"
-//	@Success		200	{object}	common.Response
-//	@Failure		500	{object}	common.Response
-//	@Router			/user [get]
+// @Summary		用户列表
+// @Description	获取用户列表
+// @Accept			json
+// @Produce		json
+// @Security		ApiKeyAuth
+// @Tags			User
+// @Param			p	query		int	true	"page number"
+// @Param			n	query		int	true	"page limit"
+// @Success		200	{object}	common.Response
+// @Failure		500	{object}	common.Response
+// @Router			/user [get]
 func GetUsers(c *gin.Context) {
 	appG := common.Gin{C: c}
 
-	_, errStr, p, n := utils.GetPage(c)
-	if errStr != "" {
-		appG.Response(http.StatusBadRequest, code.InvalidParams, errStr, nil)
+	pg, err := utils.GetPagination(c)
+	if err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}
 
 	var userServiceObj userService.UserStruct
-	userServiceObj.PageNum = p
-	userServiceObj.PageSize = n
+	userServiceObj.PageNum = pg.Offset()
+	userServiceObj.PageSize = pg.Limit()
 
-	err := c.ShouldBindQuery(&userServiceObj)
-	if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
+	if err := c.ShouldBindQuery(&userServiceObj); err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, "参数绑定失败", nil)
 		return
 	}
 
@@ -86,8 +86,8 @@ func GetUsers(c *gin.Context) {
 	data := utils.PageResult{
 		List:        userArr,
 		Total:       total,
-		CurrentPage: p,
-		PageSize:    n,
+		CurrentPage: pg.Page,
+		PageSize:    pg.PageSize,
 	}
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
 }

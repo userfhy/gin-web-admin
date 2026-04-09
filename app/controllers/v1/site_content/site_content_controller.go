@@ -6,6 +6,7 @@ import (
 
 	siteContentService "gin-web-admin/app/service/v1/site_content"
 	"gin-web-admin/common"
+	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
 
 	"github.com/gin-gonic/gin"
@@ -14,16 +15,10 @@ import (
 func GetSiteContentList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
-	pageNum, _ := strconv.Atoi(c.DefaultQuery("pageNum", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
-	if pageNum <= 0 {
-		pageNum = 1
-	}
-	if pageSize <= 0 {
-		pageSize = 10
-	}
-	if pageSize > 100 {
-		pageSize = 100
+	pg, err := utils.GetPagination(c, utils.WithMaxPageSize(100))
+	if err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
 	}
 
 	var status *int
@@ -55,8 +50,8 @@ func GetSiteContentList(c *gin.Context) {
 	}
 
 	data, err := siteContentService.GetSiteContentList(siteContentService.SiteContentQuery{
-		PageNum:    pageNum,
-		PageSize:   pageSize,
+		PageNum:    pg.Page,
+		PageSize:   pg.PageSize,
 		Keyword:    c.Query("keyword"),
 		Status:     status,
 		CategoryID: categoryID,

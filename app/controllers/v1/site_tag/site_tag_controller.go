@@ -6,6 +6,7 @@ import (
 
 	siteTagService "gin-web-admin/app/service/v1/site_tag"
 	"gin-web-admin/common"
+	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
 
 	"github.com/gin-gonic/gin"
@@ -14,16 +15,10 @@ import (
 func GetSiteTagList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
-	pageNum, _ := strconv.Atoi(c.DefaultQuery("pageNum", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
-	if pageNum <= 0 {
-		pageNum = 1
-	}
-	if pageSize <= 0 {
-		pageSize = 10
-	}
-	if pageSize > 100 {
-		pageSize = 100
+	pg, err := utils.GetPagination(c, utils.WithMaxPageSize(100))
+	if err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
 	}
 
 	var status *int
@@ -37,8 +32,8 @@ func GetSiteTagList(c *gin.Context) {
 	}
 
 	data, err := siteTagService.GetSiteTagList(siteTagService.SiteTagQuery{
-		PageNum:  pageNum,
-		PageSize: pageSize,
+		PageNum:  pg.Page,
+		PageSize: pg.PageSize,
 		Keyword:  c.Query("keyword"),
 		Status:   status,
 	})

@@ -7,6 +7,7 @@ import (
 	model "gin-web-admin/app/models"
 	service "gin-web-admin/app/service/v1/menu"
 	"gin-web-admin/common"
+	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
 
 	"github.com/gin-gonic/gin"
@@ -77,8 +78,11 @@ func DeleteMenu(c *gin.Context) {
 func GetMenuList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
-	pageNum, _ := strconv.Atoi(c.DefaultQuery("pageNum", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	pg, err := utils.GetPagination(c)
+	if err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
+	}
 
 	// 构建查询条件，可根据你前端传参处理
 	where := make(map[string]any)
@@ -86,7 +90,7 @@ func GetMenuList(c *gin.Context) {
 		where["menu_type"] = menuType
 	}
 
-	menus, err := service.GetMenuList(pageNum, pageSize, where)
+	menus, err := service.GetMenuList(pg.Page, pg.PageSize, where)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "查询失败", nil)
 		return

@@ -130,35 +130,22 @@ type Page struct {
 
 ```golang
 
-type Page struct {
-    P uint `json:"p" form:"p" validate:"required,numeric,min=1"`
-    N uint `json:"n" form:"n" validate:"required,numeric,min=1"`
+// GetPagination 统一解析 pageNum/page/p 与 pageSize/size/n，并限制最大 size
+func GetPagination(c *gin.Context, opts ...utils.PaginationOption) (utils.Pagination, error) {
+    // 默认 page=1、pageSize=10、最大 100，可通过 opts 自定义
+    return utils.GetPagination(c, opts...)
 }
 
-// GetPage get page parameters
-func GetPage(c *gin.Context) (error, string, int, int) {
-    currentPage := 0
-
-    // 绑定 query 参数到结构体
-    var p Page
-    if err := c.ShouldBindQuery(&p); err != nil {
-        return err, "参数绑定失败,请检查传递参数类型！", 0, 0
-    }
-
-    // 验证绑定结构体参数
-    err, parameterErrorStr := common.CheckBindStructParameter(p, c)
+func ExampleHandler(c *gin.Context) {
+    appG := common.Gin{C: c}
+    pg, err := utils.GetPagination(c, utils.WithMaxPageSize(100))
     if err != nil {
-        return err, parameterErrorStr, 0, 0
+        appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+        return
     }
 
-    page := com.StrTo(c.DefaultQuery("p", "0")).MustInt()
-    limit := com.StrTo(c.DefaultQuery("n", "15")).MustInt()
-    
-    if page > 0 {
-       currentPage = (page - 1) * limit
-    }
-
-    return nil, "", currentPage, limit
+    list, total := queryFromDB(pg.Page, pg.PageSize) // 由业务自行实现
+    appG.Response(http.StatusOK, code.SUCCESS, "ok", pg.Result(list, total))
 }
 ```
 
