@@ -78,9 +78,13 @@ func InitRouter(r *gin.Engine, deps Dependencies) *gin.Engine {
 		middleware.JWTHandler(deps.UserService),
 		casbinMiddleware,
 	)
+	authzGroup.Use(middleware.OperationLogger())
 
 	jwtOnly := v1.Group("")
-	jwtOnly.Use(middleware.JWTHandler(deps.UserService))
+	jwtOnly.Use(
+		middleware.JWTHandler(deps.UserService),
+		middleware.OperationLogger(),
+	)
 
 	InitUserRouter(public, authzGroup, userHandler, authHandler) // 用户管理
 	InitRoleRouter(authzGroup, roleHandler)                      // 角色

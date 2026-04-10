@@ -11,6 +11,7 @@ import (
 	"gin-web-admin/utils/code"
 	"gin-web-admin/utils/gredis"
 	"gin-web-admin/utils/logging"
+	security "gin-web-admin/utils/security"
 )
 
 // RefreshAccessTokenStruct 刷新令牌结构体
@@ -88,7 +89,7 @@ func NewService(store *data.Store) *Service {
 	return &Service{store: store}
 }
 
-func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string) (string, error) {
+func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string, ip string) (string, error) {
 	var (
 		oldRefresh = ""
 	)
@@ -103,6 +104,11 @@ func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string) (string, e
 	updates := map[string]any{
 		"logged_in_at":  time.Now(),
 		"refresh_token": refreshToken,
+	}
+	if ip != "" {
+		updates["last_login_ip"] = ip
+		updates["failed_login_count"] = 0
+		updates["locked_until"] = nil
 	}
 
 	err, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
@@ -146,7 +152,10 @@ func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error
 	return data, nil
 }
 
-func (s *Service) ChangeUserPassword(userId uint, newPassword string) bool {
+func (s *Service) ChangeUserPassword(userId uint, newPassword string) error {
+	if err := security.ValidatePasswordComplexity(newPassword); err != nil {
+		return err
+	}
 	wheres := make(map[string]any)
 	wheres["id ="] = userId
 
@@ -154,11 +163,10 @@ func (s *Service) ChangeUserPassword(userId uint, newPassword string) bool {
 	updates["password"] = utils.EncodeUserPassword(newPassword)
 	_, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
 	if rowsAffected == 0 {
-		logging.Println("修改用户密码失败！")
-		return false
+		return fmt.Errorf("修改用户密码失败，用户不存在或未更新")
 	}
 
-	return true
+	return nil
 }
 
 func (s *Service) JoinBlockList(userId uint, jwt string) {
@@ -220,6 +228,9 @@ func blacklistTTL(jwt string) time.Duration {
 }
 
 func (s *Service) CreateUser(newUser AddUserStruct) error {
+	if err := security.ValidatePasswordComplexity(newUser.Password); err != nil {
+		return err
+	}
 	return model.CreatUser(model.Auth{
 		Username: strings.TrimSpace(newUser.Username),
 		Password: utils.EncodeUserPassword(newUser.Password),

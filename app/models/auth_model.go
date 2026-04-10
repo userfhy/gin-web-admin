@@ -8,36 +8,36 @@ import (
 
 type Auth struct {
 	BaseModel
-	RoleId       uint     `gorm:"DEFAULT:0;NOT NULL;" json:"role_id"`
-	Status       int      `gorm:"type:int(1);DEFAULT:0;NOT NULL;" json:"status"`
-	LoggedInAt   JSONTime `json:"logged_in_at"`
-	Username     string   `gorm:"Size:20;unique;NOT NULL;" json:"user_name"`
-	Nickname     string   `gorm:"Size:30;" json:"nickname"`
-	Phone        string   `gorm:"Size:30;" json:"phone"`
-	Email        string   `gorm:"Size:40;" json:"email"`
-	Sex          int      `gorm:"type:tinyint(1) unsigned;DEFAULT:0;NOT NULL;comment:1-女 2-男" json:"sex"`
-	Password     string   `gorm:"Size:50;NOT NULL;" json:"-"`
-	RefreshToken string   `gorm:"Size:600;unique;default:''" json:"refresh_token"`
-	RoleName     string   `gorm:"-" json:"role_name"`
-	Role         Role     `gorm:"foreignkey:RoleId" json:"-"`
+	RoleId           uint      `gorm:"DEFAULT:0;NOT NULL;" json:"role_id"`
+	Status           int       `gorm:"type:int(1);DEFAULT:0;NOT NULL;" json:"status"`
+	LoggedInAt       JSONTime  `json:"logged_in_at"`
+	LockedUntil      *JSONTime `json:"locked_until"`
+	FailedLoginCount int       `gorm:"type:int;default:0" json:"failed_login_count"`
+	LastLoginIP      string    `gorm:"size:64" json:"last_login_ip"`
+	Username         string    `gorm:"Size:20;unique;NOT NULL;" json:"user_name"`
+	Nickname         string    `gorm:"Size:30;" json:"nickname"`
+	Phone            string    `gorm:"Size:30;" json:"phone"`
+	Email            string    `gorm:"Size:40;" json:"email"`
+	Sex              int       `gorm:"type:tinyint(1) unsigned;DEFAULT:0;NOT NULL;comment:1-女 2-男" json:"sex"`
+	Password         string    `gorm:"Size:50;NOT NULL;" json:"-"`
+	RefreshToken     string    `gorm:"Size:600;unique;default:''" json:"refresh_token"`
+	RoleName         string    `gorm:"-" json:"role_name"`
+	Role             Role      `gorm:"foreignkey:RoleId" json:"-"`
 }
 
 func (Auth) TableName() string {
 	return TablePrefix + "auth"
 }
 
-func CheckAuth(username string, password string) (bool, uint, string, bool, int) {
+func GetAuthByUsername(username string) (*Auth, error) {
 	var auth Auth
-	db.Select("*").Where(Auth{
-		Username: username,
-		Password: utils.EncodeUserPassword(password),
-	}).Preload("Role").First(&auth)
-
-	if auth.ID > 0 {
-		return true, auth.ID, auth.Role.RoleKey, auth.Role.IsAdmin, auth.Status
+	if err := db.Where("username = ?", username).Preload("Role").First(&auth).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
 	}
-
-	return false, 0, "", false, 0
+	return &auth, nil
 }
 
 func CreatUser(auth Auth) error {

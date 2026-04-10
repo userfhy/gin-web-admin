@@ -51,13 +51,18 @@ func (h *Handler) UserLogin(c *gin.Context) {
 		return
 	}
 
-	result, err := h.service.Login(userLogin)
+	clientIP := c.ClientIP()
+	result, err := h.service.Login(userLogin, clientIP)
 	if err != nil {
 		switch {
 		case errors.Is(err, authService.ErrInvalidCredentials):
 			appG.Response(http.StatusOK, code.ErrorUserPasswordInvalid, code.GetMsg(code.ErrorUserPasswordInvalid), nil)
 		case errors.Is(err, authService.ErrUserDisabled):
 			appG.Response(http.StatusOK, code.ErrorAuth, "该用户已被禁用", nil)
+		case errors.Is(err, authService.ErrAccountLocked):
+			appG.Response(http.StatusTooManyRequests, code.ErrorAuth, "账号已锁定，请稍后再试", nil)
+		case errors.Is(err, authService.ErrIPNotAllowed):
+			appG.Response(http.StatusForbidden, code.ErrorAuth, "当前 IP 未被授权登录", nil)
 		default:
 			utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "登录失败", err)
 		}
@@ -157,8 +162,10 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 			appG.Response(http.StatusOK, code.ErrorUserOldPasswordInvalid, code.GetMsg(code.ErrorUserOldPasswordInvalid), nil)
 		case errors.Is(err, authService.ErrUserDisabled):
 			appG.Response(http.StatusOK, code.ErrorAuth, "该用户已被禁用", nil)
+		case errors.Is(err, authService.ErrAccountLocked):
+			appG.Response(http.StatusTooManyRequests, code.ErrorAuth, "账号已锁定，请稍后再试", nil)
 		default:
-			appG.Response(http.StatusOK, code.UnknownError, code.GetMsg(code.UnknownError), nil)
+			appG.Response(http.StatusOK, code.UnknownError, err.Error(), nil)
 		}
 		return
 	}

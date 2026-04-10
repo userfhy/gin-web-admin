@@ -30,6 +30,7 @@ Gin-based admin backend featuring user/role management, CMS-style menu/content m
 - 🧭 **Swagger/OpenAPI ready** – `swag init` produces up-to-date API docs for easy integration.
 - 🧰 **Utility toolbox** – pagination, validator wrappers, SSE helpers, logging, translation middleware.
 - 🏗️ **Cross-platform builds** – sample scripts for Windows/Linux static binaries.
+- 🔒 **Account security** – password complexity policy, IP whitelist, login lockouts, and audit logs for login/critical operations.
 
 ## Project Layout
 
@@ -64,6 +65,7 @@ go run ./cmd/server
 
 - Config options live in `conf/app.toml`; copy the sample per environment (dev/stg/prod).
 - `internal/setting` loads Redis/MySQL/JWT/Casbin/Server settings.
+- Account policies (password complexity, IP whitelist, lockouts) live under the `[security]` section.
 - Override via env vars for zero-touch deploys:
 
 ```bash

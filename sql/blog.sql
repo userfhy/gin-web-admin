@@ -66,6 +66,9 @@ CREATE TABLE `gin_auth` (
   `sex` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1-女 2-男',
   `password` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `refresh_token` varchar(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '',
+  `failed_login_count` int NOT NULL DEFAULT '0',
+  `locked_until` datetime(3) DEFAULT NULL,
+  `last_login_ip` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni_gin_auth_username` (`username`),
   UNIQUE KEY `uni_gin_auth_refresh_token` (`refresh_token`)
@@ -75,12 +78,12 @@ CREATE TABLE `gin_auth` (
 -- Records of gin_auth
 -- ----------------------------
 BEGIN;
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2026-04-10 14:05:54.454', NULL, 1, 1, '2026-04-10 14:05:54.454', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzc2MzU1MjAwLCJpYXQiOjE3NzU4MDExNTR9.j2yFZ2xDfDFIePy6hUS6hNdKxV0zMD4k3dajERfDNW8');
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2026-01-30 11:09:31.753', NULL, 2, 1, '2026-01-30 11:09:31.753', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMzA3MjAwLCJpYXQiOjE3Njk3NDI1NzF9.YsRC6J1VXClDI_h2_-u3T1bCfh-duJasVkIE7aBiEcc');
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (3, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor2', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '3');
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (4, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor3', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '4');
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (5, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor4', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '5');
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (6, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor5', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '6');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`, `failed_login_count`, `locked_until`, `last_login_ip`) VALUES (1, '2024-05-10 16:39:36.066', '2026-04-10 14:05:54.454', NULL, 1, 1, '2026-04-10 14:05:54.454', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzc2MzU1MjAwLCJpYXQiOjE3NzU4MDExNTR9.j2yFZ2xDfDFIePy6hUS6hNdKxV0zMD4k3dajERfDNW8', 0, NULL, NULL);
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`, `failed_login_count`, `locked_until`, `last_login_ip`) VALUES (2, '2024-05-10 16:39:36.066', '2026-01-30 11:09:31.753', NULL, 2, 1, '2026-01-30 11:09:31.753', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMzA3MjAwLCJpYXQiOjE3Njk3NDI1NzF9.YsRC6J1VXClDI_h2_-u3T1bCfh-duJasVkIE7aBiEcc', 0, NULL, NULL);
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`, `failed_login_count`, `locked_until`, `last_login_ip`) VALUES (3, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor2', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '3', 0, NULL, NULL);
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`, `failed_login_count`, `locked_until`, `last_login_ip`) VALUES (4, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor3', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '4', 0, NULL, NULL);
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`, `failed_login_count`, `locked_until`, `last_login_ip`) VALUES (5, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor4', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '5', 0, NULL, NULL);
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`, `failed_login_count`, `locked_until`, `last_login_ip`) VALUES (6, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor5', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '6', 0, NULL, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -441,5 +444,28 @@ CREATE TABLE `gin_site_tag` (
 BEGIN;
 INSERT INTO `gin_site_tag` (`id`, `name`, `slug`, `status`, `sort`, `created_at`, `updated_at`) VALUES (1, '标签', 'biaoqian', 1, 0, '2026-04-05 19:00:12.457', '2026-04-05 19:00:12.457');
 COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_audit_log`;
+CREATE TABLE `gin_audit_log` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  `deleted_at` datetime(3) DEFAULT NULL,
+  `category` varchar(20) DEFAULT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `username` varchar(60) DEFAULT NULL,
+  `ip` varchar(64) DEFAULT NULL,
+  `path` varchar(255) DEFAULT NULL,
+  `method` varchar(10) DEFAULT NULL,
+  `status` int DEFAULT NULL,
+  `action` varchar(120) DEFAULT NULL,
+  `message` text,
+  PRIMARY KEY (`id`),
+  KEY `idx_audit_category` (`category`),
+  KEY `idx_audit_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -115,6 +115,7 @@ func Setup() {
 		&SiteContentCategory{},
 		&SiteTag{},
 		&SiteContentTag{},
+		&AuditLog{},
 	)
 }
 

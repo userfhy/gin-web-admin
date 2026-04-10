@@ -30,6 +30,7 @@
 - 🧭 **Swagger/OpenAPI**：`swag init` 自动生成接口文档，可快速联调。
 - 🧰 **常用工具**：分页、结构体校验、SSE、日志、配置热切换（通过环境变量指定）。
 - 🏗️ **跨平台发布**：提供 Windows/Linux 静态编译脚本。
+- 🔒 **账户安全**：强制密码复杂度、IP 白名单、登录失败锁定与登录/操作审计日志，满足合规要求。
 
 ## 目录结构
 
@@ -64,6 +65,7 @@ go run ./cmd/server
 
 - 所有配置读取自 `conf/app.toml`，可以按照环境（dev/staging/prod）复制多份文件。
 - `internal/setting` 会加载 Redis/MySQL/JWT/Casbin/Server 等配置项，可在 TOML 中逐项覆盖。
+- 密码复杂度、IP 白名单、登录锁定等安全策略统一配置在 `[security]` 区域。
 - 通过环境变量可实现“无侵入”覆盖：
 
 ```bash

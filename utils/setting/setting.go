@@ -14,6 +14,7 @@ type Config struct {
 	Server   Server
 	Database Database
 	Redis    Redis
+	Security Security
 }
 
 type App struct {
@@ -59,6 +60,19 @@ type Redis struct {
 
 var RedisSetting = &Redis{}
 
+type Security struct {
+	PasswordMinLength   int
+	RequireUppercase    bool
+	RequireLowercase    bool
+	RequireNumber       bool
+	RequireSpecial      bool
+	LoginMaxAttempts    int
+	LoginLockoutMinutes int
+	IPWhitelist         []string
+}
+
+var SecuritySetting = &Security{}
+
 var (
 	cfg        *Config
 	configPath = "conf/app.toml"
@@ -88,6 +102,7 @@ func Setup() {
 	ServerSetting = &cfg.Server
 	DatabaseSetting = &cfg.Database
 	RedisSetting = &cfg.Redis
+	SecuritySetting = &cfg.Security
 
 	// 从环境变量覆盖敏感配置
 	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret != "" {
@@ -114,4 +129,14 @@ func Setup() {
 	ServerSetting.ReadTimeout = ServerSetting.ReadTimeout * time.Second
 	ServerSetting.WriteTimeout = ServerSetting.WriteTimeout * time.Second
 	RedisSetting.IdleTimeout = RedisSetting.IdleTimeout * time.Second
+
+	if SecuritySetting.PasswordMinLength <= 0 {
+		SecuritySetting.PasswordMinLength = 8
+	}
+	if SecuritySetting.LoginMaxAttempts <= 0 {
+		SecuritySetting.LoginMaxAttempts = 5
+	}
+	if SecuritySetting.LoginLockoutMinutes <= 0 {
+		SecuritySetting.LoginLockoutMinutes = 15
+	}
 }
