@@ -138,7 +138,7 @@ func (s *Service) CreateSiteTag(payload CreateSiteTagStruct) error {
 		return err
 	}
 	sitePublicService.InvalidatePublicTags()
-	sitePublicService.InvalidatePublicContent(0, "")
+	sitePublicService.InvalidateAllPublicContent()
 	return nil
 }
 
@@ -174,7 +174,7 @@ func (s *Service) UpdateSiteTag(id int, payload UpdateSiteTagStruct) error {
 		return err
 	}
 	sitePublicService.InvalidatePublicTags()
-	sitePublicService.InvalidatePublicContent(0, "")
+	sitePublicService.InvalidateAllPublicContent()
 	return nil
 }
 
@@ -194,7 +194,7 @@ func (s *Service) DeleteSiteTag(id int) error {
 		return err
 	}
 	sitePublicService.InvalidatePublicTags()
-	sitePublicService.InvalidatePublicContent(0, "")
+	sitePublicService.InvalidateAllPublicContent()
 	return nil
 }
 

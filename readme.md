@@ -89,9 +89,11 @@ func main() {
 5. **依赖注入（server → router → handler）**：
    - 在 `routers/router.go` 的 `Dependencies` 增加 `<Module>Service *<module>Service.Service` 字段，并在 `InitRouter` 中实例化 `<module>Handler := <module>Controller.NewHandler(deps.<Module>Service)`。
    - `cmd/server/server.go` 中：在 bootstrap 后创建 `<module>Svc := <module>Service.NewService(container.Store)`，并填入构造 `routers.Dependencies` 时的 `<Module>Service`。
-6. **入口/生命周期**：
+6. **缓存/生命周期**：
    - 模块若需要后台任务（如 SSE 广播、定时同步），在 `cmd/server/server.go` 或专门的启动器中初始化，禁止在 Handler 内直接起 goroutine。
    - 需要单独运行 Service 层以便 CLI/测试时，可直接复用 `internal/bootstrap` 返回的 `container.Store`、`container.NewEngine()` 等依赖。
+   - 使用 Redis 做缓存或黑名单时，统一调用 `utils/gredis`，可选同步 (`SetJSON`/`DeleteKeys`) 或异步 (`SetJSONAsync`/`DeleteKeysAsync`) 接口。
+   - 写操作完成后务必调用对应的失效函数（例如 `sitePublicService.InvalidatePublicContent`、`sysService.InvalidateRouteCache`），避免脏数据长时间驻留缓存。
 7. **文档与权限**：
    - 使用 `swag init` 更新 `docs/swagger.*`；若新增公开接口，别忘了在 `routers/site_public_router.go` 等路由文件中注册。
    - RBAC/Casbin 场景补充菜单 SQL、Casbin 策略或角色菜单映射，保持前后端一致。

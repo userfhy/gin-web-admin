@@ -72,7 +72,7 @@ var defaultService *Service
 const (
 	categoriesCacheKey = "site:categories:all"
 	tagsCacheKey       = "site:tags:all"
-	siteCacheTTL       = 5 * time.Minute
+	siteCacheTTL       = 15 * time.Minute
 	detailCachePrefix  = "site:content:"
 	listCachePrefix    = "site:content:list:"
 )

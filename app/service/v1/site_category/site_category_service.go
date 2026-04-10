@@ -143,7 +143,7 @@ func (s *Service) CreateSiteCategory(payload CreateSiteCategoryStruct) error {
 		return err
 	}
 	sitePublicService.InvalidatePublicCategories()
-	sitePublicService.InvalidatePublicContent(0, "")
+	sitePublicService.InvalidateAllPublicContent()
 	return nil
 }
 
@@ -180,7 +180,7 @@ func (s *Service) UpdateSiteCategory(id int, payload UpdateSiteCategoryStruct) e
 		return err
 	}
 	sitePublicService.InvalidatePublicCategories()
-	sitePublicService.InvalidatePublicContent(0, "")
+	sitePublicService.InvalidateAllPublicContent()
 	return nil
 }
 
@@ -200,7 +200,7 @@ func (s *Service) DeleteSiteCategory(id int) error {
 		return err
 	}
 	sitePublicService.InvalidatePublicCategories()
-	sitePublicService.InvalidatePublicContent(0, "")
+	sitePublicService.InvalidateAllPublicContent()
 	return nil
 }
 
