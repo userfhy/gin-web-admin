@@ -1,17 +1,7 @@
 version: "2"
 
-run:
-  timeout: 5m
-  tests: false
-
-linters:
-  enable:
-    - govet
-    - staticcheck
-    - gosimple
-    - ineffassign
-    - gofmt
-    - goimports
-
-issues:
-  exclude-use-default: false
+output:
+  show-stats: true
+  sort-order:
+    - file
+    - linter
