@@ -40,8 +40,7 @@ func (h *Handler) Report(c *gin.Context) {
 	}
 
 	// 验证绑定结构体参数
-	err, parameterErrorStr := common.CheckBindStructParameter(report, c)
-	if err != nil {
+	if parameterErrorStr, err := common.CheckBindStructParameter(report, c); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, parameterErrorStr, nil)
 		return
 	}

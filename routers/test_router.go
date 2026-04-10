@@ -20,9 +20,12 @@ func InitTestRouter(router *gin.RouterGroup, handler *indexController.Handler) {
 			// 使用嵌入的模板文件
 			t, err := template.ParseFS(views.SSEStaticFS, "sse/testSSE.html")
 			if err != nil {
-				panic(err)
+				c.String(500, "template parse error")
+				return
 			}
-			t.Execute(c.Writer, "index")
+			if err := t.Execute(c.Writer, "index"); err != nil {
+				c.String(500, "template execute error")
+			}
 		})
 
 		//注册SSE路由

@@ -38,18 +38,15 @@ func (h *Handler) CreateCasbin(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var newCasbin casbinService.AddCasbinStruct
-	err := c.ShouldBindJSON(&newCasbin)
-	if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, "参数绑定失败", err) {
+	if err := c.ShouldBindJSON(&newCasbin); utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, "参数绑定失败", err) {
 		return
 	}
 
-	err, parameterErrorStr := common.CheckBindStructParameter(newCasbin, c)
-	if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
+	if parameterErrorStr, err := common.CheckBindStructParameter(newCasbin, c); utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
 		return
 	}
 
-	err = h.service.CreateCasbin(newCasbin)
-	if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "Path添加失败！", err) {
+	if err := h.service.CreateCasbin(newCasbin); utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "Path添加失败！", err) {
 		return
 	}
 
@@ -76,9 +73,7 @@ func (h *Handler) UpdateCasbin(c *gin.Context) {
 	id := com.StrTo(c.Param("id")).MustInt()
 
 	var update casbinService.AddCasbinStruct
-	err := c.ShouldBindJSON(&update)
-
-	if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
+	if err := c.ShouldBindJSON(&update); utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
 		return
 	}
 
@@ -117,7 +112,10 @@ func (h *Handler) DeleteCasbin(c *gin.Context) {
 	}
 
 	// 重新生成权限列表
-	casbin.SetupCasbin().RemovePolicy(update.V0, update.V1, update.V2)
+	if _, err := casbin.SetupCasbin().RemovePolicy(update.V0, update.V1, update.V2); err != nil {
+		appG.Response(http.StatusInternalServerError, code.ERROR, "删除规则失败", nil)
+		return
+	}
 
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", update)
 }

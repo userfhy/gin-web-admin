@@ -58,8 +58,8 @@ func (s *Service) Login(payload userService.AuthStruct, clientIP string) (LoginR
 		return LoginResult{}, ErrInvalidCredentials
 	}
 
-	if user.LockedUntil != nil && time.Now().Before(user.LockedUntil.Time) {
-		until := user.LockedUntil.Time.Format(time.RFC3339)
+	if user.LockedUntil != nil && user.LockedUntil.After(time.Now()) {
+		until := user.LockedUntil.Format(time.RFC3339)
 		s.logLogin(user.Username, user.ID, clientIP, false, "account locked until "+until)
 		return LoginResult{}, ErrAccountLocked
 	}
@@ -125,7 +125,7 @@ func (s *Service) ChangePassword(username string, payload userService.ChangePass
 	if err != nil || user == nil {
 		return ErrInvalidCredentials
 	}
-	if user.LockedUntil != nil && time.Now().Before(user.LockedUntil.Time) {
+	if user.LockedUntil != nil && user.LockedUntil.After(time.Now()) {
 		return ErrAccountLocked
 	}
 	if user.Status == 0 {
@@ -166,10 +166,8 @@ func (s *Service) handleLoginFailure(user *model.Auth, ip, reason string) {
 		updates["failed_login_count"] = 0
 		reason = fmt.Sprintf("%s; locked %d minutes", reason, cfg.LoginLockoutMinutes)
 	}
-	if err, rows := model.Update(&model.Auth{}, map[string]any{"id =": user.ID}, updates); err != nil {
+	if _, err := model.Update(&model.Auth{}, map[string]any{"id =": user.ID}, updates); err != nil {
 		reason += fmt.Sprintf(" (update error: %v)", err)
-	} else if rows == 0 {
-		reason += " (update skipped)"
 	}
 	s.logLogin(user.Username, user.ID, ip, false, reason)
 }

@@ -26,7 +26,7 @@ func InitValidate() {
 	Validate = validator.New()
 }
 
-func CheckBindStructParameter(s any, c *gin.Context) (error, string) {
+func CheckBindStructParameter(s any, c *gin.Context) (string, error) {
 	v, _ := c.Get("trans")
 
 	trans, ok := v.(ut.Translator)
@@ -34,15 +34,14 @@ func CheckBindStructParameter(s any, c *gin.Context) (error, string) {
 		trans, _ = Uni.GetTranslator("zh")
 	}
 
-	err := Validate.Struct(s)
-	if err != nil {
+	if err := Validate.Struct(s); err != nil {
 		errs := err.(validator.ValidationErrors)
 		var sliceErrs []string
 		for _, e := range errs {
 			sliceErrs = append(sliceErrs, e.Translate(trans))
 		}
-		return errs, strings.Join(sliceErrs, ",")
+		return strings.Join(sliceErrs, ","), errs
 	}
 
-	return nil, ""
+	return "", nil
 }

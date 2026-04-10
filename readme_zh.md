@@ -211,6 +211,12 @@ flowchart TD
 
 > 如果 `redis-cli` 不可用，可以使用 `docker exec -it redis redis-cli` 或者编写简单 Go 脚本调用 `utils/gredis`。控制器/E2E 测试通过接口模拟 AuthService，因此无需真实 DB/Redis，适合 CI。
 
+### Git 钩子
+
+- 仓库提供 `githooks/pre-commit`，执行 `git config core.hooksPath githooks` 即可启用本地钩子。
+- 钩子会顺序执行 `golangci-lint run` 与 `GOCACHE=/tmp/gocache go test ./...`，确保与 CI 一致，失败则阻止提交。
+- 临时跳过可设置 `SKIP_GIT_HOOKS=1` 再提交（请在修复后恢复）。
+
 ## 观测与日志
 
 默认日志输出包含 Redis 连接、Gin 路由注册等信息：
@@ -253,7 +259,7 @@ type Page struct {
 
 var page Page
 if err := c.ShouldBindQuery(&page); err != nil { ... }
-if err, msg := common.CheckBindStructParameter(page, c); err != nil {
+if msg, err := common.CheckBindStructParameter(page, c); err != nil {
     appG.Response(http.StatusBadRequest, code.InvalidParams, msg, nil)
     return
 }

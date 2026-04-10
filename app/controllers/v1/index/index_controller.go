@@ -55,7 +55,7 @@ func (h *Handler) Test(c *gin.Context) {
 	base64 := c.DefaultQuery("base64", "")
 
 	// 替换字符串
-	base64String := strings.Replace(base64, " ", "+", -1)
+	base64String := strings.ReplaceAll(base64, " ", "+")
 
 	// base64 解码
 	arrByte, err := utils.Base64Decode(base64String)

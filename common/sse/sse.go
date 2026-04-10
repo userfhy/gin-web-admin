@@ -31,7 +31,7 @@ type (
 	}
 
 	client struct {
-		sync.Mutex
+		mu           sync.Mutex
 		id           string
 		messageChan  chan Message
 		closeChan    chan struct{}
@@ -184,8 +184,8 @@ func (s *sseImpl) Send(clientID string, msg Message) error {
 	}
 
 	// 单独对客户端加锁
-	client.Lock()
-	defer client.Unlock()
+	client.mu.Lock()
+	defer client.mu.Unlock()
 
 	select {
 	case client.messageChan <- msg:

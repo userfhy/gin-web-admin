@@ -35,9 +35,9 @@ func (h *Handler) GetSiteContentList(c *gin.Context) {
 
 	filter := query.NewBuilder()
 	if err := filter.FromQuery(c, query.RuleSet{
-		"status":     {Field: "status", Op: query.OpEqual, Parser: query.IntEnumParser(0, 1)},
-		"categoryId": {Field: "category_id", Op: query.OpEqual, Parser: query.IntParser()},
-		"tagId":      {Field: "tag_id", Op: query.OpEqual, Parser: query.IntParser()},
+		"status":     query.Rule{Field: "status", Op: query.OpEqual, Parser: query.IntEnumParser(0, 1)},
+		"categoryId": query.Rule{Field: "category_id", Op: query.OpEqual, Parser: query.IntParser()},
+		"tagId":      query.Rule{Field: "tag_id", Op: query.OpEqual, Parser: query.IntParser()},
 	}); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return

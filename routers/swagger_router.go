@@ -20,10 +20,10 @@ func InitSwaggerRouter(Router *gin.Engine) {
 	configHost := ""
 	prefixUrl := setting.AppSetting.PrefixUrl
 	if strings.HasPrefix(prefixUrl, "http://") {
-		configHost = strings.Replace(prefixUrl, "http://", "", -1)
+		configHost = strings.ReplaceAll(prefixUrl, "http://", "")
 		docs.SwaggerInfo.Schemes = []string{"http"}
 	} else if strings.HasPrefix(prefixUrl, "https://") {
-		configHost = strings.Replace(prefixUrl, "https://", "", -1)
+		configHost = strings.ReplaceAll(prefixUrl, "https://", "")
 		docs.SwaggerInfo.Schemes = []string{"https"}
 	}
 	docs.SwaggerInfo.Host = configHost

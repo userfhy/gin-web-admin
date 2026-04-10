@@ -65,19 +65,15 @@ func (h *Handler) CreateRole(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var createRole roleService.CreateRoleStruct
-	err := c.ShouldBindJSON(&createRole)
-
-	if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
+	if err := c.ShouldBindJSON(&createRole); utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
 		return
 	}
 
-	err, parameterErrorStr := common.CheckBindStructParameter(createRole, c)
-	if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
+	if parameterErrorStr, err := common.CheckBindStructParameter(createRole, c); utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
 		return
 	}
 
-	err = h.service.CreateRole(createRole)
-	if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "添加新角色失败！", err) {
+	if err := h.service.CreateRole(createRole); utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "添加新角色失败！", err) {
 		return
 	}
 
@@ -140,9 +136,9 @@ func (h *Handler) GetRoles(c *gin.Context) {
 
 	filterBuilder := query.NewBuilder().IsNull("deleted_at")
 	if err := filterBuilder.FromQuery(c, query.RuleSet{
-		"role_name": {Field: "role_name", Op: query.OpLike},
-		"role_key":  {Field: "role_key", Op: query.OpLike},
-		"status":    {Field: "status", Op: query.OpEqual, Parser: query.IntParser()},
+		"role_name": query.Rule{Field: "role_name", Op: query.OpLike},
+		"role_key":  query.Rule{Field: "role_key", Op: query.OpLike},
+		"status":    query.Rule{Field: "status", Op: query.OpEqual, Parser: query.IntParser()},
 	}); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return

@@ -399,19 +399,6 @@ func extractContentIDs(list []*model.SiteContent) []int {
 	return ids
 }
 
-func autoSummary(summary string, content string) string {
-	if s := strings.TrimSpace(summary); s != "" {
-		return s
-	}
-	plain := strings.TrimSpace(strings.ReplaceAll(content, "\n", " "))
-	const maxLen = 140
-	if utf8.RuneCountInString(plain) <= maxLen {
-		return plain
-	}
-	runes := []rune(plain)
-	return string(runes[:maxLen]) + "..."
-}
-
 func buildListSummary(summary string, content string) string {
 	s := strings.TrimSpace(summary)
 	if s == "" {

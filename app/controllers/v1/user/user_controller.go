@@ -37,18 +37,15 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var newUser userService.AddUserStruct
-	err := c.ShouldBindJSON(&newUser)
-	if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, "参数绑定失败", err) {
+	if err := c.ShouldBindJSON(&newUser); utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, "参数绑定失败", err) {
 		return
 	}
 
-	err, parameterErrorStr := common.CheckBindStructParameter(newUser, c)
-	if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
+	if parameterErrorStr, err := common.CheckBindStructParameter(newUser, c); utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
 		return
 	}
 
-	err = h.service.CreateUser(newUser)
-	if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "添加新用户失败！", err) {
+	if err := h.service.CreateUser(newUser); utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "添加新用户失败！", err) {
 		return
 	}
 
@@ -85,8 +82,8 @@ func (h *Handler) GetUsers(c *gin.Context) {
 
 	filterBuilder := query.NewBuilder().IsNull("deleted_at")
 	if err := filterBuilder.FromQuery(c, query.RuleSet{
-		"username": {Field: "username", Op: query.OpLike},
-		"status":   {Field: "status", Op: query.OpEqual, Parser: query.IntParser()},
+		"username": query.Rule{Field: "username", Op: query.OpLike},
+		"status":   query.Rule{Field: "status", Op: query.OpEqual, Parser: query.IntParser()},
 	}); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return

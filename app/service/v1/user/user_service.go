@@ -66,9 +66,10 @@ func (u *UserStruct) getConditionMaps() map[string]any {
 	}
 
 	if _, ok := maps["status ="]; !ok {
-		if u.Status == "0" {
+		switch u.Status {
+		case "0":
 			maps["status ="] = 0
-		} else if u.Status == "1" {
+		case "1":
 			maps["status ="] = 1
 		}
 	}
@@ -111,7 +112,7 @@ func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string, ip string)
 		updates["locked_until"] = nil
 	}
 
-	err, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
+	rowsAffected, err := model.Update(&model.Auth{}, wheres, updates)
 	if err != nil {
 		return "", fmt.Errorf("更新用户登录信息失败: %w", err)
 	}
@@ -161,7 +162,10 @@ func (s *Service) ChangeUserPassword(userId uint, newPassword string) error {
 
 	updates := make(map[string]any)
 	updates["password"] = utils.EncodeUserPassword(newPassword)
-	_, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
+	rowsAffected, err := model.Update(&model.Auth{}, wheres, updates)
+	if err != nil {
+		return err
+	}
 	if rowsAffected == 0 {
 		return fmt.Errorf("修改用户密码失败，用户不存在或未更新")
 	}

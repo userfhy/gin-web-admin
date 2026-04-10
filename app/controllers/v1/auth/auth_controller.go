@@ -54,7 +54,7 @@ func (h *Handler) UserLogin(c *gin.Context) {
 	}
 
 	// 验证绑定结构体参数
-	err, parameterErrorStr := common.CheckBindStructParameter(userLogin, c)
+	parameterErrorStr, err := common.CheckBindStructParameter(userLogin, c)
 	if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
 		return
 	}
@@ -149,13 +149,11 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var userChangePassword userService.ChangePasswordStruct
-	err := c.ShouldBindJSON(&userChangePassword)
-
-	if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
+	if err := c.ShouldBindJSON(&userChangePassword); utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
 		return
 	}
 
-	err, parameterErrorStr := common.CheckBindStructParameter(userChangePassword, c)
+	parameterErrorStr, err := common.CheckBindStructParameter(userChangePassword, c)
 	if err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, parameterErrorStr, nil)
 		return

@@ -26,13 +26,13 @@ func Setup() {
 
 			if setting.RedisSetting.Password != "" {
 				if _, err := c.Do("AUTH", setting.RedisSetting.Password); err != nil {
-					c.Close()
+					_ = c.Close()
 					return nil, err
 				}
 			}
 
 			if _, err := c.Do("SELECT", setting.RedisSetting.DB); err != nil {
-				c.Close()
+				_ = c.Close()
 				return nil, err
 			}
 
@@ -51,7 +51,7 @@ func Setup() {
 
 func TestConnection() {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	res, err := conn.Do("PING")
 	if err != nil {
@@ -63,7 +63,7 @@ func TestConnection() {
 // Set a key/value
 func Set(key string, data any, time int) error {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	value, err := json.Marshal(data)
 	if err != nil {
@@ -86,7 +86,7 @@ func Set(key string, data any, time int) error {
 // Exists check a key
 func Exists(key string) bool {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	exists, err := redis.Bool(conn.Do("EXISTS", key))
 	if err != nil {
@@ -99,7 +99,7 @@ func Exists(key string) bool {
 // Get get a key
 func Get(key string) ([]byte, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	reply, err := redis.Bytes(conn.Do("GET", key))
 	if err != nil {
@@ -112,7 +112,7 @@ func Get(key string) ([]byte, error) {
 // Delete delete a kye
 func Delete(key string) (bool, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	return redis.Bool(conn.Do("DEL", key))
 }
@@ -130,7 +130,7 @@ func DeleteKeys(keys ...string) (int, error) {
 		args = append(args, key)
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 	return redis.Int(conn.Do("DEL", args...))
 }
 
@@ -140,7 +140,7 @@ func DeleteByPrefix(prefix string) (int, error) {
 		return 0, fmt.Errorf("redis not initialized")
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	cursor := 0
 	total := 0
@@ -206,7 +206,7 @@ func SetWithTTL(key string, value any, ttl time.Duration) error {
 		ttl = time.Minute
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	seconds := int(ttl.Seconds())
 	if seconds <= 0 {
@@ -235,7 +235,7 @@ func ExistsKey(key string) (bool, error) {
 		return false, fmt.Errorf("redis not initialized")
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	exists, err := redis.Bool(conn.Do("EXISTS", key))
 	if err != nil {
@@ -254,7 +254,7 @@ func SetJSON(key string, value any, ttl time.Duration) error {
 		return err
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	if ttl > 0 {
 		_, err = conn.Do("SETEX", key, int(ttl.Seconds()), payload)
@@ -270,7 +270,7 @@ func GetJSON(key string, dest any) (bool, error) {
 		return false, fmt.Errorf("redis not initialized")
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	data, err := redis.Bytes(conn.Do("GET", key))
 	if err == redis.ErrNil {
@@ -303,7 +303,7 @@ func SetString(key, value string, ttl time.Duration) error {
 		return fmt.Errorf("redis not initialized")
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 
 	if ttl > 0 {
 		_, err := conn.Do("SETEX", key, int(ttl.Seconds()), value)
@@ -319,7 +319,7 @@ func GetString(key string) (string, error) {
 		return "", fmt.Errorf("redis not initialized")
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 	return redis.String(conn.Do("GET", key))
 }
 
@@ -332,7 +332,7 @@ func Expire(key string, ttl time.Duration) error {
 		return fmt.Errorf("ttl must be positive")
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 	_, err := conn.Do("EXPIRE", key, int(ttl.Seconds()))
 	return err
 }
@@ -343,7 +343,7 @@ func HSet(key, field string, value any) error {
 		return fmt.Errorf("redis not initialized")
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 	_, err := conn.Do("HSET", key, field, value)
 	return err
 }
@@ -354,7 +354,7 @@ func HGetString(key, field string) (string, error) {
 		return "", fmt.Errorf("redis not initialized")
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 	return redis.String(conn.Do("HGET", key, field))
 }
 
@@ -372,6 +372,12 @@ func HDel(key string, fields ...string) (int, error) {
 		args = append(args, f)
 	}
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer closeConn(conn)
 	return redis.Int(conn.Do("HDEL", args...))
+}
+
+func closeConn(conn redis.Conn) {
+	if err := conn.Close(); err != nil {
+		logging.Warnf("redis conn close failed: %v", err)
+	}
 }

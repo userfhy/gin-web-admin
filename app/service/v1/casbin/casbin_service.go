@@ -44,10 +44,13 @@ func (s *Service) UpdateCasbin(id int, u AddCasbinStruct) bool {
 	updates := make(map[string]any)
 	updates["v1"] = u.V1
 	updates["v2"] = u.V2
-	error, rowsAffected := model.Update(&model.CasbinRuleM{}, wheres, updates)
+	rowsAffected, err := model.Update(&model.CasbinRuleM{}, wheres, updates)
+	if err != nil {
+		logging.Println("修改Casbin失败！", err)
+		return false
+	}
 	if rowsAffected == 0 {
 		logging.Println("修改Casbin失败！")
-		logging.Println(error)
 		return false
 	}
 	return true

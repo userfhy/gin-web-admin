@@ -3,12 +3,14 @@ package model
 import (
 	"database/sql/driver"
 	"fmt"
-	"gin-web-admin/utils/setting"
 	"log"
 	"os"
 	"reflect"
 	"strings"
 	"time"
+
+	"gin-web-admin/utils/logging"
+	"gin-web-admin/utils/setting"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -101,7 +103,7 @@ func Setup() {
 	//}
 
 	// 自动迁移表
-	db.AutoMigrate(
+	if err := db.AutoMigrate(
 		&Report{},
 		&Auth{},
 		&JwtBlacklist{},
@@ -116,12 +118,16 @@ func Setup() {
 		&SiteTag{},
 		&SiteContentTag{},
 		&AuditLog{},
-	)
+	); err != nil {
+		log.Fatalf("auto migrate failed: %v", err)
+	}
 }
 
 func DBClose() {
 	sql, _ := db.DB()
-	sql.Close()
+	if err := sql.Close(); err != nil {
+		logging.Warnf("db close failed: %v", err)
+	}
 }
 
 // MarshalJSON on JSONTime format Time field with %Y-%m-%d %H:%M:%S
@@ -133,10 +139,18 @@ func (t JSONTime) MarshalJSON() ([]byte, error) {
 	return []byte(formatted), nil
 }
 
+func (t JSONTime) IsZero() bool {
+	return t.Time.IsZero()
+}
+
+func (t JSONTime) Format(layout string) string {
+	return t.Time.Format(layout)
+}
+
 // Value insert timestamp into mysql need this function.
 func (t JSONTime) Value() (driver.Value, error) {
 	var zeroTime time.Time
-	if t.Time.UnixNano() == zeroTime.UnixNano() {
+	if t.UnixNano() == zeroTime.UnixNano() {
 		return nil, nil
 	}
 	return t.Time, nil
@@ -163,12 +177,12 @@ func (v BaseModel) BeforeUpdate(scope *gorm.Scope) error {
    return nil
 }*/
 
-func SoftDelete(tableStruct any) (error, int64) {
+func SoftDelete(tableStruct any) (int64, error) {
 	res := db.Model(tableStruct).Update("deleted_at", time.Now())
 	if err := res.Error; err != nil {
-		return err, 0
+		return 0, err
 	}
-	return nil, res.RowsAffected
+	return res.RowsAffected, nil
 }
 
 // 新增字段名验证函数
@@ -181,27 +195,27 @@ func validateUpdateFields(updates map[string]any) error {
 	return nil
 }
 
-func Update(tableStruct any, where map[string]any, updates map[string]any) (error, int64) {
+func Update(tableStruct any, where map[string]any, updates map[string]any) (int64, error) {
 	if len(updates) == 0 {
-		return fmt.Errorf("updates cannot be empty"), 0
+		return 0, fmt.Errorf("updates cannot be empty")
 	}
 
 	// 验证更新字段名
 	if err := validateUpdateFields(updates); err != nil {
-		return err, 0
+		return 0, err
 	}
 
 	// 安全构建WHERE条件
 	dbData, err := BuildCondition(db.Model(tableStruct), where)
 	if err != nil {
-		return err, 0
+		return 0, err
 	}
 
 	res := dbData.Updates(updates)
 	if err := res.Error; err != nil {
-		return err, 0
+		return 0, err
 	}
-	return nil, res.RowsAffected
+	return res.RowsAffected, nil
 }
 
 func GetTotal(tableStruct any, where map[string]any) (int64, error) {

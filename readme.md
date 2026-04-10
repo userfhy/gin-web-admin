@@ -182,6 +182,12 @@ All Redis access goes through `utils/gredis`, which provides sync/async set/dele
 
 > No redis-cli? Use `docker exec -it redis redis-cli` or a tiny Go helper that calls `utils/gredis`. Controller/e2e tests rely on the `AuthService` interface and mocked dependencies, so they run without touching DB/Redis, suitable for CI.
 
+### Git Hooks
+
+- Repo ships a ready-to-use hook at `githooks/pre-commit`. Enable it via `git config core.hooksPath githooks`.
+- The hook runs `golangci-lint run` and `GOCACHE=/tmp/gocache go test ./...` just like CI; failures block the commit.
+- Set `SKIP_GIT_HOOKS=1` when you intentionally need to skip checks (hotfix, WIP, etc.).
+
 ## Observability & Logs
 
 ```
@@ -221,7 +227,7 @@ type Page struct {
 
 var page Page
 if err := c.ShouldBindQuery(&page); err != nil { ... }
-if err, msg := common.CheckBindStructParameter(page, c); err != nil {
+if msg, err := common.CheckBindStructParameter(page, c); err != nil {
     appG.Response(http.StatusBadRequest, code.InvalidParams, msg, nil)
     return
 }

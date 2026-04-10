@@ -16,16 +16,11 @@ type Response struct {
 }
 
 func (g *Gin) Response(httpCode, errCode int, msg string, data any) {
-	Success := true
-	if errCode != 200 {
-		Success = false
-	}
+	success := errCode == 200
 	g.C.JSON(httpCode, Response{
-		Success: Success,
+		Success: success,
 		Code:    errCode,
 		Msg:     msg,
 		Data:    data,
 	})
-
-	return
 }

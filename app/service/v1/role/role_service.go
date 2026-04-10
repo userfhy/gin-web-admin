@@ -40,7 +40,11 @@ func NewService(store *data.Store) *Service {
 func (s *Service) DeleteRole(roleId uint) bool {
 	wheres := make(map[string]any)
 	wheres["role_id"] = roleId
-	_, rowsAffected := model.SoftDelete(&model.Role{RoleId: roleId})
+	rowsAffected, err := model.SoftDelete(&model.Role{RoleId: roleId})
+	if err != nil {
+		logging.Printf("删除Role失败：%v", err)
+		return false
+	}
 	if rowsAffected == 0 {
 		logging.Println("删除Role失败！")
 		return false
@@ -68,7 +72,11 @@ func (s *Service) UpdateRole(roleId int, u UpdateRoleStruct) bool {
 	updates := make(map[string]any)
 	updates["role_name"] = u.RoleName
 	updates["remark"] = u.Remark
-	_, rowsAffected := model.Update(&model.Role{}, wheres, updates)
+	rowsAffected, err := model.Update(&model.Role{}, wheres, updates)
+	if err != nil {
+		logging.Println("修改Role失败！", err)
+		return false
+	}
 	if rowsAffected == 0 {
 		logging.Println("修改Role失败！")
 		return false

@@ -134,8 +134,7 @@ func HexStr2int(hexStr string) (int, error) {
 	length := len(hexStr)
 	for i := 0; i < length; i++ {
 		char := hexStr[length-i-1]
-		factor := -1
-
+		var factor int
 		switch {
 		case char >= '0' && char <= '9':
 			factor = int(char) - '0'
