@@ -13,7 +13,3 @@ linters:
 
 issues:
   exclude-use-default: false
-
-output:
-  formats:
-    - format: tab
