@@ -16,11 +16,19 @@ import (
 
 var ExpireTimeFormat = "2006/01/02 15:04:05"
 
-type Handler struct {
-	service *authService.Service
+type AuthService interface {
+	Login(payload userService.AuthStruct, clientIP string) (authService.LoginResult, error)
+	RefreshAccessToken(refreshToken string) (map[string]any, error)
+	Logout(userID uint, token string)
+	ChangePassword(username string, payload userService.ChangePasswordStruct) error
+	BuildLoggedInUserData(claims *utils.Claims) map[string]any
 }
 
-func NewHandler(service *authService.Service) *Handler {
+type Handler struct {
+	service AuthService
+}
+
+func NewHandler(service AuthService) *Handler {
 	if service == nil {
 		panic("auth handler requires non-nil service")
 	}

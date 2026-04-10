@@ -1,0 +1,19 @@
+run:
+  timeout: 5m
+  tests: false
+
+linters:
+  enable:
+    - govet
+    - staticcheck
+    - gosimple
+    - ineffassign
+    - gofmt
+    - goimports
+
+issues:
+  exclude-use-default: false
+
+output:
+  formats:
+    - format: tab

@@ -172,13 +172,15 @@ All Redis access goes through `utils/gredis`, which provides sync/async set/dele
 
 | Scenario               | Command / Steps                                                |
 |------------------------|----------------------------------------------------------------|
-| Unit tests             | `GOCACHE=/tmp/.gocache go test ./...`                          |
+| Unit tests (all pkgs)  | `GOCACHE=/tmp/.gocache go test ./...`                          |
+| Auth controller tests  | `go test ./app/controllers/v1/auth -run TestHandler_UserLogin` |
+| HTTP e2e smoke         | `go test ./tests -run TestAuthLoginEndpoint`                   |
 | JWT blacklist check    | Login → `redis-cli --scan 'jwt:blacklist:*'` → logout → TTL    |
 | Site cache invalidation| Edit category/tag/content → `redis-cli --scan 'site:content:*'`|
 | Route cache refresh    | Save role-menu bindings → `redis-cli --scan 'sys:routes:*'` (expect empty)|
 | Swagger docs           | `swag init` → visit `BASE_URL/swagger/index.html`              |
 
-> No redis-cli? Use `docker exec -it redis redis-cli` or a tiny Go helper that calls `utils/gredis`.
+> No redis-cli? Use `docker exec -it redis redis-cli` or a tiny Go helper that calls `utils/gredis`. Controller/e2e tests rely on the `AuthService` interface and mocked dependencies, so they run without touching DB/Redis, suitable for CI.
 
 ## Observability & Logs
 

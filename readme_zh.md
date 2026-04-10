@@ -201,13 +201,15 @@ flowchart TD
 
 | 场景                | 指令/步骤                                                       |
 |---------------------|----------------------------------------------------------------|
-| 单元测试            | `GOCACHE=/tmp/.gocache go test ./...`                          |
+| 全量单元测试        | `GOCACHE=/tmp/.gocache go test ./...`                          |
+| Auth 控制器单测     | `go test ./app/controllers/v1/auth -run TestHandler_UserLogin` |
+| HTTP E2E 冒烟       | `go test ./tests -run TestAuthLoginEndpoint`                   |
 | Redis 黑名单验证    | 登录→`redis-cli --scan 'jwt:blacklist:*'`→退出→确认 TTL 更新   |
 | 站点缓存失效        | 修改分类/标签/文章→`redis-cli --scan 'site:content:*'`         |
 | 路由缓存刷新        | 绑定角色-菜单→`redis-cli --scan 'sys:routes:*'` 应为空         |
 | Swagger 文档        | `swag init` → 访问 `BASE_URL/swagger/index.html`               |
 
-> 如果 `redis-cli` 不可用，可以使用 `docker exec -it redis redis-cli` 或者编写简单 Go 脚本调用 `utils/gredis`。
+> 如果 `redis-cli` 不可用，可以使用 `docker exec -it redis redis-cli` 或者编写简单 Go 脚本调用 `utils/gredis`。控制器/E2E 测试通过接口模拟 AuthService，因此无需真实 DB/Redis，适合 CI。
 
 ## 观测与日志
 

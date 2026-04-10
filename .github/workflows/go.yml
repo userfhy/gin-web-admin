@@ -1,11 +1,14 @@
 name: Go
+
 on:
   push:
     branches:
-    - dev
+      - dev
+  pull_request:
+
 jobs:
   build:
-    name: Build
+    name: Test & Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -13,5 +16,9 @@ jobs:
         with:
           go-version-file: 'go.mod'
           check-latest: true
-      - name: Build
-        run: go build -v .
+      - name: Go Test
+        run: go test ./...
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.58
