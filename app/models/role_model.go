@@ -1,6 +1,9 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"gin-web-admin/utils"
+	"gorm.io/gorm"
+)
 
 type Role struct {
 	RoleId    uint      `gorm:"primary_key" json:"role_id"` // 角色编码
@@ -29,11 +32,11 @@ func CreateRole(role Role) error {
 	return nil
 }
 
-func GetRoles(pageNum int, pageSize int, where map[string]any) ([]*Role, error) {
+func GetRoles(pg utils.Pagination, where map[string]any) ([]*Role, error) {
 	var role []*Role
 
 	db2, _ := BuildCondition(db, where)
-	err := db2.Select("*").Offset(pageNum).Limit(pageSize).Find(&role).Error
+	err := db2.Select("*").Scopes(pg.Scope()).Find(&role).Error
 
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err

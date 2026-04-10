@@ -2,6 +2,7 @@ package service
 
 import (
 	model "gin-web-admin/app/models"
+	"gin-web-admin/utils"
 )
 
 func CreateMenu(menu model.Menu) error {
@@ -20,8 +21,8 @@ func GetMenu(where map[string]any) (*model.Menu, error) {
 	return model.GetMenu(where)
 }
 
-func GetMenuList(pageNum, pageSize int, where map[string]any) ([]*model.Menu, error) {
-	return model.GetMenuList(pageNum, pageSize, where)
+func GetMenuList(pg utils.Pagination, where map[string]any) ([]*model.Menu, error) {
+	return model.GetMenuList(pg, where)
 }
 
 func GetAllMenus(where map[string]any) ([]*model.Menu, error) {

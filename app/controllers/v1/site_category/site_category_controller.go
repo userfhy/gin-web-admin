@@ -8,6 +8,7 @@ import (
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
+	"gin-web-admin/utils/query"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,28 +22,30 @@ func GetSiteCategoryList(c *gin.Context) {
 		return
 	}
 
+	filter := query.NewBuilder()
+	if err := filter.FromQuery(c, query.RuleSet{
+		"status": {Field: "status", Op: query.OpEqual, Parser: query.IntEnumParser(0, 1)},
+	}); err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
+	}
 	var status *int
-	if statusStr := c.Query("status"); statusStr != "" {
-		statusInt, err := strconv.Atoi(statusStr)
-		if err != nil || (statusInt != 0 && statusInt != 1) {
-			appG.Response(http.StatusBadRequest, code.InvalidParams, "status 参数无效，只能为 0 或 1", nil)
-			return
-		}
-		status = &statusInt
+	if v, ok := filter.Build()["status ="]; ok {
+		val := v.(int)
+		status = &val
 	}
 
-	data, err := siteCategoryService.GetSiteCategoryList(siteCategoryService.SiteCategoryQuery{
-		PageNum:  pg.Page,
-		PageSize: pg.PageSize,
-		Keyword:  c.Query("keyword"),
-		Status:   status,
+	result, err := siteCategoryService.GetSiteCategoryList(siteCategoryService.SiteCategoryQuery{
+		Pagination: pg.Clone(),
+		Keyword:    c.Query("keyword"),
+		Status:     status,
 	})
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "获取分类列表失败", nil)
 		return
 	}
 
-	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
+	appG.Response(http.StatusOK, code.SUCCESS, "ok", result)
 }
 
 func GetAllSiteCategories(c *gin.Context) {

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"gin-web-admin/utils"
 	"gorm.io/gorm"
 )
 
@@ -46,7 +47,7 @@ func GetSiteTagBySlug(slug string) (*SiteTag, error) {
 	return &tag, nil
 }
 
-func GetSiteTagList(pageNum, pageSize int, keyword string, status *int) ([]*SiteTag, int64, error) {
+func GetSiteTagList(pg utils.Pagination, keyword string, status *int) ([]*SiteTag, int64, error) {
 	var (
 		list  []*SiteTag
 		total int64
@@ -66,8 +67,7 @@ func GetSiteTagList(pageNum, pageSize int, keyword string, status *int) ([]*Site
 	}
 
 	err := query.Order("sort ASC").Order("id DESC").
-		Offset((pageNum - 1) * pageSize).
-		Limit(pageSize).
+		Scopes(pg.Scope()).
 		Find(&list).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, 0, err

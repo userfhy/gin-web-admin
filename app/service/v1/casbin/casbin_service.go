@@ -2,15 +2,15 @@ package casbinService
 
 import (
 	model "gin-web-admin/app/models"
+	"gin-web-admin/utils"
 	"gin-web-admin/utils/logging"
 )
 
 type CasbinStruct struct {
-	PageNum  int
-	PageSize int
-	V0       string // role
-	V1       string // path
-	V2       string // method
+	Pagination utils.Pagination
+	V0         string // role
+	V1         string // path
+	V2         string // method
 }
 
 type AddCasbinStruct struct {
@@ -66,7 +66,7 @@ func (c *CasbinStruct) Count() (int64, error) {
 }
 
 func (c *CasbinStruct) GetAll() ([]*model.CasbinRuleM, error) {
-	casbins, err := model.GetCasbinRuleList(c.PageNum, c.PageSize, c.getConditionMaps())
+	casbins, err := model.GetCasbinRuleList(c.Pagination, c.getConditionMaps())
 	if err != nil {
 		return nil, err
 	}

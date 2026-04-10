@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"gin-web-admin/utils"
 	"gorm.io/gorm"
 )
 
@@ -47,7 +48,7 @@ func GetSiteCategoryBySlug(slug string) (*SiteCategory, error) {
 	return &category, nil
 }
 
-func GetSiteCategoryList(pageNum, pageSize int, keyword string, status *int) ([]*SiteCategory, int64, error) {
+func GetSiteCategoryList(pg utils.Pagination, keyword string, status *int) ([]*SiteCategory, int64, error) {
 	var (
 		list  []*SiteCategory
 		total int64
@@ -67,8 +68,7 @@ func GetSiteCategoryList(pageNum, pageSize int, keyword string, status *int) ([]
 	}
 
 	err := query.Order("sort ASC").Order("id DESC").
-		Offset((pageNum - 1) * pageSize).
-		Limit(pageSize).
+		Scopes(pg.Scope()).
 		Find(&list).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, 0, err

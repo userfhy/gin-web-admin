@@ -132,11 +132,10 @@ func GetCasbinList(c *gin.Context) {
 	}
 
 	casbinServiceObj := casbinService.CasbinStruct{
-		PageNum:  pg.Offset(),
-		PageSize: pg.Limit(),
-		V0:       c.DefaultQuery("role", ""),
-		V1:       c.DefaultQuery("path", ""),
-		V2:       c.DefaultQuery("method", ""),
+		Pagination: pg.Clone(),
+		V0:         c.DefaultQuery("role", ""),
+		V1:         c.DefaultQuery("path", ""),
+		V2:         c.DefaultQuery("method", ""),
 	}
 
 	total, err := casbinServiceObj.Count()
@@ -149,12 +148,7 @@ func GetCasbinList(c *gin.Context) {
 		return
 	}
 
-	data := utils.PageResult{
-		List:        arr,
-		Total:       total,
-		PageSize:    pg.PageSize,
-		CurrentPage: pg.Page,
-	}
+	data := pg.Result(arr, total)
 
 	// 筛选 group by
 	if groupBy == "v0" {

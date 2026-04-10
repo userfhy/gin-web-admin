@@ -2,19 +2,20 @@ package siteTagService
 
 import (
 	"fmt"
-	model "gin-web-admin/app/models"
-	"gin-web-admin/utils/security"
 	"regexp"
 	"strings"
+
+	model "gin-web-admin/app/models"
+	"gin-web-admin/utils"
+	"gin-web-admin/utils/security"
 )
 
 var slugPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9\-_/]*$`)
 
 type SiteTagQuery struct {
-	PageNum  int
-	PageSize int
-	Keyword  string
-	Status   *int
+	Pagination utils.Pagination
+	Keyword    string
+	Status     *int
 }
 
 type SiteTagVO struct {
@@ -42,10 +43,10 @@ type UpdateSiteTagStruct struct {
 	Sort   int    `json:"sort"`
 }
 
-func GetSiteTagList(query SiteTagQuery) (map[string]any, error) {
-	list, total, err := model.GetSiteTagList(query.PageNum, query.PageSize, query.Keyword, query.Status)
+func GetSiteTagList(query SiteTagQuery) (utils.PageResult, error) {
+	list, total, err := model.GetSiteTagList(query.Pagination, query.Keyword, query.Status)
 	if err != nil {
-		return nil, err
+		return utils.PageResult{}, err
 	}
 	ids := make([]int, 0, len(list))
 	for _, item := range list {
@@ -53,7 +54,7 @@ func GetSiteTagList(query SiteTagQuery) (map[string]any, error) {
 	}
 	countMap, err := model.CountSiteContentByTagIDs(ids)
 	if err != nil {
-		return nil, err
+		return utils.PageResult{}, err
 	}
 	vos := make([]SiteTagVO, 0, len(list))
 	for _, item := range list {
@@ -68,12 +69,7 @@ func GetSiteTagList(query SiteTagQuery) (map[string]any, error) {
 			UpdatedAt:    item.UpdatedAt,
 		})
 	}
-	return map[string]any{
-		"list":        vos,
-		"total":       total,
-		"currentPage": query.PageNum,
-		"pageSize":    query.PageSize,
-	}, nil
+	return query.Pagination.Result(vos, total), nil
 }
 
 func GetAllSiteTags(status *int) ([]*model.SiteTag, error) {

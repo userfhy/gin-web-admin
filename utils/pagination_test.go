@@ -69,3 +69,17 @@ func TestGetPaginationInvalid(t *testing.T) {
 		t.Fatal("expected error for invalid size")
 	}
 }
+
+func TestPageResultMetadata(t *testing.T) {
+	pg := Pagination{Page: 2, PageSize: 15}
+	result := pg.Result([]int{1, 2, 3}, 40)
+	if result.PageCount != 3 {
+		t.Fatalf("expected pageCount 3 got %d", result.PageCount)
+	}
+	if !result.HasPrev || !result.HasNext {
+		t.Fatalf("expected both prev and next, got %+v", result)
+	}
+	if result.CurrentPage != 2 || result.PageSize != 15 {
+		t.Fatalf("unexpected fields: %+v", result)
+	}
+}

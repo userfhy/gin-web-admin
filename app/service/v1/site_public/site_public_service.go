@@ -2,14 +2,15 @@ package sitePublicService
 
 import (
 	"fmt"
-	model "gin-web-admin/app/models"
 	"strings"
 	"unicode/utf8"
+
+	model "gin-web-admin/app/models"
+	"gin-web-admin/utils"
 )
 
 type PublicContentQuery struct {
-	PageNum      int
-	PageSize     int
+	Pagination   utils.Pagination
 	Keyword      string
 	CategorySlug string
 	TagSlug      string
@@ -102,20 +103,16 @@ func GetPublicCategories() ([]PublicCategoryVO, error) {
 	return result, nil
 }
 
-func GetPublicContentList(query PublicContentQuery) (map[string]any, error) {
+func GetPublicContentList(query PublicContentQuery) (utils.PageResult, error) {
+	pg := query.Pagination.Clone()
 	var categoryID *int
 	if slug := strings.TrimSpace(query.CategorySlug); slug != "" {
 		category, err := model.GetSiteCategoryBySlug(slug)
 		if err != nil {
-			return nil, err
+			return utils.PageResult{}, err
 		}
 		if category == nil || category.Status != 1 {
-			return map[string]any{
-				"list":        []PublicContentListVO{},
-				"total":       0,
-				"currentPage": query.PageNum,
-				"pageSize":    query.PageSize,
-			}, nil
+			return pg.Result([]PublicContentListVO{}, 0), nil
 		}
 		categoryID = &category.ID
 	}
@@ -124,31 +121,26 @@ func GetPublicContentList(query PublicContentQuery) (map[string]any, error) {
 	if slug := strings.TrimSpace(query.TagSlug); slug != "" {
 		tag, err := model.GetSiteTagBySlug(slug)
 		if err != nil {
-			return nil, err
+			return utils.PageResult{}, err
 		}
 		if tag == nil || tag.Status != 1 {
-			return map[string]any{
-				"list":        []PublicContentListVO{},
-				"total":       0,
-				"currentPage": query.PageNum,
-				"pageSize":    query.PageSize,
-			}, nil
+			return pg.Result([]PublicContentListVO{}, 0), nil
 		}
 		tagID = &tag.ID
 	}
 
-	list, total, err := model.GetPublishedSiteContentList(query.PageNum, query.PageSize, query.Keyword, categoryID, tagID)
+	list, total, err := model.GetPublishedSiteContentList(pg, query.Keyword, categoryID, tagID)
 	if err != nil {
-		return nil, err
+		return utils.PageResult{}, err
 	}
 
 	categoryByContent, err := getPublicCategoriesByContentIDs(extractContentIDs(list))
 	if err != nil {
-		return nil, err
+		return utils.PageResult{}, err
 	}
 	tagByContent, err := getPublicTagsByContentIDs(extractContentIDs(list))
 	if err != nil {
-		return nil, err
+		return utils.PageResult{}, err
 	}
 
 	result := make([]PublicContentListVO, 0, len(list))
@@ -167,12 +159,7 @@ func GetPublicContentList(query PublicContentQuery) (map[string]any, error) {
 		})
 	}
 
-	return map[string]any{
-		"list":        result,
-		"total":       total,
-		"currentPage": query.PageNum,
-		"pageSize":    query.PageSize,
-	}, nil
+	return pg.Result(result, total), nil
 }
 
 func GetPublicContentDetailBySlug(slug string) (*PublicContentDetailVO, error) {

@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 
+	"gin-web-admin/utils"
 	"gorm.io/gorm"
 )
 
@@ -46,7 +47,7 @@ func GetMenu(where map[string]any) (*Menu, error) {
 }
 
 // 获取菜单列表（条件+分页）
-func GetMenuList(pageNum, pageSize int, where map[string]any) ([]*Menu, error) {
+func GetMenuList(pg utils.Pagination, where map[string]any) ([]*Menu, error) {
 	var menus []*Menu
 
 	query := db.Model(&Menu{})
@@ -54,8 +55,7 @@ func GetMenuList(pageNum, pageSize int, where map[string]any) ([]*Menu, error) {
 		query = query.Where(where)
 	}
 
-	err := query.Offset((pageNum - 1) * pageSize).
-		Limit(pageSize).
+	err := query.Scopes(pg.Scope()).
 		Order("rank ASC").
 		Find(&menus).Error
 

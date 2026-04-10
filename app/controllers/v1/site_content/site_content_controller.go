@@ -8,6 +8,7 @@ import (
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
+	"gin-web-admin/utils/query"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,37 +22,34 @@ func GetSiteContentList(c *gin.Context) {
 		return
 	}
 
-	var status *int
-	if statusStr := c.Query("status"); statusStr != "" {
-		statusInt, err := strconv.Atoi(statusStr)
-		if err != nil || (statusInt != 0 && statusInt != 1) {
-			appG.Response(http.StatusBadRequest, code.InvalidParams, "status 参数无效，只能为 0 或 1", nil)
-			return
-		}
-		status = &statusInt
-	}
-	var categoryID *int
-	if categoryStr := c.Query("categoryId"); categoryStr != "" {
-		categoryInt, err := strconv.Atoi(categoryStr)
-		if err != nil || categoryInt <= 0 {
-			appG.Response(http.StatusBadRequest, code.InvalidParams, "categoryId 参数无效", nil)
-			return
-		}
-		categoryID = &categoryInt
-	}
-	var tagID *int
-	if tagStr := c.Query("tagId"); tagStr != "" {
-		tagInt, err := strconv.Atoi(tagStr)
-		if err != nil || tagInt <= 0 {
-			appG.Response(http.StatusBadRequest, code.InvalidParams, "tagId 参数无效", nil)
-			return
-		}
-		tagID = &tagInt
+	filter := query.NewBuilder()
+	if err := filter.FromQuery(c, query.RuleSet{
+		"status":     {Field: "status", Op: query.OpEqual, Parser: query.IntEnumParser(0, 1)},
+		"categoryId": {Field: "category_id", Op: query.OpEqual, Parser: query.IntParser()},
+		"tagId":      {Field: "tag_id", Op: query.OpEqual, Parser: query.IntParser()},
+	}); err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
 	}
 
-	data, err := siteContentService.GetSiteContentList(siteContentService.SiteContentQuery{
-		PageNum:    pg.Page,
-		PageSize:   pg.PageSize,
+	var status *int
+	if v, ok := filter.Build()["status ="]; ok {
+		val := v.(int)
+		status = &val
+	}
+	var categoryID *int
+	if v, ok := filter.Build()["category_id ="]; ok {
+		val := v.(int)
+		categoryID = &val
+	}
+	var tagID *int
+	if v, ok := filter.Build()["tag_id ="]; ok {
+		val := v.(int)
+		tagID = &val
+	}
+
+	result, err := siteContentService.GetSiteContentList(siteContentService.SiteContentQuery{
+		Pagination: pg.Clone(),
 		Keyword:    c.Query("keyword"),
 		Status:     status,
 		CategoryID: categoryID,
@@ -62,7 +60,7 @@ func GetSiteContentList(c *gin.Context) {
 		return
 	}
 
-	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
+	appG.Response(http.StatusOK, code.SUCCESS, "ok", result)
 }
 
 func GetSiteContent(c *gin.Context) {

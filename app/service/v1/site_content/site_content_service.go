@@ -2,13 +2,15 @@ package siteContentService
 
 import (
 	"fmt"
-	model "gin-web-admin/app/models"
-	"gin-web-admin/utils/security"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	model "gin-web-admin/app/models"
+	"gin-web-admin/utils"
+	"gin-web-admin/utils/security"
 
 	"gorm.io/gorm"
 )
@@ -16,8 +18,7 @@ import (
 var slugPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9\-_/]*$`)
 
 type SiteContentQuery struct {
-	PageNum    int
-	PageSize   int
+	Pagination utils.Pagination
 	Keyword    string
 	Status     *int
 	CategoryID *int
@@ -76,21 +77,16 @@ type UpdateSiteContentStatusStruct struct {
 	Status int `json:"status" binding:"oneof=0 1"`
 }
 
-func GetSiteContentList(query SiteContentQuery) (map[string]any, error) {
-	list, total, err := model.GetSiteContentList(query.PageNum, query.PageSize, query.Keyword, query.Status, query.CategoryID, query.TagID)
+func GetSiteContentList(query SiteContentQuery) (utils.PageResult, error) {
+	list, total, err := model.GetSiteContentList(query.Pagination, query.Keyword, query.Status, query.CategoryID, query.TagID)
 	if err != nil {
-		return nil, err
+		return utils.PageResult{}, err
 	}
 	contentVOs, err := toSiteContentVOList(list)
 	if err != nil {
-		return nil, err
+		return utils.PageResult{}, err
 	}
-	return map[string]any{
-		"list":        contentVOs,
-		"total":       total,
-		"currentPage": query.PageNum,
-		"pageSize":    query.PageSize,
-	}, nil
+	return query.Pagination.Result(contentVOs, total), nil
 }
 
 func GetSiteContentDetail(id int) (*SiteContentVO, error) {

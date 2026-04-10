@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"gin-web-admin/utils"
 	"github.com/casbin/casbin/v3"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"gorm.io/gorm"
@@ -74,11 +75,11 @@ func CreatCasbin(casbin CasbinRuleM) error {
 	return nil
 }
 
-func GetCasbinRuleList(pageNum int, pageSize int, where map[string]any) ([]*CasbinRuleM, error) {
+func GetCasbinRuleList(pg utils.Pagination, where map[string]any) ([]*CasbinRuleM, error) {
 	var casbinRuleList []*CasbinRuleM
 
 	db, _ := BuildCondition(db, where)
-	err := db.Select("*").Offset(pageNum).Limit(pageSize).Find(&casbinRuleList).Error
+	err := db.Select("*").Scopes(pg.Scope()).Find(&casbinRuleList).Error
 
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err

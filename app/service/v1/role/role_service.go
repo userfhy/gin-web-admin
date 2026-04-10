@@ -2,12 +2,13 @@ package roleService
 
 import (
 	model "gin-web-admin/app/models"
+	"gin-web-admin/utils"
 	"gin-web-admin/utils/logging"
 )
 
 type RoleStruct struct {
-	PageNum  int
-	PageSize int
+	Pagination utils.Pagination
+	Conditions map[string]any
 }
 
 type NewRoleStruct struct {
@@ -62,7 +63,12 @@ func UpdateRole(roleId int, u UpdateRoleStruct) bool {
 
 func (u *RoleStruct) getConditionMaps() map[string]any {
 	maps := make(map[string]any)
-	maps["deleted_at is"] = nil
+	for k, v := range u.Conditions {
+		maps[k] = v
+	}
+	if _, ok := maps["deleted_at is"]; !ok {
+		maps["deleted_at is"] = nil
+	}
 	return maps
 }
 
@@ -75,7 +81,7 @@ func (u *RoleStruct) Count() (int64, error) {
 }
 
 func (u *RoleStruct) GetAll() ([]*model.Role, error) {
-	roles, err := model.GetRoles(u.PageNum, u.PageSize, u.getConditionMaps())
+	roles, err := model.GetRoles(u.Pagination, u.getConditionMaps())
 	if err != nil {
 		return nil, err
 	}

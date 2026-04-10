@@ -90,7 +90,7 @@ func GetMenuList(c *gin.Context) {
 		where["menu_type"] = menuType
 	}
 
-	menus, err := service.GetMenuList(pg.Page, pg.PageSize, where)
+	menus, err := service.GetMenuList(pg.Clone(), where)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "查询失败", nil)
 		return

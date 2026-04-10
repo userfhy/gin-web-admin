@@ -42,8 +42,7 @@ func GetPublicContentList(c *gin.Context) {
 	}
 
 	data, err := sitePublicService.GetPublicContentList(sitePublicService.PublicContentQuery{
-		PageNum:      pg.Page,
-		PageSize:     pg.PageSize,
+		Pagination:   pg.Clone(),
 		Keyword:      c.Query("keyword"),
 		CategorySlug: c.Query("categorySlug"),
 		TagSlug:      c.Query("tagSlug"),

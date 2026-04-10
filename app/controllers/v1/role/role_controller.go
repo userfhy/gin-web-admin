@@ -1,13 +1,16 @@
 package roleController
 
 import (
+	"net/http"
+
 	roleService "gin-web-admin/app/service/v1/role"
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
 	"gin-web-admin/utils/com"
+	"gin-web-admin/utils/query"
+
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // @Summary		删除角色
@@ -121,9 +124,19 @@ func GetRoles(c *gin.Context) {
 	}
 
 	roleServiceObj := roleService.RoleStruct{
-		PageNum:  pg.Offset(),
-		PageSize: pg.Limit(),
+		Pagination: pg.Clone(),
 	}
+
+	filterBuilder := query.NewBuilder().IsNull("deleted_at")
+	if err := filterBuilder.FromQuery(c, query.RuleSet{
+		"role_name": {Field: "role_name", Op: query.OpLike},
+		"role_key":  {Field: "role_key", Op: query.OpLike},
+		"status":    {Field: "status", Op: query.OpEqual, Parser: query.IntParser()},
+	}); err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
+	}
+	roleServiceObj.Conditions = filterBuilder.Build()
 
 	total, err := roleServiceObj.Count()
 	if utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "获取页数失败", err) {
@@ -135,11 +148,5 @@ func GetRoles(c *gin.Context) {
 		return
 	}
 
-	data := utils.PageResult{
-		List:        userArr,
-		Total:       total,
-		PageSize:    pg.PageSize,
-		CurrentPage: pg.Page,
-	}
-	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
+	appG.Response(http.StatusOK, code.SUCCESS, "ok", pg.Result(userArr, total))
 }

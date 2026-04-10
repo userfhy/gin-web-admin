@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type PageResult struct {
@@ -12,12 +13,23 @@ type PageResult struct {
 	Total       int64 `json:"total"`
 	PageSize    int   `json:"pageSize"`
 	CurrentPage int   `json:"currentPage"`
+	PageCount   int   `json:"pageCount"`
+	HasNext     bool  `json:"hasNext"`
+	HasPrev     bool  `json:"hasPrev"`
 }
 
 // Pagination 表示分页请求参数
 type Pagination struct {
 	Page     int
 	PageSize int
+}
+
+// Clone 返回一个浅拷贝，避免引用同一实例被修改
+func (p Pagination) Clone() Pagination {
+	return Pagination{
+		Page:     p.Page,
+		PageSize: p.PageSize,
+	}
 }
 
 // Offset 计算当前页对应的偏移量
@@ -36,13 +48,32 @@ func (p Pagination) Limit() int {
 	return p.PageSize
 }
 
+// Scope 返回一个可直接用于 gorm 的分页 Scope
+func (p Pagination) Scope() func(*gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if p.PageSize <= 0 {
+			return db
+		}
+		return db.Offset(p.Offset()).Limit(p.PageSize)
+	}
+}
+
 // Result 根据分页信息快速生成 PageResult
 func (p Pagination) Result(list any, total int64) PageResult {
+	pageCount := 0
+	if p.PageSize > 0 && total > 0 {
+		pageCount = int((total + int64(p.PageSize) - 1) / int64(p.PageSize))
+	}
+	hasNext := pageCount > 0 && p.Page < pageCount
+	hasPrev := p.Page > 1
 	return PageResult{
 		List:        list,
 		Total:       total,
 		PageSize:    p.PageSize,
 		CurrentPage: p.Page,
+		PageCount:   pageCount,
+		HasNext:     hasNext,
+		HasPrev:     hasPrev,
 	}
 }
 

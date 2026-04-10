@@ -1,11 +1,13 @@
 package userController
 
 import (
+	"net/http"
+
 	userService "gin-web-admin/app/service/v1/user"
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
-	"net/http"
+	"gin-web-admin/utils/query"
 
 	"github.com/gin-gonic/gin"
 )
@@ -63,13 +65,22 @@ func GetUsers(c *gin.Context) {
 	}
 
 	var userServiceObj userService.UserStruct
-	userServiceObj.PageNum = pg.Offset()
-	userServiceObj.PageSize = pg.Limit()
+	userServiceObj.Pagination = pg.Clone()
 
 	if err := c.ShouldBindQuery(&userServiceObj); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, "参数绑定失败", nil)
 		return
 	}
+
+	filterBuilder := query.NewBuilder().IsNull("deleted_at")
+	if err := filterBuilder.FromQuery(c, query.RuleSet{
+		"username": {Field: "username", Op: query.OpLike},
+		"status":   {Field: "status", Op: query.OpEqual, Parser: query.IntParser()},
+	}); err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
+	}
+	userServiceObj.Conditions = filterBuilder.Build()
 
 	total, err := userServiceObj.Count()
 	if err != nil {
@@ -83,11 +94,5 @@ func GetUsers(c *gin.Context) {
 		return
 	}
 
-	data := utils.PageResult{
-		List:        userArr,
-		Total:       total,
-		CurrentPage: pg.Page,
-		PageSize:    pg.PageSize,
-	}
-	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
+	appG.Response(http.StatusOK, code.SUCCESS, "ok", pg.Result(userArr, total))
 }

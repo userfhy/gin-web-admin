@@ -2,12 +2,13 @@ package userService
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	model "gin-web-admin/app/models"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
 	"gin-web-admin/utils/logging"
-	"strings"
-	"time"
 )
 
 // RefreshAccessTokenStruct 刷新令牌结构体
@@ -33,16 +34,15 @@ type AddUserStruct struct {
 }
 
 type UserStruct struct {
-	ID       int    `json:"id"`
-	Username string `form:"username"`
-	Nickname string `form:"nickname"`
-	Phone    string `form:"phone"`
-	Email    string `form:"email"`
-	Sex      string `form:"sex"`
-	Status   string `form:"status" validate:"omitempty,numeric,min=0"`
-
-	PageNum  int
-	PageSize int
+	ID         int    `json:"id"`
+	Username   string `form:"username"`
+	Nickname   string `form:"nickname"`
+	Phone      string `form:"phone"`
+	Email      string `form:"email"`
+	Sex        string `form:"sex"`
+	Status     string `json:"status" validate:"omitempty,numeric,min=0"`
+	Pagination utils.Pagination
+	Conditions map[string]any
 }
 
 type TestList struct {
@@ -52,15 +52,22 @@ type TestList struct {
 
 func (u *UserStruct) getConditionMaps() map[string]any {
 	maps := make(map[string]any)
-	maps["deleted_at is"] = nil
-	if u.Username != "" {
+	for k, v := range u.Conditions {
+		maps[k] = v
+	}
+	if _, ok := maps["deleted_at is"]; !ok {
+		maps["deleted_at is"] = nil
+	}
+	if _, ok := maps["username like"]; !ok && u.Username != "" {
 		maps["username like"] = "%" + u.Username + "%"
 	}
 
-	if u.Status == "0" {
-		maps["status ="] = 0
-	} else if u.Status == "1" {
-		maps["status ="] = 1
+	if _, ok := maps["status ="]; !ok {
+		if u.Status == "0" {
+			maps["status ="] = 0
+		} else if u.Status == "1" {
+			maps["status ="] = 1
+		}
 	}
 
 	return maps
@@ -156,7 +163,7 @@ func (u *UserStruct) Count() (int64, error) {
 }
 
 func (u *UserStruct) GetAll() ([]*model.Auth, error) {
-	Users, err := model.GetUsers(u.PageNum, u.PageSize, u.getConditionMaps())
+	Users, err := model.GetUsers(u.Pagination, u.getConditionMaps())
 	if err != nil {
 		return nil, err
 	}

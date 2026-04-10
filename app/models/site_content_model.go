@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"gin-web-admin/utils"
 	"gorm.io/gorm"
 )
 
@@ -52,7 +53,7 @@ func GetSiteContentBySlug(slug string) (*SiteContent, error) {
 	return &content, nil
 }
 
-func GetSiteContentList(pageNum, pageSize int, keyword string, status *int, categoryID *int, tagID *int) ([]*SiteContent, int64, error) {
+func GetSiteContentList(pg utils.Pagination, keyword string, status *int, categoryID *int, tagID *int) ([]*SiteContent, int64, error) {
 	var (
 		list  []*SiteContent
 		total int64
@@ -82,8 +83,7 @@ func GetSiteContentList(pageNum, pageSize int, keyword string, status *int, cate
 
 	err := query.Order("sort ASC").
 		Order("id DESC").
-		Offset((pageNum - 1) * pageSize).
-		Limit(pageSize).
+		Scopes(pg.Scope()).
 		Find(&list).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, 0, err
@@ -91,9 +91,9 @@ func GetSiteContentList(pageNum, pageSize int, keyword string, status *int, cate
 	return list, total, nil
 }
 
-func GetPublishedSiteContentList(pageNum, pageSize int, keyword string, categoryID *int, tagID *int) ([]*SiteContent, int64, error) {
+func GetPublishedSiteContentList(pg utils.Pagination, keyword string, categoryID *int, tagID *int) ([]*SiteContent, int64, error) {
 	status := 1
-	return GetSiteContentList(pageNum, pageSize, keyword, &status, categoryID, tagID)
+	return GetSiteContentList(pg, keyword, &status, categoryID, tagID)
 }
 
 func ExistsSiteContentBySlug(slug string, excludeID int) (bool, error) {

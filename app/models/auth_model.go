@@ -63,11 +63,11 @@ func GetUser(maps map[string]any) (*Auth, error) {
 }
 
 // GetTestUsers gets a list of users based on paging constraints
-func GetUsers(pageNum int, pageSize int, where map[string]any) ([]*Auth, error) {
+func GetUsers(pg utils.Pagination, where map[string]any) ([]*Auth, error) {
 	var user []*Auth
 
 	db, _ := BuildCondition(db, where)
-	err := db.Select("*").Offset(pageNum).Limit(pageSize).Preload(
+	err := db.Select("*").Scopes(pg.Scope()).Preload(
 		"Role", func(db *gorm.DB) *gorm.DB {
 			return db.Select("role_id,role_name")
 		}).Find(&user).Error
