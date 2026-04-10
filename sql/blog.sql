@@ -3,15 +3,15 @@
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 80407 (8.4.7)
+ Source Server Version : 80408 (8.4.8)
  Source Host           : 192.168.1.128:3306
  Source Schema         : blog
 
  Target Server Type    : MySQL
- Target Server Version : 80407 (8.4.7)
+ Target Server Version : 80408 (8.4.8)
  File Encoding         : 65001
 
- Date: 30/01/2026 10:18:18
+ Date: 10/04/2026 15:12:37
 */
 
 SET NAMES utf8mb4;
@@ -75,8 +75,8 @@ CREATE TABLE `gin_auth` (
 -- Records of gin_auth
 -- ----------------------------
 BEGIN;
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2026-01-30 10:14:41.089', NULL, 1, 1, '2026-01-30 10:14:41.089', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMzA3MjAwLCJpYXQiOjE3Njk3MzkyODF9.P_rWslJ9DAZrwuhWaNR_dATwACMuLAJE8EQK1gR9xJ8');
-INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2026-01-30 10:12:56.283', NULL, 2, 1, '2026-01-30 10:12:56.282', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMzA3MjAwLCJpYXQiOjE3Njk3MzkxNzZ9.ZHVP-Fu7JDYVM2gaf0CgSG7vPJuc3fDt10xNvU3M0D0');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (1, '2024-05-10 16:39:36.066', '2026-04-10 14:05:54.454', NULL, 1, 1, '2026-04-10 14:05:54.454', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzc2MzU1MjAwLCJpYXQiOjE3NzU4MDExNTR9.j2yFZ2xDfDFIePy6hUS6hNdKxV0zMD4k3dajERfDNW8');
+INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (2, '2024-05-10 16:39:36.066', '2026-01-30 11:09:31.753', NULL, 2, 1, '2026-01-30 11:09:31.753', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMzA3MjAwLCJpYXQiOjE3Njk3NDI1NzF9.YsRC6J1VXClDI_h2_-u3T1bCfh-duJasVkIE7aBiEcc');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (3, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor2', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '3');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (4, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor3', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '4');
 INSERT INTO `gin_auth` (`id`, `created_at`, `updated_at`, `deleted_at`, `role_id`, `status`, `logged_in_at`, `username`, `nickname`, `phone`, `email`, `sex`, `password`, `refresh_token`) VALUES (5, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor4', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', '5');
@@ -98,7 +98,7 @@ CREATE TABLE `gin_dept` (
   `status` int NOT NULL DEFAULT '1' COMMENT '状态(1启用0停用)',
   `remark` varchar(255) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of gin_dept
@@ -107,6 +107,8 @@ BEGIN;
 INSERT INTO `gin_dept` (`id`, `parent_id`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `remark`) VALUES (1, 0, '总部', 0, '', '', '', 1, '');
 INSERT INTO `gin_dept` (`id`, `parent_id`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `remark`) VALUES (2, 1, '郑州分公司', 0, '', '', '', 1, '');
 INSERT INTO `gin_dept` (`id`, `parent_id`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `remark`) VALUES (3, 1, '开封分公司', 0, '', '', '', 1, '');
+INSERT INTO `gin_dept` (`id`, `parent_id`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `remark`) VALUES (4, 0, '顶级分类', 0, '', '', '', 1, '');
+INSERT INTO `gin_dept` (`id`, `parent_id`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `remark`) VALUES (5, 4, '北京公司', 0, '', '', '', 1, '');
 COMMIT;
 
 -- ----------------------------
@@ -122,30 +124,12 @@ CREATE TABLE `gin_jwt_blacklist` (
   `jwt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   PRIMARY KEY (`id`),
   KEY `idx_blog_jwt_blacklist_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of gin_jwt_blacklist
 -- ----------------------------
 BEGIN;
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (53, '2025-03-09 16:20:06.457', '2025-03-09 16:20:06.457', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNTEyMzM5LCJpYXQiOjE3NDE1MDUxMzl9.ZQ3GcKcFTViabKxEE4UN8MDyJ_P3zk6ANpV8FOJQQ3s');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (54, '2025-03-10 15:49:37.684', '2025-03-10 15:49:37.684', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNTk1NzQ4LCJpYXQiOjE3NDE1ODg1NDh9.mBnz1WfSU3RFwRci0QTKuB_zpcX3J2MMqJbp1bMt9lk');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (55, '2025-03-10 15:55:15.811', '2025-03-10 15:55:15.811', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwMTgxLCJpYXQiOjE3NDE1OTI5ODF9.8wN8UeYPxOlaorjEnLxHm0xxlbH9hRhDlNTDBw_-wt0');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (56, '2025-03-10 15:56:35.592', '2025-03-10 15:56:35.592', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwNTE4LCJpYXQiOjE3NDE1OTMzMTh9.dKNrdibPC98tjgadSZ6F4ua9_MHDaoyroU4GjZREgFY');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (57, '2025-03-10 15:57:49.024', '2025-03-10 15:57:49.024', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwNTk5LCJpYXQiOjE3NDE1OTMzOTl9.5IEJMUG6WpJPRwYMcHVSL-iYfOejUloRHvV-mhaOfsY');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (58, '2025-03-10 15:58:33.418', '2025-03-10 15:58:33.418', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwNjczLCJpYXQiOjE3NDE1OTM0NzN9.E2b9gPfkrebnV5kwrvXkd4cok2X1oD-ihpxVnXN4UaU');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (59, '2025-03-10 15:59:14.634', '2025-03-10 15:59:14.634', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAwNzE3LCJpYXQiOjE3NDE1OTM1MTd9.Jivy3Z8E7vNCUPXCljef6GqFn2UhgX2n4Y00ChmtceM');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (60, '2025-03-10 16:15:16.614', '2025-03-10 16:15:16.614', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxNTU2LCJpYXQiOjE3NDE1OTQzNTZ9.8LjrKDC_Nob9Q1vJZRITUj8Dyjw3BaccgogDwiFCYoI');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (61, '2025-03-10 16:16:29.314', '2025-03-10 16:16:29.314', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxNzI0LCJpYXQiOjE3NDE1OTQ1MjR9.ZWBsS6bXvqR0efZFxu6uWUIv4LjPeQaDP7XayXX-CNo');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (62, '2025-03-10 16:17:36.074', '2025-03-10 16:17:36.074', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxODI0LCJpYXQiOjE3NDE1OTQ2MjR9.Af17NI-8xhGfKapPSm_C6VtJEL1vgiYL3b8gHFMSVd8');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (63, '2025-03-10 16:18:03.198', '2025-03-10 16:18:03.198', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxODYwLCJpYXQiOjE3NDE1OTQ2NjB9.0XSpn4xt6bLJhFkQ-C8r-BJe-MD2XaalQbpaIUsG7FU');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (64, '2025-03-10 16:22:34.045', '2025-03-10 16:22:34.045', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAxODg2LCJpYXQiOjE3NDE1OTQ2ODZ9.6cg898mZBtQ1aXP96atXK2w7FfRFhUhEAeSL283jnXs');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (65, '2025-03-10 16:47:26.300', '2025-03-10 16:47:26.300', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQxNjAyNTQ5LCJpYXQiOjE3NDE1OTUzNDl9.L4l5Na16nm61MkXNFpJSQnpS14Ntl6GT427vhXoMVMo');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (66, '2025-04-14 15:26:10.615', '2025-04-14 15:26:10.615', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzQ0NjIyNzYyLCJpYXQiOjE3NDQ2MTU1NjJ9.aNt7hq5hDr2MT0p1K9gcOWuRoQDZ87FKUn9ZdkOf6zc');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (67, '2026-01-30 10:00:03.349', '2026-01-30 10:00:03.349', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzY5NzM5NzcxLCJpYXQiOjE3Njk3MzI1NzF9.rzRzoJ82RDR-pZUiLXB08lgAGIRUmxJPRLnInJZiCpE');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (68, '2026-01-30 10:01:25.828', '2026-01-30 10:01:25.828', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzY5NzQ1NjA5LCJpYXQiOjE3Njk3Mzg0MDl9.7sjuc6jrh9qqdFcs2XAtNVemxkd9Ea0N_WG43mlm_ds');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (69, '2026-01-30 10:12:34.489', '2026-01-30 10:12:34.489', NULL, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzY5NzQ2MzExLCJpYXQiOjE3Njk3MzkxMTF9.vCVaXFJaXh8PvyzLDI5POWXNpfnGP2XANp4TzroNwJg');
-INSERT INTO `gin_jwt_blacklist` (`id`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `jwt`) VALUES (70, '2026-01-30 10:12:49.615', '2026-01-30 10:12:49.615', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzY5NzQ2MzYyLCJpYXQiOjE3Njk3MzkxNjJ9.0trEEWa1NhUyLnrFQJDU1urPZuLf5bgQV21zDMxB8y4');
 COMMIT;
 
 -- ----------------------------
@@ -176,7 +160,7 @@ CREATE TABLE `gin_menu` (
   `show_link` tinyint(1) DEFAULT NULL COMMENT '是否显示链接',
   `show_parent` tinyint(1) DEFAULT NULL COMMENT '是否显示父级菜单',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of gin_menu
@@ -215,6 +199,10 @@ INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`,
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (31, 30, 1, 'menus.pureTabs', 'Tabs', '/tabs/index', 'tabs/index', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (32, 30, 1, '', 'TabQueryDetail', '/tabs/query-detail', NULL, 0, NULL, '', NULL, NULL, NULL, '/tabs/index', '', '', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (33, 30, 1, '', 'TabParamsDetail', '/tabs/params-detail/:id', 'params-detail', 0, NULL, '', NULL, NULL, NULL, '/tabs/index', '', '', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (34, 0, 0, '官网管理', '', '/site', NULL, 6, NULL, 'ri:global-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (35, 34, 1, '内容管理', 'SiteContent', '/site/content/index', 'site/content/index', 0, NULL, 'ri:article-line', NULL, NULL, NULL, '', '', '', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (36, 34, 1, '类别管理', 'SiteCategory', '/site/category/index', 'site/category/index', 0, NULL, 'ri:price-tag-3-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (37, 34, 1, '标签管理', 'SiteTag', '/site/tag/index', 'site/tag/index', 0, NULL, 'ri:price-tag-2-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -315,6 +303,10 @@ INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 30);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 31);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 32);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 33);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 34);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 35);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 36);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 37);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 12);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 13);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 14);
@@ -337,6 +329,117 @@ INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 30);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 31);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 32);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 33);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_site_category
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_site_category`;
+CREATE TABLE `gin_site_category` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(100) NOT NULL COMMENT '分类名称',
+  `slug` varchar(120) NOT NULL COMMENT '分类标识',
+  `description` varchar(500) DEFAULT NULL COMMENT '分类描述',
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态(1启用0停用)',
+  `sort` bigint NOT NULL DEFAULT '0' COMMENT '排序值(越小越靠前)',
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_site_category_slug` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_site_category
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_site_category` (`id`, `name`, `slug`, `description`, `status`, `sort`, `created_at`, `updated_at`) VALUES (1, '分类news', 'news', '', 1, 0, '2026-04-05 18:03:47.701', '2026-04-10 14:59:29.769');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_site_content
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_site_content`;
+CREATE TABLE `gin_site_content` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `title` varchar(150) NOT NULL COMMENT '内容标题',
+  `slug` varchar(150) NOT NULL COMMENT '页面标识',
+  `summary` varchar(500) DEFAULT NULL COMMENT '摘要',
+  `cover` varchar(500) DEFAULT NULL COMMENT '封面图',
+  `content` longtext COMMENT '正文内容',
+  `seo_keywords` varchar(255) DEFAULT NULL COMMENT 'SEO关键词',
+  `seo_description` varchar(500) DEFAULT NULL COMMENT 'SEO描述',
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态(1发布0草稿)',
+  `sort` bigint NOT NULL DEFAULT '0' COMMENT '排序值(越小越靠前)',
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  `published_at` datetime(3) DEFAULT NULL COMMENT '发布时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_site_content_slug` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_site_content
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_site_content` (`id`, `title`, `slug`, `summary`, `cover`, `content`, `seo_keywords`, `seo_description`, `status`, `sort`, `created_at`, `updated_at`, `published_at`) VALUES (1, '测试标题111', '1', '**d是否🎉️ 第三方分多少 &lt;script&gt;alert(222333);&lt;/script&gt;', '', '**d是否🎉️ 第三方分多少234**\n\ndsfsdf第三方士大夫水电费水电费水电费水电费水电费水电费水电费胜多负少的给对方回复过几年更好看❤️ 🎉️ 😕\n\n都是1111\n\n```javascript\n&lt;script&gt;alert(222333);&lt;/script&gt;\n```', '', '', 1, 1, '2026-04-05 17:41:45.080', '2026-04-10 15:01:40.695', '2026-04-05 18:22:55.089');
+INSERT INTO `gin_site_content` (`id`, `title`, `slug`, `summary`, `cover`, `content`, `seo_keywords`, `seo_description`, `status`, `sort`, `created_at`, `updated_at`, `published_at`) VALUES (2, '测试22', '2', '第三方1', '', '第三方222', '', '', 1, 0, '2026-04-10 10:49:30.702', '2026-04-10 15:01:39.508', '2026-04-10 10:49:30.702');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_site_content_category
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_site_content_category`;
+CREATE TABLE `gin_site_content_category` (
+  `content_id` bigint NOT NULL,
+  `category_id` bigint NOT NULL,
+  PRIMARY KEY (`content_id`,`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_site_content_category
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_site_content_category` (`content_id`, `category_id`) VALUES (1, 1);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_site_content_tag
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_site_content_tag`;
+CREATE TABLE `gin_site_content_tag` (
+  `content_id` bigint NOT NULL,
+  `tag_id` bigint NOT NULL,
+  PRIMARY KEY (`content_id`,`tag_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_site_content_tag
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_site_content_tag` (`content_id`, `tag_id`) VALUES (1, 1);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_site_tag
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_site_tag`;
+CREATE TABLE `gin_site_tag` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(80) NOT NULL COMMENT '标签名',
+  `slug` varchar(120) NOT NULL COMMENT '标签标识',
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态(1启用0停用)',
+  `sort` bigint NOT NULL DEFAULT '0' COMMENT '排序值(越小越靠前)',
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_site_tag_slug` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_site_tag
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_site_tag` (`id`, `name`, `slug`, `status`, `sort`, `created_at`, `updated_at`) VALUES (1, '标签', 'biaoqian', 1, 0, '2026-04-05 19:00:12.457', '2026-04-05 19:00:12.457');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

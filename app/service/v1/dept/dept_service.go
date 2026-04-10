@@ -44,33 +44,12 @@ type Service struct {
 	store *data.Store
 }
 
-var defaultService *Service
-
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
 }
 
-func SetDefaultService(s *Service) {
-	defaultService = s
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("dept service not initialized")
-	}
-	return defaultService
-}
-
-func GetDeptList() ([]*model.Dept, error) {
-	return serviceInstance().GetDeptList()
-}
-
 func (s *Service) GetDeptList() ([]*model.Dept, error) {
 	return model.GetAllDepts(nil)
-}
-
-func GetDeptTree() ([]*DeptTreeNode, error) {
-	return serviceInstance().GetDeptTree()
 }
 
 func (s *Service) GetDeptTree() ([]*DeptTreeNode, error) {
@@ -114,10 +93,6 @@ func (s *Service) GetDeptTree() ([]*DeptTreeNode, error) {
 	return roots, nil
 }
 
-func CreateDept(payload CreateDeptStruct) error {
-	return serviceInstance().CreateDept(payload)
-}
-
 func (s *Service) CreateDept(payload CreateDeptStruct) error {
 	dept := model.Dept{
 		ParentID: payload.ParentID,
@@ -130,10 +105,6 @@ func (s *Service) CreateDept(payload CreateDeptStruct) error {
 		Remark:   payload.Remark,
 	}
 	return model.CreateDept(dept)
-}
-
-func UpdateDept(id int, payload UpdateDeptStruct) error {
-	return serviceInstance().UpdateDept(id, payload)
 }
 
 func (s *Service) UpdateDept(id int, payload UpdateDeptStruct) error {
@@ -151,10 +122,6 @@ func (s *Service) UpdateDept(id int, payload UpdateDeptStruct) error {
 	data["status"] = payload.Status
 	data["remark"] = payload.Remark
 	return model.UpdateDept(id, data)
-}
-
-func DeleteDept(id int) error {
-	return serviceInstance().DeleteDept(id)
 }
 
 func (s *Service) DeleteDept(id int) error {

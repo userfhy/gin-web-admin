@@ -12,7 +12,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func JWTHandler() gin.HandlerFunc {
+func JWTHandler(userSvc *userService.Service) gin.HandlerFunc {
+	if userSvc == nil {
+		panic("jwt middleware requires user service")
+	}
 	return func(c *gin.Context) {
 		var rCode int
 		var data any
@@ -49,7 +52,7 @@ func JWTHandler() gin.HandlerFunc {
 			}
 		}
 
-		jwtCount, _ := userService.InBlockList(token)
+		jwtCount, _ := userSvc.InBlockList(token)
 		if jwtCount >= 1 {
 			rCode = code.AuthTokenInBlockList
 		}

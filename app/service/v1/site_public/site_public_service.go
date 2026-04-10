@@ -67,8 +67,6 @@ type Service struct {
 	store *data.Store
 }
 
-var defaultService *Service
-
 const (
 	categoriesCacheKey = "site:categories:all"
 	tagsCacheKey       = "site:tags:all"
@@ -79,21 +77,6 @@ const (
 
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
-}
-
-func SetDefaultService(s *Service) {
-	defaultService = s
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("site_public service not initialized")
-	}
-	return defaultService
-}
-
-func GetPublicTags() ([]PublicTagVO, error) {
-	return serviceInstance().GetPublicTags()
 }
 
 func (s *Service) GetPublicTags() ([]PublicTagVO, error) {
@@ -117,10 +100,6 @@ func (s *Service) GetPublicTags() ([]PublicTagVO, error) {
 	}
 	gredis.SetJSONAsync(tagsCacheKey, result, siteCacheTTL)
 	return result, nil
-}
-
-func GetPublicCategories() ([]PublicCategoryVO, error) {
-	return serviceInstance().GetPublicCategories()
 }
 
 func (s *Service) GetPublicCategories() ([]PublicCategoryVO, error) {
@@ -154,10 +133,6 @@ func (s *Service) GetPublicCategories() ([]PublicCategoryVO, error) {
 	}
 	gredis.SetJSONAsync(categoriesCacheKey, result, siteCacheTTL)
 	return result, nil
-}
-
-func GetPublicContentList(query PublicContentQuery) (utils.PageResult, error) {
-	return serviceInstance().GetPublicContentList(query)
 }
 
 func (s *Service) GetPublicContentList(query PublicContentQuery) (utils.PageResult, error) {
@@ -226,10 +201,6 @@ func (s *Service) GetPublicContentList(query PublicContentQuery) (utils.PageResu
 	return pageResult, nil
 }
 
-func GetPublicContentDetailBySlug(slug string) (*PublicContentDetailVO, error) {
-	return serviceInstance().GetPublicContentDetailBySlug(slug)
-}
-
 func (s *Service) GetPublicContentDetailBySlug(slug string) (*PublicContentDetailVO, error) {
 	if strings.TrimSpace(slug) == "" {
 		return nil, fmt.Errorf("slug is required")
@@ -272,10 +243,6 @@ func (s *Service) GetPublicContentDetailBySlug(slug string) (*PublicContentDetai
 	}
 	s.setCachedContentDetail(slugCacheKey(slug), detail)
 	return detail, nil
-}
-
-func GetPublicContentDetailByID(id int) (*PublicContentDetailVO, error) {
-	return serviceInstance().GetPublicContentDetailByID(id)
 }
 
 func (s *Service) GetPublicContentDetailByID(id int) (*PublicContentDetailVO, error) {

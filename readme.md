@@ -1,257 +1,241 @@
 # Gin Web Admin
 
-## Web admin frontend project
+[中文说明](./readme_zh.md)
 
-[web-admin-frontend](https://github.com/userfhy/web-admin-frontend)
+Gin-based admin backend featuring user/role management, CMS-style menu/content modules, Casbin authorization, Redis caching, and async route loading. Frontend companion: [web-admin-frontend](https://github.com/userfhy/web-admin-frontend).
 
-## First Run
+## Table of Contents
+
+1. [Highlights](#highlights)
+2. [Project Layout](#project-layout)
+3. [Quick Start](#quick-start)
+4. [Configuration & Run Modes](#configuration--run-modes)
+5. [Architecture & Boot Flow](#architecture--boot-flow)
+6. [Redis & Caching Strategy](#redis--caching-strategy)
+7. [Module Development Checklist](#module-development-checklist)
+8. [Testing & Quality](#testing--quality)
+9. [Observability & Logs](#observability--logs)
+10. [Swagger API Docs](#swagger-api-docs)
+11. [Parameter Validation Tips](#parameter-validation-tips)
+12. [Cross Compilation](#cross-compilation)
+13. [License](#license)
+
+---
+
+## Highlights
+
+- 🧩 **Modular DI architecture** – services are instantiated in `cmd/server` and injected downstream via `routers -> controllers`, keeping dependencies explicit and testable.
+- 🔐 **Layered authorization** – JWT + Redis blacklist + Casbin RBAC, plus async menu/route cache for faster front-end bootstrap.
+- 🚀 **Redis caching suite** – categories/tags/content, async routes, JWT blacklist, etc., all reuse `utils/gredis` helpers with async set/delete.
+- 🧭 **Swagger/OpenAPI ready** – `swag init` produces up-to-date API docs for easy integration.
+- 🧰 **Utility toolbox** – pagination, validator wrappers, SSE helpers, logging, translation middleware.
+- 🏗️ **Cross-platform builds** – sample scripts for Windows/Linux static binaries.
+
+## Project Layout
+
+```
+├── cmd/server          # Entry point + dependency wiring
+├── internal/bootstrap  # Config, DB, Redis, Casbin container
+├── routers             # Router definitions & dependency struct
+├── app
+│   ├── controllers/v1  # HTTP handlers
+│   ├── middleware      # JWT / Casbin / CORS / i18n
+│   └── service/v1      # Business services (DB + cache access)
+├── app/models          # GORM models & queries
+├── utils               # gredis, pagination, logging, validator ...
+├── conf                # TOML configs (sample)
+├── docs                # Swagger outputs
+├── sql                 # init / migration scripts
+└── readme.md
+```
+
+## Quick Start
 
 ```bash
 cp conf/app.toml.example conf/app.toml
 go mod download
-go run main.go
-```
-
-### 指定配置文件/运行模式
-
-服务默认读取 `conf/app.toml`，如果需要为不同环境指定独立配置，可以：
-
-```bash
-export APP_CONFIG_PATH=/path/to/your/app.toml
-export RUN_MODE=release # 可选：覆盖配置中的 run_mode
 go run ./cmd/server
 ```
 
-也可以直接在代码中调用 `server.Run(server.Options{ConfigPath: "/path/to/app.toml"})` 或 `setting.SetConfigPath()`，更适合单元测试/自定义启动器。
+- Default listen address: `:8081` (`server.http_port` in `conf/app.toml`).
+- `go run main.go` delegates to the same bootstrap logic.
 
-### 自定义启动逻辑
+## Configuration & Run Modes
 
-如果你需要嵌入到自己的 CLI/服务中，可以复用 `cmd/server` 暴露的选项，控制配置文件和优雅退出时间：
+- Config options live in `conf/app.toml`; copy the sample per environment (dev/stg/prod).
+- `internal/setting` loads Redis/MySQL/JWT/Casbin/Server settings.
+- Override via env vars for zero-touch deploys:
+
+```bash
+export APP_CONFIG_PATH=/path/to/app.toml   # custom config file
+export RUN_MODE=release                    # override run_mode
+go run ./cmd/server
+```
+
+Programmatic usage:
 
 ```go
-package main
-
-import (
-    "time"
-
-    "gin-web-admin/cmd/server"
-)
-
-func main() {
-    _ = server.Run(server.Options{
-        ConfigPath:      "./conf/app.toml",
-        ShutdownTimeout: 10 * time.Second,
-    })
-}
+_ = server.Run(server.Options{
+    ConfigPath:      "./conf/app.toml",
+    ShutdownTimeout: 10 * time.Second,
+})
 ```
 
-需要在其它程序中重用数据库、Redis 等依赖时，可以直接使用 `internal/bootstrap`：
+Need shared dependencies elsewhere? Call `bootstrap.Initialize` to reuse the container (DB, Redis pool, Gin engine, Casbin enforcer, ...).
 
-```go
-package main
+## Architecture & Boot Flow
 
-import (
-    "gin-web-admin/internal/bootstrap"
-)
+### Boot Flow Diagram
 
-func main() {
-    container, err := bootstrap.Initialize(bootstrap.Options{
-        ConfigPath: "./conf/app.toml",
-    })
-    if err != nil {
-        panic(err)
-    }
-
-    db := container.DB
-    redisPool := container.RedisPool
-    _ = db
-    _ = redisPool
-}
+```mermaid
+flowchart TD
+    A[Entry main.go / go run ./cmd/server] --> B[server.Run]
+    B --> C[bootstrap.Initialize<br/>config, logging, DB, Redis, Casbin]
+    C --> D[Container ready<br/>Store, Engine, Enforcer]
+    D --> E[Instantiate services<br/>user/menu/site...]
+    E --> F[routers.InitRouter<br/>inject handlers + middleware]
+    F --> G[http.Server.ListenAndServe]
+    G --> H{SIGINT/SIGTERM?}
+    H -->|Yes| I[server.Shutdown<br/>graceful stop]
+    H -->|No| J[Serve requests]
 ```
 
-## 新增模块/接口改动清单
+> Custom launchers must follow the same order: bootstrap dependencies → create services/routers → start HTTP server + graceful shutdown.
 
-当前代码正从旧的包级函数演进到“Service + Handler + Router”依赖注入模式，新增业务模块建议按以下步骤进行，避免遗漏：
+### Dependency Injection Notes
 
-1. **模型与迁移（可选）**：
-   - 在 `app/models` 定义数据结构与查询函数，复用 `TablePrefix`、`utils.Pagination`、`model.BuildCondition` 等基础能力。
-   - 如需新表或字段，请在 `sql/` 下维护迁移脚本，禁止在 `model.Setup()` 中直接 AutoMigrate 生产库。
-2. **Service 层**：
-   - 在 `app/service/v1/<module>` 新建 `service.go`，声明 `type Service struct { store *data.Store }` 并提供 `NewService(store *data.Store)`。
-   - 所有业务方法写成接收者方法，必要时新增接口方便 mock，避免再暴露包级全局函数。
-   - 若需要访问 Redis，优先使用 `utils/gredis` 提供的封装（如 `SetWithTTL`、`ExistsKey`，后续也可扩展），统一复用连接池。
-3. **Controller/Handler**：
-   - `app/controllers/v1/<module>` 下实现 `Handler`，构造函数注入 Service。
-   - Handler 方法内统一使用 `common.Gin`、`utils.GetPagination`、`utils/code` 等工具，保持错误码/响应格式一致。
-4. **Router**：
-   - `routers/<module>_router.go` 仅负责路由注册，签名形如 `Init<Module>Router(group *gin.RouterGroup, handler *<module>Controller.Handler)`。
-   - 避免在路由层创建 Service/Handler，更不要直接引用包级 controller 函数。
-5. **依赖注入（server → router → handler）**：
-   - 在 `routers/router.go` 的 `Dependencies` 增加 `<Module>Service *<module>Service.Service` 字段，并在 `InitRouter` 中实例化 `<module>Handler := <module>Controller.NewHandler(deps.<Module>Service)`。
-   - `cmd/server/server.go` 中：在 bootstrap 后创建 `<module>Svc := <module>Service.NewService(container.Store)`，并填入构造 `routers.Dependencies` 时的 `<Module>Service`。
-6. **缓存/生命周期**：
-   - 模块若需要后台任务（如 SSE 广播、定时同步），在 `cmd/server/server.go` 或专门的启动器中初始化，禁止在 Handler 内直接起 goroutine。
-   - 需要单独运行 Service 层以便 CLI/测试时，可直接复用 `internal/bootstrap` 返回的 `container.Store`、`container.NewEngine()` 等依赖。
-   - 使用 Redis 做缓存或黑名单时，统一调用 `utils/gredis`，可选同步 (`SetJSON`/`DeleteKeys`) 或异步 (`SetJSONAsync`/`DeleteKeysAsync`) 接口。
-   - 写操作完成后务必调用对应的失效函数（例如 `sitePublicService.InvalidatePublicContent`、`sysService.InvalidateRouteCache`），避免脏数据长时间驻留缓存。
-7. **文档与权限**：
-   - 使用 `swag init` 更新 `docs/swagger.*`；若新增公开接口，别忘了在 `routers/site_public_router.go` 等路由文件中注册。
-   - RBAC/Casbin 场景补充菜单 SQL、Casbin 策略或角色菜单映射，保持前后端一致。
-8. **验证**：
-   - 执行 `GOCACHE=/tmp/.gocache go test ./...`，必要时补充单元/集成测试。
-   - 运行 `go run ./cmd/server`，通过 Swagger 或 `curl` 确认新路由可访问，日志无异常。
+1. `bootstrap.Initialize` builds `container.Store` (DB/GORM), `container.CasbinEnforcer`, Redis pool, etc.
+2. `cmd/server/server.go` creates every `NewService` instance. Cross-service deps (e.g., auth → user) are passed through constructors.
+3. `routers.Dependencies` carries services into controllers. Middlewares (e.g., `middleware.JWTHandler`) also receive dependencies explicitly (UserService now required).
+4. Avoid reviving `SetDefaultService`-style globals—keep dependencies explicit for clarity and tests.
 
-> 小贴士：如果只是为现有模块增加接口，也应复用 `Handler` + DI 的方式，避免重新引入全局状态。
+## Redis & Caching Strategy
 
-## Cross Compile
+All Redis access goes through `utils/gredis`, which provides sync/async set/delete, JSON helpers, prefix scans, etc. Always reuse this pool—no extra clients.
 
-### Windows
+### Key Spaces & Suggested TTL
 
-```bash
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64  go build -a -ldflags '-extldflags "-static"' .
+| Cache key/prefix            | Purpose                                | TTL/Policy           | Invalidated by                                     |
+|----------------------------|----------------------------------------|----------------------|----------------------------------------------------|
+| `site:categories:all`      | Public category list                   | `siteCacheTTL` = 15m | `sitePublicService.InvalidatePublicCategories()`   |
+| `site:tags:all`            | Public tag list                        | `siteCacheTTL`       | `InvalidatePublicTags()`                           |
+| `site:content:id:<id>`     | Content detail by ID                   | `siteCacheTTL`       | `InvalidatePublicContent(id, slug)`                |
+| `site:content:slug:<slug>` | Content detail by slug                 | `siteCacheTTL`       | same as above                                      |
+| `site:content:list:*`      | Paginated content list cache           | `siteCacheTTL`       | Any category/tag/content mutation (delete prefix)  |
+| `sys:routes:<roleKey>`     | Async routes (menu tree)               | 10m                  | `sysService.InvalidateRouteCache()`                |
+| `jwt:blacklist:<jwt>`      | JWT blacklist (logout/password change) | token remaining TTL  | `userService.JoinBlockList()`                      |
+
+- `siteCacheTTL` defaults to 15 minutes. Raise/lower depending on DB pressure vs freshness requirements, but always call invalidators after writes.
+- Prefer async helpers (`SetJSONAsync`, `DeleteByPrefixAsync`) to avoid blocking request goroutines.
+
+### Verifying Redis Writes
+
+1. **JWT blacklist**
+   ```bash
+   redis-cli --scan --pattern 'jwt:blacklist:*'
+   redis-cli TTL jwt:blacklist:<token>
+   ```
+   Login stores the latest refresh token; logout/password change pushes the old token into the blacklist and clears DB refresh tokens.
+2. **Site caches**
+   ```bash
+   redis-cli GET site:categories:all | jq
+   redis-cli --scan --pattern 'site:content:list:*'
+   ```
+   After publishing/updating/deleting content/category/tag, ensure related keys are removed (WARN logs appear if deletion fails).
+3. **Async routes**
+   ```bash
+   redis-cli --scan --pattern 'sys:routes:*'
+   ```
+   Role-menu binding changes should clear the prefix.
+
+### FAQ
+
+- **Why does JWT middleware still hit the DB?** Redis blacklist is checked first; DB queries only happen when Redis returns "not found" (or Redis is unavailable).
+- **What else can be cached?** Consider frequently read reference data (dropdowns, public settings, announcements). Use a dedicated prefix + TTL + invalidator.
+
+## Module Development Checklist
+
+> Goal: keep advancing the "Service + Handler + Router + Tests" DI pattern while aligning cache/permission/docs.
+
+1. **Models & migrations (`app/models`, `sql/`)** – define structs, relations, pagination queries; manage DDL scripts in `sql/`, avoid production AutoMigrate.
+2. **Service layer (`app/service/v1/<module>`)** – `type Service struct { store *data.Store }`, inject other services if needed, expose receiver methods only, reuse `utils/gredis` for cache.
+3. **Controllers / handlers** – implement `Handler` in `app/controllers/v1/<module>`, constructor must accept the service. Reuse `common.Gin`, `utils.GetPagination`, `utils/code`.
+4. **Routers** – add `Init<Module>Router(group, handler)`; extend `routers.Dependencies` and wire the handler in `InitRouter`.
+5. **Wiring** – instantiate `NewService` in `cmd/server/server.go` and populate the dependencies struct. Pass service pointers between modules explicitly.
+6. **Cache/Redis** – read path checks cache first; writes must call invalidators (delete keys or prefixes) to keep public data fresh.
+7. **Permissions/docs** – update menu SQL, Casbin policies, role-menu bindings as needed; rerun `swag init` for documentation.
+8. **Validation** – `GOCACHE=/tmp/.gocache go test ./...`, `go run ./cmd/server` for manual verification; double-check Redis state for cache-heavy modules.
+
+## Testing & Quality
+
+| Scenario               | Command / Steps                                                |
+|------------------------|----------------------------------------------------------------|
+| Unit tests             | `GOCACHE=/tmp/.gocache go test ./...`                          |
+| JWT blacklist check    | Login → `redis-cli --scan 'jwt:blacklist:*'` → logout → TTL    |
+| Site cache invalidation| Edit category/tag/content → `redis-cli --scan 'site:content:*'`|
+| Route cache refresh    | Save role-menu bindings → `redis-cli --scan 'sys:routes:*'` (expect empty)|
+| Swagger docs           | `swag init` → visit `BASE_URL/swagger/index.html`              |
+
+> No redis-cli? Use `docker exec -it redis redis-cli` or a tiny Go helper that calls `utils/gredis`.
+
+## Observability & Logs
+
 ```
-
-### Linux
-
-```bash
-CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' .
-```
-
-## Logs
-
-```bash
-$ go run main.go 
+$ go run main.go
 2020/06/28 15:42:40 [info] Redis connected 192.168.3.5:6379 DB: 0
 2020/06/28 15:42:40 PONG
-[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
- - using env:   export GIN_MODE=release
- - using code:  gin.SetMode(gin.ReleaseMode)
-
-INFO[2025-03-16 14:18:39] Redis connected 192.168.1.128:6379 DB: 3      caller="main.init.0:53" service=sse-service
-INFO[2025-03-16 14:18:39] PONG                                          caller="gin-web-admin/utils/gredis.Setup:49" service=sse-service
-[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
- - using env:   export GIN_MODE=release
- - using code:  gin.SetMode(gin.ReleaseMode)
-
-[GIN-debug] POST   /v1/api/login             --> gin-web-admin/app/controllers/v1/auth.UserLogin (4 handlers)
-[GIN-debug] POST   /v1/api/refresh_token     --> gin-web-admin/app/controllers/v1/auth.RefreshAccessToken (4 handlers)
-[GIN-debug] GET    /v1/api/user              --> gin-web-admin/app/controllers/v1/user.GetUsers (7 handlers)
-[GIN-debug] PUT    /v1/api/user/logout       --> gin-web-admin/app/controllers/v1/auth.UserLogout (7 handlers)
-[GIN-debug] PUT    /v1/api/user/change_password --> gin-web-admin/app/controllers/v1/auth.ChangePassword (7 handlers)
-[GIN-debug] GET    /v1/api/user/logged_in    --> gin-web-admin/app/controllers/v1/auth.GetLoggedInUser (7 handlers)
-[GIN-debug] GET    /v1/api/role              --> gin-web-admin/app/controllers/v1/role.GetRoles (7 handlers)
-[GIN-debug] POST   /v1/api/role              --> gin-web-admin/app/controllers/v1/role.CreateRole (7 handlers)
-[GIN-debug] PUT    /v1/api/role/:role_id     --> gin-web-admin/app/controllers/v1/role.UpdateRole (7 handlers)
-[GIN-debug] DELETE /v1/api/role/:role_id     --> gin-web-admin/app/controllers/v1/role.DeleteRole (7 handlers)
-[GIN-debug] GET    /v1/api/casbin            --> gin-web-admin/app/controllers/v1/casbin.GetCasbinList (7 handlers)
-[GIN-debug] POST   /v1/api/casbin            --> gin-web-admin/app/controllers/v1/casbin.CreateCasbin (7 handlers)
-[GIN-debug] PUT    /v1/api/casbin/:id        --> gin-web-admin/app/controllers/v1/casbin.UpdateCasbin (7 handlers)
-[GIN-debug] DELETE /v1/api/casbin/:id        --> gin-web-admin/app/controllers/v1/casbin.DeleteCasbin (7 handlers)
-[GIN-debug] GET    /v1/api/sys/router        --> gin-web-admin/app/controllers/v1/sys.GetRouterList (7 handlers)
-[GIN-debug] GET    /v1/api/sys/menu_list     --> gin-web-admin/app/controllers/v1/sys.GetMenuList (7 handlers)
-[GIN-debug] POST   /v1/api/test/ping         --> gin-web-admin/app/controllers/v1/index.Ping (5 handlers)
-[GIN-debug] GET    /v1/api/test/ping         --> gin-web-admin/app/controllers/v1/index.Ping (5 handlers)
-[GIN-debug] GET    /v1/api/test/font         --> gin-web-admin/app/controllers/v1/index.Test (5 handlers)
-[GIN-debug] GET    /v1/api/test/sse          --> gin-web-admin/routers.InitTestRouter.func1 (5 handlers)
-[GIN-debug] GET    /v1/api/test/events       --> gin-web-admin/common/sse.(*sseImpl).Handler.func1 (5 handlers)
-[GIN-debug] POST   /v1/api/test/send         --> gin-web-admin/app/controllers/v1/index.SendStream (5 handlers)
-[GIN-debug] GET    /v1/api/test/count        --> gin-web-admin/app/controllers/v1/index.SSEClientCount (5 handlers)
-[GIN-debug] POST   /v1/api/report            --> gin-web-admin/app/controllers/v1/report.Report (5 handlers)
-[GIN-debug] GET    /swagger                  --> gin-web-admin/routers.InitSwaggerRouter.func1 (4 handlers)
-[GIN-debug] GET    /swagger/*any             --> github.com/swaggo/gin-swagger.CustomWrapHandler.func1 (4 handlers)
-INFO[2025-03-16 14:18:39] start http server listening :8081             caller="runtime.main:283" service=sse-service
-INFO[2025-03-16 14:18:39] Actual pid is 2969363                         caller="runtime.main:283" service=sse-service
-
-
+[GIN-debug] POST /v1/api/login ...
+INFO[2025-03-16 14:18:39] start http server listening :8081
 ```
 
-## Swagger Docs
+Recommendations:
 
-### Preview
+- Set `setting.ServerSetting.RunMode=release` or `GIN_MODE=release` in production.
+- Keep INFO/WARN logs for cache invalidation, JWT blacklist writes, Casbin refreshes to simplify troubleshooting.
+- Integrate with ELK/Loki/etc. by extending `utils/logging` if needed.
 
-![swagger_preview](./img/swagger_preview.png)
+## Swagger API Docs
 
-![swagger_preview_2](./img/swagger_preview_2.png)
-
-Access ```BASE_URL/swagger/index.html``` view docs.
-
-Please check the instructions for use.
-[gin-swagger](https://github.com/swaggo/gin-swagger)
-
-### Generate
+- Browse at `BASE_URL/swagger/index.html`.
+- Generate via:
 
 ```bash
-$ swag init
-2019/08/22 16:17:11 Generate swagger docs....
-2019/08/22 16:17:11 Generate general API Info, search dir:./
-2019/08/22 16:17:11 create docs.go at  docs/docs.go
-2019/08/22 16:17:11 create swagger.json at  docs/swagger.json
-2019/08/22 16:17:11 create swagger.yaml at  docs/swagger.yaml
+swag init
 ```
 
-## Parameter Verification
+- Preview screenshots: `img/swagger_preview.png`, `img/swagger_preview_2.png`.
 
-### 1.Defining structure
+## Parameter Validation Tips
 
-use `validator.v10` Docs: [validator.v10](https://pkg.go.dev/github.com/go-playground/validator/v10)
+Using `validator.v10` through `common.CheckBindStructParameter`:
 
-```golang
+```go
 type Page struct {
     P uint `json:"p" form:"p" validate:"required,numeric,min=1"`
     N uint `json:"n" form:"n" validate:"required,numeric,min=1"`
 }
-```
 
-### 2.Binding Request Parameters
-
-```golang
-    var p Page
-    if err := c.ShouldBindQuery(&p); err != nil {
-        return err, "参数绑定失败,请检查传递参数类型！", 0, 0
-    }
-```
-
-### 3.Verify Binding Parameters
-
-```golang
-    err, parameterErrorStr := common.CheckBindStructParameter(p, c)
-```
-
-### Complete example
-
-```golang
-
-// GetPagination 统一解析 pageNum/page/p 与 pageSize/size/n，并限制最大 size
-func GetPagination(c *gin.Context, opts ...utils.PaginationOption) (utils.Pagination, error) {
-    // 默认 page=1、pageSize=10、最大 100，可通过 opts 自定义
-    return utils.GetPagination(c, opts...)
-}
-
-func ExampleHandler(c *gin.Context) {
-    appG := common.Gin{C: c}
-    pg, err := utils.GetPagination(c, utils.WithMaxPageSize(100))
-    if err != nil {
-        appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
-        return
-    }
-
-    list, total := queryFromDB(pg.Page, pg.PageSize) // 由业务自行实现
-    appG.Response(http.StatusOK, code.SUCCESS, "ok", pg.Result(list, total))
+var page Page
+if err := c.ShouldBindQuery(&page); err != nil { ... }
+if err, msg := common.CheckBindStructParameter(page, c); err != nil {
+    appG.Response(http.StatusBadRequest, code.InvalidParams, msg, nil)
+    return
 }
 ```
 
-## Features
+`utils.GetPagination` already parses `page/pageSize` (with max limits) and returns a helper that formats responses.
 
-- [Gin-gonic](https://github.com/gin-gonic/gin)
-- [Gorm](https://github.com/go-gorm/gorm)
-- [Swagger(swag)](https://github.com/swaggo/swag)
-- [Toml](https://github.com/BurntSushi/toml)
-- [Redis](https://github.com/gomodule/redigo)
-- [Air](https://github.com/cosmtrek/air)
-- [JWT](https://github.com/golang-jwt/jwt)
-- [Casbin](https://github.com/casbin/casbin)
-- [Gorm-adapter](https://github.com/casbin/gorm-adapter)
+## Cross Compilation
+
+```bash
+# Windows
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
+  go build -a -ldflags '-extldflags "-static"' .
+
+# Linux
+CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' .
+```
 
 ## License
 
-[MIT](https://github.com/userfhy/gin-web-admin/blob/dev/LICENSE)
+[MIT](./LICENSE)

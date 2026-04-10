@@ -44,40 +44,28 @@ func Run(opts Options) error {
 	}
 
 	userSvc := userService.NewService(container.Store)
-	userService.SetDefaultService(userSvc)
 
-	authSvc := authService.NewService(container.Store)
-	authService.SetDefaultService(authSvc)
+	authSvc := authService.NewService(container.Store, userSvc)
 
 	roleSvc := roleService.NewService(container.Store)
-	roleService.SetDefaultService(roleSvc)
 
 	menuSvc := menuService.NewService(container.Store)
-	menuService.SetDefaultService(menuSvc)
 
 	casbinSvc := casbinService.NewService(container.Store)
-	casbinService.SetDefaultService(casbinSvc)
 
 	reportSvc := reportService.NewService(container.Store)
-	reportService.SetDefaultService(reportSvc)
 
 	deptSvc := deptService.NewService(container.Store)
-	deptService.SetDefaultService(deptSvc)
 
 	siteCategorySvc := siteCategoryService.NewService(container.Store)
-	siteCategoryService.SetDefaultService(siteCategorySvc)
 
 	siteContentSvc := siteContentService.NewService(container.Store)
-	siteContentService.SetDefaultService(siteContentSvc)
 
 	siteTagSvc := siteTagService.NewService(container.Store)
-	siteTagService.SetDefaultService(siteTagSvc)
 
 	sitePublicSvc := sitePublicService.NewService(container.Store)
-	sitePublicService.SetDefaultService(sitePublicSvc)
 
 	sysSvc := sysService.NewService(container.Store)
-	sysService.SetDefaultService(sysSvc)
 
 	testSvc := testService.NewService()
 

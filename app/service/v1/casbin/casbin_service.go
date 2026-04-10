@@ -24,25 +24,8 @@ type Service struct {
 	store *data.Store
 }
 
-var defaultService *Service
-
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
-}
-
-func SetDefaultService(s *Service) {
-	defaultService = s
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("casbin service not initialized")
-	}
-	return defaultService
-}
-
-func CreateCasbin(n AddCasbinStruct) error {
-	return serviceInstance().CreateCasbin(n)
 }
 
 func (s *Service) CreateCasbin(n AddCasbinStruct) error {
@@ -52,10 +35,6 @@ func (s *Service) CreateCasbin(n AddCasbinStruct) error {
 		V1:    n.V1,
 		V2:    n.V2,
 	})
-}
-
-func UpdateCasbin(id int, u AddCasbinStruct) bool {
-	return serviceInstance().UpdateCasbin(id, u)
 }
 
 func (s *Service) UpdateCasbin(id int, u AddCasbinStruct) bool {
@@ -92,19 +71,11 @@ func (c *CasbinStruct) getConditionMaps() map[string]any {
 }
 
 func (c *CasbinStruct) Count() (int64, error) {
-	return serviceInstance().count(*c)
+	return model.GetTotal(model.CasbinRuleM{}, c.getConditionMaps())
 }
 
 func (c *CasbinStruct) GetAll() ([]*model.CasbinRuleM, error) {
-	return serviceInstance().getAll(*c)
-}
-
-func CountCasbinRules(query CasbinStruct) (int64, error) {
-	return serviceInstance().count(query)
-}
-
-func GetCasbinRuleList(query CasbinStruct) ([]*model.CasbinRuleM, error) {
-	return serviceInstance().getAll(query)
+	return model.GetCasbinRuleList(c.Pagination, c.getConditionMaps())
 }
 
 func (s *Service) count(query CasbinStruct) (int64, error) {

@@ -49,25 +49,8 @@ type Service struct {
 	store *data.Store
 }
 
-var defaultService *Service
-
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
-}
-
-func SetDefaultService(s *Service) {
-	defaultService = s
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("site tag service not initialized")
-	}
-	return defaultService
-}
-
-func GetSiteTagList(query SiteTagQuery) (utils.PageResult, error) {
-	return serviceInstance().GetSiteTagList(query)
 }
 
 func (s *Service) GetSiteTagList(query SiteTagQuery) (utils.PageResult, error) {
@@ -99,16 +82,8 @@ func (s *Service) GetSiteTagList(query SiteTagQuery) (utils.PageResult, error) {
 	return query.Pagination.Result(vos, total), nil
 }
 
-func GetAllSiteTags(status *int) ([]*model.SiteTag, error) {
-	return serviceInstance().GetAllSiteTags(status)
-}
-
 func (s *Service) GetAllSiteTags(status *int) ([]*model.SiteTag, error) {
 	return model.GetAllSiteTags(status)
-}
-
-func CreateSiteTag(payload CreateSiteTagStruct) error {
-	return serviceInstance().CreateSiteTag(payload)
 }
 
 func (s *Service) CreateSiteTag(payload CreateSiteTagStruct) error {
@@ -142,10 +117,6 @@ func (s *Service) CreateSiteTag(payload CreateSiteTagStruct) error {
 	return nil
 }
 
-func UpdateSiteTag(id int, payload UpdateSiteTagStruct) error {
-	return serviceInstance().UpdateSiteTag(id, payload)
-}
-
 func (s *Service) UpdateSiteTag(id int, payload UpdateSiteTagStruct) error {
 	name := security.SanitizePlainText(payload.Name, 80)
 	slug := normalizeSlug(payload.Slug)
@@ -176,10 +147,6 @@ func (s *Service) UpdateSiteTag(id int, payload UpdateSiteTagStruct) error {
 	sitePublicService.InvalidatePublicTags()
 	sitePublicService.InvalidateAllPublicContent()
 	return nil
-}
-
-func DeleteSiteTag(id int) error {
-	return serviceInstance().DeleteSiteTag(id)
 }
 
 func (s *Service) DeleteSiteTag(id int) error {

@@ -83,25 +83,8 @@ type Service struct {
 	store *data.Store
 }
 
-var defaultService *Service
-
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
-}
-
-func SetDefaultService(s *Service) {
-	defaultService = s
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("site content service not initialized")
-	}
-	return defaultService
-}
-
-func GetSiteContentList(query SiteContentQuery) (utils.PageResult, error) {
-	return serviceInstance().GetSiteContentList(query)
 }
 
 func (s *Service) GetSiteContentList(query SiteContentQuery) (utils.PageResult, error) {
@@ -116,10 +99,6 @@ func (s *Service) GetSiteContentList(query SiteContentQuery) (utils.PageResult, 
 	return query.Pagination.Result(contentVOs, total), nil
 }
 
-func GetSiteContentDetail(id int) (*SiteContentVO, error) {
-	return serviceInstance().GetSiteContentDetail(id)
-}
-
 func (s *Service) GetSiteContentDetail(id int) (*SiteContentVO, error) {
 	row, err := model.GetSiteContentByID(id)
 	if err != nil || row == nil {
@@ -130,10 +109,6 @@ func (s *Service) GetSiteContentDetail(id int) (*SiteContentVO, error) {
 		return nil, err
 	}
 	return &list[0], nil
-}
-
-func CreateSiteContent(payload CreateSiteContentStruct) error {
-	return serviceInstance().CreateSiteContent(payload)
 }
 
 func (s *Service) CreateSiteContent(payload CreateSiteContentStruct) error {
@@ -194,10 +169,6 @@ func (s *Service) CreateSiteContent(payload CreateSiteContentStruct) error {
 	sitePublicService.InvalidatePublicCategories()
 	sitePublicService.InvalidatePublicTags()
 	return nil
-}
-
-func UpdateSiteContent(id int, payload UpdateSiteContentStruct) error {
-	return serviceInstance().UpdateSiteContent(id, payload)
 }
 
 func (s *Service) UpdateSiteContent(id int, payload UpdateSiteContentStruct) error {
@@ -271,10 +242,6 @@ func (s *Service) UpdateSiteContent(id int, payload UpdateSiteContentStruct) err
 	return nil
 }
 
-func UpdateSiteContentStatus(id int, payload UpdateSiteContentStatusStruct) error {
-	return serviceInstance().UpdateSiteContentStatus(id, payload)
-}
-
 func (s *Service) UpdateSiteContentStatus(id int, payload UpdateSiteContentStatusStruct) error {
 	old, err := model.GetSiteContentByID(id)
 	if err != nil {
@@ -296,10 +263,6 @@ func (s *Service) UpdateSiteContentStatus(id int, payload UpdateSiteContentStatu
 	sitePublicService.InvalidatePublicCategories()
 	sitePublicService.InvalidatePublicTags()
 	return nil
-}
-
-func DeleteSiteContent(id int) error {
-	return serviceInstance().DeleteSiteContent(id)
 }
 
 func (s *Service) DeleteSiteContent(id int) error {

@@ -16,7 +16,8 @@ var (
 )
 
 type Service struct {
-	store *data.Store
+	store       *data.Store
+	userService *userService.Service
 }
 
 type LoginResult struct {
@@ -29,25 +30,11 @@ type LoginResult struct {
 	ExpiresAt    time.Time
 }
 
-func NewService(store *data.Store) *Service {
-	return &Service{store: store}
-}
-
-var defaultService *Service
-
-func SetDefaultService(s *Service) {
-	defaultService = s
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("auth service not initialized")
+func NewService(store *data.Store, userSvc *userService.Service) *Service {
+	if userSvc == nil {
+		panic("auth service requires user service dependency")
 	}
-	return defaultService
-}
-
-func Login(payload userService.AuthStruct) (LoginResult, error) {
-	return serviceInstance().Login(payload)
+	return &Service{store: store, userService: userSvc}
 }
 
 func (s *Service) Login(payload userService.AuthStruct) (LoginResult, error) {
@@ -75,12 +62,12 @@ func (s *Service) Login(payload userService.AuthStruct) (LoginResult, error) {
 		return LoginResult{}, err
 	}
 
-	oldRefresh, err := userService.SetLoggedUserInfo(userID, refreshToken)
+	oldRefresh, err := s.userService.SetLoggedUserInfo(userID, refreshToken)
 	if err != nil {
 		return LoginResult{}, err
 	}
 	if oldRefresh != "" && oldRefresh != refreshToken {
-		userService.JoinBlockList(userID, oldRefresh)
+		s.userService.JoinBlockList(userID, oldRefresh)
 	}
 
 	return LoginResult{
@@ -94,27 +81,15 @@ func (s *Service) Login(payload userService.AuthStruct) (LoginResult, error) {
 	}, nil
 }
 
-func RefreshAccessToken(refreshToken string) (map[string]any, error) {
-	return serviceInstance().RefreshAccessToken(refreshToken)
-}
-
 func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error) {
-	return userService.RefreshAccessToken(refreshToken)
-}
-
-func Logout(userID uint, token string) {
-	serviceInstance().Logout(userID, token)
+	return s.userService.RefreshAccessToken(refreshToken)
 }
 
 func (s *Service) Logout(userID uint, token string) {
 	if token == "" {
 		return
 	}
-	userService.JoinBlockList(userID, token)
-}
-
-func ChangePassword(username string, payload userService.ChangePasswordStruct) error {
-	return serviceInstance().ChangePassword(username, payload)
+	s.userService.JoinBlockList(userID, token)
 }
 
 func (s *Service) ChangePassword(username string, payload userService.ChangePasswordStruct) error {
@@ -125,15 +100,11 @@ func (s *Service) ChangePassword(username string, payload userService.ChangePass
 	if status == 0 {
 		return ErrUserDisabled
 	}
-	ok := userService.ChangeUserPassword(userID, payload.NewPassword)
+	ok := s.userService.ChangeUserPassword(userID, payload.NewPassword)
 	if !ok {
 		return errors.New("change password failed")
 	}
 	return nil
-}
-
-func BuildLoggedInUserData(claims *utils.Claims) map[string]any {
-	return serviceInstance().BuildLoggedInUserData(claims)
 }
 
 func (s *Service) BuildLoggedInUserData(claims *utils.Claims) map[string]any {

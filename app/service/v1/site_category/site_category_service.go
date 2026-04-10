@@ -52,25 +52,8 @@ type Service struct {
 	store *data.Store
 }
 
-var defaultService *Service
-
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
-}
-
-func SetDefaultService(s *Service) {
-	defaultService = s
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("site category service not initialized")
-	}
-	return defaultService
-}
-
-func GetSiteCategoryList(query SiteCategoryQuery) (utils.PageResult, error) {
-	return serviceInstance().GetSiteCategoryList(query)
 }
 
 func (s *Service) GetSiteCategoryList(query SiteCategoryQuery) (utils.PageResult, error) {
@@ -103,16 +86,8 @@ func (s *Service) GetSiteCategoryList(query SiteCategoryQuery) (utils.PageResult
 	return query.Pagination.Result(vos, total), nil
 }
 
-func GetAllSiteCategories(status *int) ([]*model.SiteCategory, error) {
-	return serviceInstance().GetAllSiteCategories(status)
-}
-
 func (s *Service) GetAllSiteCategories(status *int) ([]*model.SiteCategory, error) {
 	return model.GetAllSiteCategories(status)
-}
-
-func CreateSiteCategory(payload CreateSiteCategoryStruct) error {
-	return serviceInstance().CreateSiteCategory(payload)
 }
 
 func (s *Service) CreateSiteCategory(payload CreateSiteCategoryStruct) error {
@@ -147,10 +122,6 @@ func (s *Service) CreateSiteCategory(payload CreateSiteCategoryStruct) error {
 	return nil
 }
 
-func UpdateSiteCategory(id int, payload UpdateSiteCategoryStruct) error {
-	return serviceInstance().UpdateSiteCategory(id, payload)
-}
-
 func (s *Service) UpdateSiteCategory(id int, payload UpdateSiteCategoryStruct) error {
 	name := security.SanitizePlainText(payload.Name, 100)
 	slug := normalizeSlug(payload.Slug)
@@ -182,10 +153,6 @@ func (s *Service) UpdateSiteCategory(id int, payload UpdateSiteCategoryStruct) e
 	sitePublicService.InvalidatePublicCategories()
 	sitePublicService.InvalidateAllPublicContent()
 	return nil
-}
-
-func DeleteSiteCategory(id int) error {
-	return serviceInstance().DeleteSiteCategory(id)
 }
 
 func (s *Service) DeleteSiteCategory(id int) error {

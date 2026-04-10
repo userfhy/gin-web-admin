@@ -19,7 +19,7 @@ func (h *Handler) GetRoleMenuIds(c *gin.Context) {
 		return
 	}
 
-	ids, err := roleService.GetRoleMenuIds(roleId)
+	ids, err := h.service.GetRoleMenuIds(roleId)
 	if utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "获取角色菜单权限失败", err) {
 		return
 	}
@@ -40,7 +40,7 @@ func (h *Handler) SaveRoleMenuIds(c *gin.Context) {
 		return
 	}
 
-	if err := roleService.SaveRoleMenuIds(roleId, payload.MenuIds); utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "保存角色菜单权限失败", err) {
+	if err := h.service.SaveRoleMenuIds(roleId, payload.MenuIds); utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "保存角色菜单权限失败", err) {
 		return
 	}
 

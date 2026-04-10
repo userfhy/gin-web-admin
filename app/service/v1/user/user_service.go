@@ -84,26 +84,8 @@ const (
 	defaultBlacklistTTL   = 24 * time.Hour
 )
 
-var defaultService *Service
-
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
-}
-
-func SetDefaultService(service *Service) {
-	defaultService = service
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("user service not initialized")
-	}
-	return defaultService
-}
-
-// SetLoggedUserInfo 设置登录用户信息，返回旧的 refresh_token 便于失效处理
-func SetLoggedUserInfo(userId uint, refreshToken string) (string, error) {
-	return serviceInstance().SetLoggedUserInfo(userId, refreshToken)
 }
 
 func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string) (string, error) {
@@ -131,10 +113,6 @@ func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string) (string, e
 		return "", fmt.Errorf("未找到要更新的用户信息")
 	}
 	return oldRefresh, nil
-}
-
-func RefreshAccessToken(refreshToken string) (map[string]any, error) {
-	return serviceInstance().RefreshAccessToken(refreshToken)
 }
 
 func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error) {
@@ -168,10 +146,6 @@ func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error
 	return data, nil
 }
 
-func ChangeUserPassword(userId uint, newPassword string) bool {
-	return serviceInstance().ChangeUserPassword(userId, newPassword)
-}
-
 func (s *Service) ChangeUserPassword(userId uint, newPassword string) bool {
 	wheres := make(map[string]any)
 	wheres["id ="] = userId
@@ -187,10 +161,6 @@ func (s *Service) ChangeUserPassword(userId uint, newPassword string) bool {
 	return true
 }
 
-func JoinBlockList(userId uint, jwt string) {
-	serviceInstance().JoinBlockList(userId, jwt)
-}
-
 func (s *Service) JoinBlockList(userId uint, jwt string) {
 	if jwt == "" {
 		return
@@ -200,10 +170,6 @@ func (s *Service) JoinBlockList(userId uint, jwt string) {
 	}
 	_ = model.CreateBlockList(userId, jwt)
 	_, _ = model.Update(model.Auth{}, map[string]any{"id =": userId}, map[string]any{"refresh_token": ""})
-}
-
-func InBlockList(jwt string) (int64, error) {
-	return serviceInstance().InBlockList(jwt)
 }
 
 func (s *Service) InBlockList(jwt string) (int64, error) {
@@ -251,10 +217,6 @@ func blacklistTTL(jwt string) time.Duration {
 		return time.Minute
 	}
 	return ttl
-}
-
-func CreateUser(newUser AddUserStruct) error {
-	return serviceInstance().CreateUser(newUser)
 }
 
 func (s *Service) CreateUser(newUser AddUserStruct) error {

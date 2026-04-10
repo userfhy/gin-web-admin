@@ -33,25 +33,8 @@ type Service struct {
 	store *data.Store
 }
 
-var defaultService *Service
-
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
-}
-
-func SetDefaultService(s *Service) {
-	defaultService = s
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("role service not initialized")
-	}
-	return defaultService
-}
-
-func DeleteRole(roleId uint) bool {
-	return serviceInstance().DeleteRole(roleId)
 }
 
 func (s *Service) DeleteRole(roleId uint) bool {
@@ -66,10 +49,6 @@ func (s *Service) DeleteRole(roleId uint) bool {
 	return true
 }
 
-func CreateRole(newRole CreateRoleStruct) error {
-	return serviceInstance().CreateRole(newRole)
-}
-
 func (s *Service) CreateRole(newRole CreateRoleStruct) error {
 	if err := model.CreateRole(model.Role{
 		RoleKey:  newRole.RoleKey,
@@ -80,10 +59,6 @@ func (s *Service) CreateRole(newRole CreateRoleStruct) error {
 	}
 	sysService.InvalidateRouteCache()
 	return nil
-}
-
-func UpdateRole(roleId int, u UpdateRoleStruct) bool {
-	return serviceInstance().UpdateRole(roleId, u)
 }
 
 func (s *Service) UpdateRole(roleId int, u UpdateRoleStruct) bool {

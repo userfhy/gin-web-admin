@@ -19,21 +19,8 @@ const (
 	asyncRoutesCacheTTL    = 10 * time.Minute
 )
 
-var defaultService *Service
-
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
-}
-
-func SetDefaultService(s *Service) {
-	defaultService = s
-}
-
-func serviceInstance() *Service {
-	if defaultService == nil {
-		panic("sys service not initialized")
-	}
-	return defaultService
 }
 
 type AsyncRouteMeta struct {
@@ -53,10 +40,6 @@ type AsyncRoute struct {
 	Redirect  string         `json:"redirect,omitempty"`
 	Meta      AsyncRouteMeta `json:"meta"`
 	Children  []*AsyncRoute  `json:"children,omitempty"`
-}
-
-func GetAsyncRoutes(roleKey string) ([]*AsyncRoute, error) {
-	return serviceInstance().GetAsyncRoutes(roleKey)
 }
 
 func (s *Service) GetAsyncRoutes(roleKey string) ([]*AsyncRoute, error) {
