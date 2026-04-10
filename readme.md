@@ -119,15 +119,15 @@ All Redis access goes through `utils/gredis`, which provides sync/async set/dele
 
 | Cache key/prefix            | Purpose                                | TTL/Policy           | Invalidated by                                     |
 |----------------------------|----------------------------------------|----------------------|----------------------------------------------------|
-| `site:categories:all`      | Public category list                   | `siteCacheTTL` = 15m | `sitePublicService.InvalidatePublicCategories()`   |
-| `site:tags:all`            | Public tag list                        | `siteCacheTTL`       | `InvalidatePublicTags()`                           |
-| `site:content:id:<id>`     | Content detail by ID                   | `siteCacheTTL`       | `InvalidatePublicContent(id, slug)`                |
-| `site:content:slug:<slug>` | Content detail by slug                 | `siteCacheTTL`       | same as above                                      |
-| `site:content:list:*`      | Paginated content list cache           | `siteCacheTTL`       | Any category/tag/content mutation (delete prefix)  |
+| `site:categories:all`      | Public category list                   | `[site].CacheTTL` (default 15m) | `sitePublicService.InvalidatePublicCategories()`   |
+| `site:tags:all`            | Public tag list                        | `[site].CacheTTL`              | `InvalidatePublicTags()`                           |
+| `site:content:id:<id>`     | Content detail by ID                   | `[site].CacheTTL`              | `InvalidatePublicContent(id, slug)`                |
+| `site:content:slug:<slug>` | Content detail by slug                 | `[site].CacheTTL`              | same as above                                      |
+| `site:content:list:*`      | Paginated content list cache           | `[site].CacheTTL`              | Any category/tag/content mutation (delete prefix)  |
 | `sys:routes:<roleKey>`     | Async routes (menu tree)               | 10m                  | `sysService.InvalidateRouteCache()`                |
 | `jwt:blacklist:<jwt>`      | JWT blacklist (logout/password change) | token remaining TTL  | `userService.JoinBlockList()`                      |
 
-- `siteCacheTTL` defaults to 15 minutes. Raise/lower depending on DB pressure vs freshness requirements, but always call invalidators after writes.
+- Site cache TTL is configurable via `conf/app.toml` → `[site].CacheTTL` (Go duration string, default `15m`). Raise/lower depending on DB pressure vs freshness requirements, but always call invalidators after writes.
 - Prefer async helpers (`SetJSONAsync`, `DeleteByPrefixAsync`) to avoid blocking request goroutines.
 
 ### Verifying Redis Writes

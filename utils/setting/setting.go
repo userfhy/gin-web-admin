@@ -15,6 +15,7 @@ type Config struct {
 	Database Database
 	Redis    Redis
 	Security Security
+	Site     Site
 }
 
 type App struct {
@@ -73,6 +74,12 @@ type Security struct {
 
 var SecuritySetting = &Security{}
 
+type Site struct {
+	CacheTTL time.Duration `toml:"CacheTTL"`
+}
+
+var SiteSetting = &Site{}
+
 var (
 	cfg        *Config
 	configPath = "conf/app.toml"
@@ -103,6 +110,7 @@ func Setup() {
 	DatabaseSetting = &cfg.Database
 	RedisSetting = &cfg.Redis
 	SecuritySetting = &cfg.Security
+	SiteSetting = &cfg.Site
 
 	// 从环境变量覆盖敏感配置
 	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret != "" {
@@ -138,5 +146,8 @@ func Setup() {
 	}
 	if SecuritySetting.LoginLockoutMinutes <= 0 {
 		SecuritySetting.LoginLockoutMinutes = 15
+	}
+	if SiteSetting.CacheTTL <= 0 {
+		SiteSetting.CacheTTL = 15 * time.Minute
 	}
 }

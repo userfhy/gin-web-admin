@@ -119,15 +119,15 @@ flowchart TD
 
 | 缓存 Key/前缀                    | 描述                              | TTL/策略             | 失效函数/入口                                   |
 |----------------------------------|-----------------------------------|----------------------|------------------------------------------------|
-| `site:categories:all`            | 官网分类列表                      | `siteCacheTTL`=15m   | `sitePublicService.InvalidatePublicCategories` |
-| `site:tags:all`                  | 官网标签列表                      | `siteCacheTTL`=15m   | `sitePublicService.InvalidatePublicTags`       |
-| `site:content:id:<id>`           | 官网内容详情（ID）                | `siteCacheTTL`       | `InvalidatePublicContent`                      |
-| `site:content:slug:<slug>`       | 官网内容详情（Slug）              | `siteCacheTTL`       | 同上                                           |
-| `site:content:list:*`            | 官网内容列表分页 Cache            | `siteCacheTTL`       | 分类/标签/内容写操作均触发删除前缀             |
+| `site:categories:all`            | 官网分类列表                      | `[site].CacheTTL`（默认15m） | `sitePublicService.InvalidatePublicCategories` |
+| `site:tags:all`                  | 官网标签列表                      | `[site].CacheTTL`             | `sitePublicService.InvalidatePublicTags`       |
+| `site:content:id:<id>`           | 官网内容详情（ID）                | `[site].CacheTTL`             | `InvalidatePublicContent`                      |
+| `site:content:slug:<slug>`       | 官网内容详情（Slug）              | `[site].CacheTTL`             | 同上                                           |
+| `site:content:list:*`            | 官网内容列表分页 Cache            | `[site].CacheTTL`             | 分类/标签/内容写操作均触发删除前缀             |
 | `sys:routes:<roleKey>`           | 动态菜单/路由树                   | 10m                  | `sysService.InvalidateRouteCache`              |
 | `jwt:blacklist:<jwt>`            | JWT 黑名单（登录失效/退出）       | token 剩余有效期     | `userService.JoinBlockList`                    |
 
-- `siteCacheTTL` 默认 15 分钟。若访问量大且后台改动频繁，可缩短 TTL（修改常量或提炼为配置）；若更关注 DB 压力，可延长至 30 分钟，但务必保证每次写操作调用相应失效函数，避免用户看到过期数据。
+- 站点缓存 TTL 可通过 `conf/app.toml` 中的 `[site].CacheTTL`（Go duration 字符串，默认 `15m`）配置。若访问量大且后台改动频繁，可缩短 TTL；若更关注 DB 压力，可延长 TTL，但务必配合失效函数，避免陈旧数据。
 - 新增缓存请优先使用 `SetJSONAsync` / `DeleteByPrefixAsync` 等异步方法，避免阻塞请求线程。
 
 ### 如何验证 Redis 写入

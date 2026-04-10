@@ -46,3 +46,7 @@ LoginMaxAttempts = 5
 LoginLockoutMinutes = 15
 # Leave empty to allow all IPs; support single IP or CIDR
 IPWhitelist = ["127.0.0.1/32", "::1"]
+
+[site]
+# Default ttl for site related caches (Go duration format)
+CacheTTL = "15m"

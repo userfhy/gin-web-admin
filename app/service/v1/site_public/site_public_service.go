@@ -11,6 +11,7 @@ import (
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/gredis"
 	"gin-web-admin/utils/logging"
+	"gin-web-admin/utils/setting"
 )
 
 type PublicContentQuery struct {
@@ -70,10 +71,19 @@ type Service struct {
 const (
 	categoriesCacheKey = "site:categories:all"
 	tagsCacheKey       = "site:tags:all"
-	siteCacheTTL       = 15 * time.Minute
 	detailCachePrefix  = "site:content:"
 	listCachePrefix    = "site:content:list:"
 )
+
+const defaultSiteCacheTTL = 30 * time.Minute
+
+func siteCacheTTL() time.Duration {
+	ttl := setting.SiteSetting.CacheTTL
+	if ttl <= 0 {
+		return defaultSiteCacheTTL
+	}
+	return ttl
+}
 
 func NewService(store *data.Store) *Service {
 	return &Service{store: store}
@@ -98,7 +108,7 @@ func (s *Service) GetPublicTags() ([]PublicTagVO, error) {
 			Slug: item.Slug,
 		})
 	}
-	gredis.SetJSONAsync(tagsCacheKey, result, siteCacheTTL)
+	gredis.SetJSONAsync(tagsCacheKey, result, siteCacheTTL())
 	return result, nil
 }
 
@@ -131,7 +141,7 @@ func (s *Service) GetPublicCategories() ([]PublicCategoryVO, error) {
 			ContentCount: countMap[item.ID],
 		})
 	}
-	gredis.SetJSONAsync(categoriesCacheKey, result, siteCacheTTL)
+	gredis.SetJSONAsync(categoriesCacheKey, result, siteCacheTTL())
 	return result, nil
 }
 
@@ -445,7 +455,7 @@ func (s *Service) getCachedContentDetail(key string) (*PublicContentDetailVO, bo
 }
 
 func (s *Service) setCachedContentDetail(key string, detail *PublicContentDetailVO) {
-	gredis.SetJSONAsync(key, detail, siteCacheTTL)
+	gredis.SetJSONAsync(key, detail, siteCacheTTL())
 }
 
 func slugCacheKey(slug string) string {
@@ -467,7 +477,7 @@ func (s *Service) getCachedContentList(key string) (utils.PageResult, bool) {
 }
 
 func (s *Service) setCachedContentList(key string, result utils.PageResult) {
-	gredis.SetJSONAsync(key, result, siteCacheTTL)
+	gredis.SetJSONAsync(key, result, siteCacheTTL())
 }
 
 func listCacheKey(query PublicContentQuery) string {
