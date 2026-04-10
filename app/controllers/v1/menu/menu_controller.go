@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	model "gin-web-admin/app/models"
-	service "gin-web-admin/app/service/v1/menu"
+	menuService "gin-web-admin/app/service/v1/menu"
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
@@ -13,8 +13,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Handler struct {
+	service *menuService.Service
+}
+
+func NewHandler(service *menuService.Service) *Handler {
+	if service == nil {
+		panic("menu handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
 // 新增菜单
-func CreateMenu(c *gin.Context) {
+func (h *Handler) CreateMenu(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var menu model.Menu
@@ -23,7 +34,7 @@ func CreateMenu(c *gin.Context) {
 		return
 	}
 
-	if err := service.CreateMenu(menu); err != nil {
+	if err := h.service.CreateMenu(menu); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}
@@ -32,7 +43,7 @@ func CreateMenu(c *gin.Context) {
 }
 
 // 更新菜单
-func UpdateMenu(c *gin.Context) {
+func (h *Handler) UpdateMenu(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	idStr := c.Param("id")
@@ -48,7 +59,7 @@ func UpdateMenu(c *gin.Context) {
 		return
 	}
 
-	if err := service.UpdateMenu(id, data); err != nil {
+	if err := h.service.UpdateMenu(id, data); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, "更新失败: "+err.Error(), nil)
 		return
 	}
@@ -56,7 +67,7 @@ func UpdateMenu(c *gin.Context) {
 }
 
 // 删除菜单
-func DeleteMenu(c *gin.Context) {
+func (h *Handler) DeleteMenu(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	idStr := c.Param("id")
@@ -66,7 +77,7 @@ func DeleteMenu(c *gin.Context) {
 		return
 	}
 
-	if err := service.DeleteMenu(id); err != nil {
+	if err := h.service.DeleteMenu(id); err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "删除失败", nil)
 		return
 	}
@@ -75,7 +86,7 @@ func DeleteMenu(c *gin.Context) {
 }
 
 // 获取菜单列表（分页）
-func GetMenuList(c *gin.Context) {
+func (h *Handler) GetMenuList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	pg, err := utils.GetPagination(c)
@@ -90,7 +101,7 @@ func GetMenuList(c *gin.Context) {
 		where["menu_type"] = menuType
 	}
 
-	menus, err := service.GetMenuList(pg.Clone(), where)
+	menus, err := h.service.GetMenuList(pg.Clone(), where)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "查询失败", nil)
 		return
@@ -107,11 +118,11 @@ func GetMenuList(c *gin.Context) {
 // @Tags			SYS
 // @Success		200	{object}	common.Response
 // @Router			/menu/menu_list [get]
-func GetAllMenus(c *gin.Context) {
+func (h *Handler) GetAllMenus(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	where := map[string]any{}
-	menus, err := service.GetAllMenus(where)
+	menus, err := h.service.GetAllMenus(where)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "获取失败", nil)
 		return

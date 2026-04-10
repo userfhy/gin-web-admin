@@ -3,10 +3,14 @@ package sitePublicService
 import (
 	"fmt"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	model "gin-web-admin/app/models"
+	"gin-web-admin/internal/data"
 	"gin-web-admin/utils"
+	"gin-web-admin/utils/gredis"
+	"gin-web-admin/utils/logging"
 )
 
 type PublicContentQuery struct {
@@ -59,7 +63,45 @@ type PublicTagVO struct {
 	Slug string `json:"slug"`
 }
 
+type Service struct {
+	store *data.Store
+}
+
+var defaultService *Service
+
+const (
+	categoriesCacheKey = "site:categories:all"
+	tagsCacheKey       = "site:tags:all"
+	siteCacheTTL       = 5 * time.Minute
+	detailCachePrefix  = "site:content:"
+	listCachePrefix    = "site:content:list:"
+)
+
+func NewService(store *data.Store) *Service {
+	return &Service{store: store}
+}
+
+func SetDefaultService(s *Service) {
+	defaultService = s
+}
+
+func serviceInstance() *Service {
+	if defaultService == nil {
+		panic("site_public service not initialized")
+	}
+	return defaultService
+}
+
 func GetPublicTags() ([]PublicTagVO, error) {
+	return serviceInstance().GetPublicTags()
+}
+
+func (s *Service) GetPublicTags() ([]PublicTagVO, error) {
+	var cached []PublicTagVO
+	if ok, err := gredis.GetJSON(tagsCacheKey, &cached); err == nil && ok {
+		return cached, nil
+	}
+
 	status := 1
 	tags, err := model.GetAllSiteTags(&status)
 	if err != nil {
@@ -73,10 +115,20 @@ func GetPublicTags() ([]PublicTagVO, error) {
 			Slug: item.Slug,
 		})
 	}
+	gredis.SetJSONAsync(tagsCacheKey, result, siteCacheTTL)
 	return result, nil
 }
 
 func GetPublicCategories() ([]PublicCategoryVO, error) {
+	return serviceInstance().GetPublicCategories()
+}
+
+func (s *Service) GetPublicCategories() ([]PublicCategoryVO, error) {
+	var cached []PublicCategoryVO
+	if ok, err := gredis.GetJSON(categoriesCacheKey, &cached); err == nil && ok {
+		return cached, nil
+	}
+
 	status := 1
 	categories, err := model.GetAllSiteCategories(&status)
 	if err != nil {
@@ -100,10 +152,20 @@ func GetPublicCategories() ([]PublicCategoryVO, error) {
 			ContentCount: countMap[item.ID],
 		})
 	}
+	gredis.SetJSONAsync(categoriesCacheKey, result, siteCacheTTL)
 	return result, nil
 }
 
 func GetPublicContentList(query PublicContentQuery) (utils.PageResult, error) {
+	return serviceInstance().GetPublicContentList(query)
+}
+
+func (s *Service) GetPublicContentList(query PublicContentQuery) (utils.PageResult, error) {
+	cacheKey := listCacheKey(query)
+	if pageResult, ok := s.getCachedContentList(cacheKey); ok {
+		return pageResult, nil
+	}
+
 	pg := query.Pagination.Clone()
 	var categoryID *int
 	if slug := strings.TrimSpace(query.CategorySlug); slug != "" {
@@ -134,11 +196,11 @@ func GetPublicContentList(query PublicContentQuery) (utils.PageResult, error) {
 		return utils.PageResult{}, err
 	}
 
-	categoryByContent, err := getPublicCategoriesByContentIDs(extractContentIDs(list))
+	categoryByContent, err := s.getPublicCategoriesByContentIDs(extractContentIDs(list))
 	if err != nil {
 		return utils.PageResult{}, err
 	}
-	tagByContent, err := getPublicTagsByContentIDs(extractContentIDs(list))
+	tagByContent, err := s.getPublicTagsByContentIDs(extractContentIDs(list))
 	if err != nil {
 		return utils.PageResult{}, err
 	}
@@ -159,13 +221,23 @@ func GetPublicContentList(query PublicContentQuery) (utils.PageResult, error) {
 		})
 	}
 
-	return pg.Result(result, total), nil
+	pageResult := pg.Result(result, total)
+	s.setCachedContentList(cacheKey, pageResult)
+	return pageResult, nil
 }
 
 func GetPublicContentDetailBySlug(slug string) (*PublicContentDetailVO, error) {
+	return serviceInstance().GetPublicContentDetailBySlug(slug)
+}
+
+func (s *Service) GetPublicContentDetailBySlug(slug string) (*PublicContentDetailVO, error) {
 	if strings.TrimSpace(slug) == "" {
 		return nil, fmt.Errorf("slug is required")
 	}
+	if detail, ok := s.getCachedContentDetail(slugCacheKey(slug)); ok {
+		return detail, nil
+	}
+
 	item, err := model.GetSiteContentBySlug(slug)
 	if err != nil {
 		return nil, err
@@ -174,16 +246,16 @@ func GetPublicContentDetailBySlug(slug string) (*PublicContentDetailVO, error) {
 		return nil, nil
 	}
 
-	categoryByContent, err := getPublicCategoriesByContentIDs([]int{item.ID})
+	categoryByContent, err := s.getPublicCategoriesByContentIDs([]int{item.ID})
 	if err != nil {
 		return nil, err
 	}
-	tagByContent, err := getPublicTagsByContentIDs([]int{item.ID})
+	tagByContent, err := s.getPublicTagsByContentIDs([]int{item.ID})
 	if err != nil {
 		return nil, err
 	}
 
-	return &PublicContentDetailVO{
+	detail := &PublicContentDetailVO{
 		ID:             item.ID,
 		Title:          item.Title,
 		Slug:           item.Slug,
@@ -197,13 +269,24 @@ func GetPublicContentDetailBySlug(slug string) (*PublicContentDetailVO, error) {
 		ReadingMinute:  readingMinute(item.Content),
 		Categories:     categoryByContent[item.ID],
 		Tags:           tagByContent[item.ID],
-	}, nil
+	}
+	s.setCachedContentDetail(slugCacheKey(slug), detail)
+	return detail, nil
 }
 
 func GetPublicContentDetailByID(id int) (*PublicContentDetailVO, error) {
+	return serviceInstance().GetPublicContentDetailByID(id)
+}
+
+func (s *Service) GetPublicContentDetailByID(id int) (*PublicContentDetailVO, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("id is required")
 	}
+	cacheKey := idCacheKey(id)
+	if detail, ok := s.getCachedContentDetail(cacheKey); ok {
+		return detail, nil
+	}
+
 	item, err := model.GetSiteContentByID(id)
 	if err != nil {
 		return nil, err
@@ -212,16 +295,16 @@ func GetPublicContentDetailByID(id int) (*PublicContentDetailVO, error) {
 		return nil, nil
 	}
 
-	categoryByContent, err := getPublicCategoriesByContentIDs([]int{item.ID})
+	categoryByContent, err := s.getPublicCategoriesByContentIDs([]int{item.ID})
 	if err != nil {
 		return nil, err
 	}
-	tagByContent, err := getPublicTagsByContentIDs([]int{item.ID})
+	tagByContent, err := s.getPublicTagsByContentIDs([]int{item.ID})
 	if err != nil {
 		return nil, err
 	}
 
-	return &PublicContentDetailVO{
+	detail := &PublicContentDetailVO{
 		ID:             item.ID,
 		Title:          item.Title,
 		Slug:           item.Slug,
@@ -235,10 +318,12 @@ func GetPublicContentDetailByID(id int) (*PublicContentDetailVO, error) {
 		ReadingMinute:  readingMinute(item.Content),
 		Categories:     categoryByContent[item.ID],
 		Tags:           tagByContent[item.ID],
-	}, nil
+	}
+	s.setCachedContentDetail(cacheKey, detail)
+	return detail, nil
 }
 
-func getPublicTagsByContentIDs(contentIDs []int) (map[int][]PublicTagVO, error) {
+func (s *Service) getPublicTagsByContentIDs(contentIDs []int) (map[int][]PublicTagVO, error) {
 	result := make(map[int][]PublicTagVO, len(contentIDs))
 	if len(contentIDs) == 0 {
 		return result, nil
@@ -288,7 +373,7 @@ func getPublicTagsByContentIDs(contentIDs []int) (map[int][]PublicTagVO, error) 
 	return result, nil
 }
 
-func getPublicCategoriesByContentIDs(contentIDs []int) (map[int][]PublicCategoryVO, error) {
+func (s *Service) getPublicCategoriesByContentIDs(contentIDs []int) (map[int][]PublicCategoryVO, error) {
 	result := make(map[int][]PublicCategoryVO, len(contentIDs))
 	if len(contentIDs) == 0 {
 		return result, nil
@@ -390,4 +475,87 @@ func readingMinute(content string) int {
 		return 1
 	}
 	return minute
+}
+
+func (s *Service) getCachedContentDetail(key string) (*PublicContentDetailVO, bool) {
+	var detail PublicContentDetailVO
+	ok, err := gredis.GetJSON(key, &detail)
+	if err != nil {
+		logging.Warnf("get content detail cache failed: %v", err)
+		return nil, false
+	}
+	if !ok {
+		return nil, false
+	}
+	return &detail, true
+}
+
+func (s *Service) setCachedContentDetail(key string, detail *PublicContentDetailVO) {
+	gredis.SetJSONAsync(key, detail, siteCacheTTL)
+}
+
+func slugCacheKey(slug string) string {
+	return detailCachePrefix + "slug:" + slug
+}
+
+func idCacheKey(id int) string {
+	return detailCachePrefix + "id:" + fmt.Sprintf("%d", id)
+}
+
+func (s *Service) getCachedContentList(key string) (utils.PageResult, bool) {
+	var result utils.PageResult
+	ok, err := gredis.GetJSON(key, &result)
+	if err != nil {
+		logging.Warnf("get content list cache failed: %v", err)
+		return utils.PageResult{}, false
+	}
+	return result, ok
+}
+
+func (s *Service) setCachedContentList(key string, result utils.PageResult) {
+	gredis.SetJSONAsync(key, result, siteCacheTTL)
+}
+
+func listCacheKey(query PublicContentQuery) string {
+	return fmt.Sprintf("%skeyword=%s:cat=%s:tag=%s:page=%d:size=%d",
+		listCachePrefix,
+		strings.TrimSpace(query.Keyword),
+		strings.TrimSpace(query.CategorySlug),
+		strings.TrimSpace(query.TagSlug),
+		query.Pagination.Page,
+		query.Pagination.PageSize,
+	)
+}
+
+// InvalidatePublicCategories 清理分类相关缓存
+func InvalidatePublicCategories() {
+	gredis.DeleteKeysAsync(categoriesCacheKey)
+	gredis.DeleteByPrefixAsync(listCachePrefix)
+}
+
+// InvalidatePublicTags 清理标签相关缓存
+func InvalidatePublicTags() {
+	gredis.DeleteKeysAsync(tagsCacheKey)
+	gredis.DeleteByPrefixAsync(listCachePrefix)
+}
+
+// InvalidatePublicContent 清理内容列表与详情缓存
+func InvalidatePublicContent(id int, slug string) {
+	keys := make([]string, 0, 2)
+	if id > 0 {
+		keys = append(keys, idCacheKey(id))
+	}
+	if slug = strings.TrimSpace(slug); slug != "" {
+		keys = append(keys, slugCacheKey(slug))
+	}
+	if len(keys) > 0 {
+		gredis.DeleteKeysAsync(keys...)
+	}
+	gredis.DeleteByPrefixAsync(listCachePrefix)
+}
+
+// InvalidateAllPublicContent 完整清理所有内容缓存
+func InvalidateAllPublicContent() {
+	gredis.DeleteByPrefixAsync(detailCachePrefix)
+	gredis.DeleteByPrefixAsync(listCachePrefix)
 }

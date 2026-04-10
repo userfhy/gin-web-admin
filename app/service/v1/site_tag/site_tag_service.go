@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	model "gin-web-admin/app/models"
+	sitePublicService "gin-web-admin/app/service/v1/site_public"
+	"gin-web-admin/internal/data"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/security"
 )
@@ -43,7 +45,32 @@ type UpdateSiteTagStruct struct {
 	Sort   int    `json:"sort"`
 }
 
+type Service struct {
+	store *data.Store
+}
+
+var defaultService *Service
+
+func NewService(store *data.Store) *Service {
+	return &Service{store: store}
+}
+
+func SetDefaultService(s *Service) {
+	defaultService = s
+}
+
+func serviceInstance() *Service {
+	if defaultService == nil {
+		panic("site tag service not initialized")
+	}
+	return defaultService
+}
+
 func GetSiteTagList(query SiteTagQuery) (utils.PageResult, error) {
+	return serviceInstance().GetSiteTagList(query)
+}
+
+func (s *Service) GetSiteTagList(query SiteTagQuery) (utils.PageResult, error) {
 	list, total, err := model.GetSiteTagList(query.Pagination, query.Keyword, query.Status)
 	if err != nil {
 		return utils.PageResult{}, err
@@ -73,10 +100,18 @@ func GetSiteTagList(query SiteTagQuery) (utils.PageResult, error) {
 }
 
 func GetAllSiteTags(status *int) ([]*model.SiteTag, error) {
+	return serviceInstance().GetAllSiteTags(status)
+}
+
+func (s *Service) GetAllSiteTags(status *int) ([]*model.SiteTag, error) {
 	return model.GetAllSiteTags(status)
 }
 
 func CreateSiteTag(payload CreateSiteTagStruct) error {
+	return serviceInstance().CreateSiteTag(payload)
+}
+
+func (s *Service) CreateSiteTag(payload CreateSiteTagStruct) error {
 	name := security.SanitizePlainText(payload.Name, 80)
 	slug := normalizeSlug(payload.Slug)
 	if name == "" {
@@ -94,15 +129,24 @@ func CreateSiteTag(payload CreateSiteTagStruct) error {
 		return fmt.Errorf("slug already exists")
 	}
 
-	return model.CreateSiteTag(model.SiteTag{
+	if err := model.CreateSiteTag(model.SiteTag{
 		Name:   name,
 		Slug:   slug,
 		Status: payload.Status,
 		Sort:   payload.Sort,
-	})
+	}); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicTags()
+	sitePublicService.InvalidatePublicContent(0, "")
+	return nil
 }
 
 func UpdateSiteTag(id int, payload UpdateSiteTagStruct) error {
+	return serviceInstance().UpdateSiteTag(id, payload)
+}
+
+func (s *Service) UpdateSiteTag(id int, payload UpdateSiteTagStruct) error {
 	name := security.SanitizePlainText(payload.Name, 80)
 	slug := normalizeSlug(payload.Slug)
 	if name == "" {
@@ -126,10 +170,19 @@ func UpdateSiteTag(id int, payload UpdateSiteTagStruct) error {
 		"status": payload.Status,
 		"sort":   payload.Sort,
 	}
-	return model.UpdateSiteTag(id, data)
+	if err := model.UpdateSiteTag(id, data); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicTags()
+	sitePublicService.InvalidatePublicContent(0, "")
+	return nil
 }
 
 func DeleteSiteTag(id int) error {
+	return serviceInstance().DeleteSiteTag(id)
+}
+
+func (s *Service) DeleteSiteTag(id int) error {
 	inUse, err := model.IsSiteTagInUse(id)
 	if err != nil {
 		return err
@@ -137,7 +190,12 @@ func DeleteSiteTag(id int) error {
 	if inUse {
 		return fmt.Errorf("tag in use")
 	}
-	return model.DeleteSiteTag(id)
+	if err := model.DeleteSiteTag(id); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicTags()
+	sitePublicService.InvalidatePublicContent(0, "")
+	return nil
 }
 
 func validateSlug(slug string) error {

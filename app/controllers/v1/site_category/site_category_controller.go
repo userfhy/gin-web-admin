@@ -13,7 +13,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetSiteCategoryList(c *gin.Context) {
+type Handler struct {
+	service *siteCategoryService.Service
+}
+
+func NewHandler(service *siteCategoryService.Service) *Handler {
+	if service == nil {
+		panic("site category handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
+func (h *Handler) GetSiteCategoryList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	pg, err := utils.GetPagination(c, utils.WithMaxPageSize(100))
@@ -35,7 +46,7 @@ func GetSiteCategoryList(c *gin.Context) {
 		status = &val
 	}
 
-	result, err := siteCategoryService.GetSiteCategoryList(siteCategoryService.SiteCategoryQuery{
+	result, err := h.service.GetSiteCategoryList(siteCategoryService.SiteCategoryQuery{
 		Pagination: pg.Clone(),
 		Keyword:    c.Query("keyword"),
 		Status:     status,
@@ -48,7 +59,7 @@ func GetSiteCategoryList(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", result)
 }
 
-func GetAllSiteCategories(c *gin.Context) {
+func (h *Handler) GetAllSiteCategories(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var status *int
@@ -61,7 +72,7 @@ func GetAllSiteCategories(c *gin.Context) {
 		status = &statusInt
 	}
 
-	list, err := siteCategoryService.GetAllSiteCategories(status)
+	list, err := h.service.GetAllSiteCategories(status)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "获取全部分类失败", nil)
 		return
@@ -69,7 +80,7 @@ func GetAllSiteCategories(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", list)
 }
 
-func CreateSiteCategory(c *gin.Context) {
+func (h *Handler) CreateSiteCategory(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var payload siteCategoryService.CreateSiteCategoryStruct
@@ -78,7 +89,7 @@ func CreateSiteCategory(c *gin.Context) {
 		return
 	}
 
-	if err := siteCategoryService.CreateSiteCategory(payload); err != nil {
+	if err := h.service.CreateSiteCategory(payload); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}
@@ -86,7 +97,7 @@ func CreateSiteCategory(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "创建成功", nil)
 }
 
-func UpdateSiteCategory(c *gin.Context) {
+func (h *Handler) UpdateSiteCategory(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -101,7 +112,7 @@ func UpdateSiteCategory(c *gin.Context) {
 		return
 	}
 
-	if err := siteCategoryService.UpdateSiteCategory(id, payload); err != nil {
+	if err := h.service.UpdateSiteCategory(id, payload); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}
@@ -109,7 +120,7 @@ func UpdateSiteCategory(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "更新成功", nil)
 }
 
-func DeleteSiteCategory(c *gin.Context) {
+func (h *Handler) DeleteSiteCategory(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -118,7 +129,7 @@ func DeleteSiteCategory(c *gin.Context) {
 		return
 	}
 
-	if err := siteCategoryService.DeleteSiteCategory(id); err != nil {
+	if err := h.service.DeleteSiteCategory(id); err != nil {
 		if err.Error() == "category in use" {
 			appG.Response(http.StatusBadRequest, code.InvalidParams, "该分类已关联内容，无法删除", nil)
 			return

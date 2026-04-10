@@ -1,12 +1,25 @@
 package sysController
 
 import (
+	"net/http"
+
+	sysService "gin-web-admin/app/service/v1/sys"
 	"gin-web-admin/common"
 	"gin-web-admin/utils/code"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+type Handler struct {
+	service *sysService.Service
+}
+
+func NewHandler(service *sysService.Service) *Handler {
+	if service == nil {
+		panic("sys handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
 
 var Routers gin.RoutesInfo
 
@@ -18,9 +31,7 @@ var Routers gin.RoutesInfo
 // @Tags			SYS
 // @Success		200	{object}	common.Response
 // @Router			/sys/menu_list [get]
-func GetMenuList(c *gin.Context) {
-
-}
+func (h *Handler) GetMenuList(c *gin.Context) {}
 
 // @Summary		后端存在路由列表
 // @Description	get router list
@@ -30,7 +41,7 @@ func GetMenuList(c *gin.Context) {
 // @Tags			SYS
 // @Success		200	{object}	common.Response
 // @Router			/sys/router [get]
-func GetRouterList(c *gin.Context) {
+func (h *Handler) GetRouterList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	type Router struct {
@@ -38,15 +49,13 @@ func GetRouterList(c *gin.Context) {
 		Method string `json:"method"`
 	}
 
-	data := make([]Router, 0)
+	data := make([]Router, 0, len(Routers))
 
-	routers := Routers
-
-	for index := range routers {
-		var router Router
-		router.Method = Routers[index].Method
-		router.Path = Routers[index].Path
-		data = append(data, router)
+	for _, route := range Routers {
+		data = append(data, Router{
+			Method: route.Method,
+			Path:   route.Path,
+		})
 	}
 
 	appG.Response(http.StatusOK, code.SUCCESS, "获取存在路由列表成功", data)

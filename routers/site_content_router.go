@@ -2,23 +2,18 @@ package routers
 
 import (
 	siteContentController "gin-web-admin/app/controllers/v1/site_content"
-	"gin-web-admin/app/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InitSiteContentRouter(Router *gin.RouterGroup) {
-	siteContent := Router.Group("/site-content").Use(
-		middleware.TranslationHandler(),
-		middleware.JWTHandler(),
-		middleware.CasbinHandler(),
-	)
+func InitSiteContentRouter(router *gin.RouterGroup, handler *siteContentController.Handler) {
+	siteContent := router.Group("/site-content")
 	{
-		siteContent.GET("", siteContentController.GetSiteContentList)
-		siteContent.GET("/:id", siteContentController.GetSiteContent)
-		siteContent.POST("", siteContentController.CreateSiteContent)
-		siteContent.PUT("/:id", siteContentController.UpdateSiteContent)
-		siteContent.PATCH("/:id/status", siteContentController.UpdateSiteContentStatus)
-		siteContent.DELETE("/:id", siteContentController.DeleteSiteContent)
+		siteContent.GET("", handler.GetSiteContentList)
+		siteContent.GET("/:id", handler.GetSiteContent)
+		siteContent.POST("", handler.CreateSiteContent)
+		siteContent.PUT("/:id", handler.UpdateSiteContent)
+		siteContent.PATCH("/:id/status", handler.UpdateSiteContentStatus)
+		siteContent.DELETE("/:id", handler.DeleteSiteContent)
 	}
 }

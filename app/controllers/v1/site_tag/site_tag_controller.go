@@ -13,7 +13,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetSiteTagList(c *gin.Context) {
+type Handler struct {
+	service *siteTagService.Service
+}
+
+func NewHandler(service *siteTagService.Service) *Handler {
+	if service == nil {
+		panic("site tag handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
+func (h *Handler) GetSiteTagList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	pg, err := utils.GetPagination(c, utils.WithMaxPageSize(100))
@@ -35,7 +46,7 @@ func GetSiteTagList(c *gin.Context) {
 		status = &val
 	}
 
-	result, err := siteTagService.GetSiteTagList(siteTagService.SiteTagQuery{
+	result, err := h.service.GetSiteTagList(siteTagService.SiteTagQuery{
 		Pagination: pg.Clone(),
 		Keyword:    c.Query("keyword"),
 		Status:     status,
@@ -47,7 +58,7 @@ func GetSiteTagList(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", result)
 }
 
-func GetAllSiteTags(c *gin.Context) {
+func (h *Handler) GetAllSiteTags(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	filter := query.NewBuilder()
@@ -63,7 +74,7 @@ func GetAllSiteTags(c *gin.Context) {
 		status = &val
 	}
 
-	list, err := siteTagService.GetAllSiteTags(status)
+	list, err := h.service.GetAllSiteTags(status)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "获取全部标签失败", nil)
 		return
@@ -71,7 +82,7 @@ func GetAllSiteTags(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", list)
 }
 
-func CreateSiteTag(c *gin.Context) {
+func (h *Handler) CreateSiteTag(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var payload siteTagService.CreateSiteTagStruct
@@ -80,14 +91,14 @@ func CreateSiteTag(c *gin.Context) {
 		return
 	}
 
-	if err := siteTagService.CreateSiteTag(payload); err != nil {
+	if err := h.service.CreateSiteTag(payload); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}
 	appG.Response(http.StatusOK, code.SUCCESS, "创建成功", nil)
 }
 
-func UpdateSiteTag(c *gin.Context) {
+func (h *Handler) UpdateSiteTag(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -102,14 +113,14 @@ func UpdateSiteTag(c *gin.Context) {
 		return
 	}
 
-	if err := siteTagService.UpdateSiteTag(id, payload); err != nil {
+	if err := h.service.UpdateSiteTag(id, payload); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}
 	appG.Response(http.StatusOK, code.SUCCESS, "更新成功", nil)
 }
 
-func DeleteSiteTag(c *gin.Context) {
+func (h *Handler) DeleteSiteTag(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -118,7 +129,7 @@ func DeleteSiteTag(c *gin.Context) {
 		return
 	}
 
-	if err := siteTagService.DeleteSiteTag(id); err != nil {
+	if err := h.service.DeleteSiteTag(id); err != nil {
 		if err.Error() == "tag in use" {
 			appG.Response(http.StatusBadRequest, code.InvalidParams, "该标签已关联内容，无法删除", nil)
 			return

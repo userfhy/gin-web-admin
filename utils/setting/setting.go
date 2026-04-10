@@ -59,12 +59,27 @@ type Redis struct {
 
 var RedisSetting = &Redis{}
 
-var cfg *Config
+var (
+	cfg        *Config
+	configPath = "conf/app.toml"
+)
+
+// SetConfigPath 允许在运行时覆盖配置文件路径，便于多环境部署或测试。
+func SetConfigPath(path string) {
+	if path != "" {
+		configPath = path
+	}
+}
 
 // Setup 初始化配置
 func Setup() {
+	path := configPath
+	if envPath := os.Getenv("APP_CONFIG_PATH"); envPath != "" {
+		path = envPath
+	}
+
 	cfg = &Config{}
-	if _, err := toml.DecodeFile("conf/app.toml", cfg); err != nil {
+	if _, err := toml.DecodeFile(path, cfg); err != nil {
 		log.Fatalf("setting.Setup, fail to parse 'conf/app.toml': %v", err)
 	}
 

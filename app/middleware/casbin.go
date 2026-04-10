@@ -2,15 +2,26 @@ package middleware
 
 import (
 	"fmt"
-	"gin-web-admin/utils"
-	"gin-web-admin/utils/casbin"
 	"net/http"
 
+	"gin-web-admin/utils"
+
+	"github.com/casbin/casbin/v3"
 	"github.com/gin-gonic/gin"
 )
 
-func CasbinHandler() gin.HandlerFunc {
+func CasbinHandler(enforcer *casbin.SyncedEnforcer) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if enforcer == nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"code": http.StatusInternalServerError,
+				"msg":  "casbin enforcer not initialized",
+				"data": gin.H{},
+			})
+			c.Abort()
+			return
+		}
+
 		claims, _ := c.Get("claims")
 		user := claims.(*utils.Claims)
 
@@ -20,9 +31,8 @@ func CasbinHandler() gin.HandlerFunc {
 		act := c.Request.Method
 
 		// 验证路由权限
-		check, _ := casbin.CasbinEnforcer.Enforce(roleKey, obj, act)
+		check, _ := enforcer.Enforce(roleKey, obj, act)
 		if !check {
-			//log.Println("权限没有通过")
 			c.JSON(http.StatusOK, gin.H{
 				"code": http.StatusUnauthorized,
 				"msg":  fmt.Sprintf("[%s]对应权限[%s]没有[%s]路由的[%s]权限", username, roleKey, obj, act),
@@ -33,6 +43,5 @@ func CasbinHandler() gin.HandlerFunc {
 		}
 
 		c.Next()
-		//log.Println(user, obj, act)
 	}
 }

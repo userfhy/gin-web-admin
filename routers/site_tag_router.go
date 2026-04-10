@@ -2,22 +2,17 @@ package routers
 
 import (
 	siteTagController "gin-web-admin/app/controllers/v1/site_tag"
-	"gin-web-admin/app/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InitSiteTagRouter(Router *gin.RouterGroup) {
-	siteTag := Router.Group("/site-tag").Use(
-		middleware.TranslationHandler(),
-		middleware.JWTHandler(),
-		middleware.CasbinHandler(),
-	)
+func InitSiteTagRouter(router *gin.RouterGroup, handler *siteTagController.Handler) {
+	siteTag := router.Group("/site-tag")
 	{
-		siteTag.GET("", siteTagController.GetSiteTagList)
-		siteTag.GET("/all", siteTagController.GetAllSiteTags)
-		siteTag.POST("", siteTagController.CreateSiteTag)
-		siteTag.PUT("/:id", siteTagController.UpdateSiteTag)
-		siteTag.DELETE("/:id", siteTagController.DeleteSiteTag)
+		siteTag.GET("", handler.GetSiteTagList)
+		siteTag.GET("/all", handler.GetAllSiteTags)
+		siteTag.POST("", handler.CreateSiteTag)
+		siteTag.PUT("/:id", handler.UpdateSiteTag)
+		siteTag.DELETE("/:id", handler.DeleteSiteTag)
 	}
 }

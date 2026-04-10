@@ -2,21 +2,16 @@ package routers
 
 import (
 	deptController "gin-web-admin/app/controllers/v1/dept"
-	"gin-web-admin/app/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InitDeptRouter(Router *gin.RouterGroup) {
-	dept := Router.Group("/dept").Use(
-		middleware.TranslationHandler(),
-		middleware.JWTHandler(),
-		middleware.CasbinHandler(),
-	)
+func InitDeptRouter(router *gin.RouterGroup, handler *deptController.Handler) {
+	dept := router.Group("/dept")
 	{
-		dept.GET("", deptController.GetDeptList)
-		dept.POST("", deptController.CreateDept)
-		dept.PUT("/:id", deptController.UpdateDept)
-		dept.DELETE("/:id", deptController.DeleteDept)
+		dept.GET("", handler.GetDeptList)
+		dept.POST("", handler.CreateDept)
+		dept.PUT("/:id", handler.UpdateDept)
+		dept.DELETE("/:id", handler.DeleteDept)
 	}
 }

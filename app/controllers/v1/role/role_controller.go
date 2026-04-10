@@ -13,6 +13,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Handler struct {
+	service *roleService.Service
+}
+
+func NewHandler(service *roleService.Service) *Handler {
+	if service == nil {
+		panic("role handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
 // @Summary		删除角色
 // @Description	删除角色
 // @Accept			json
@@ -23,14 +34,14 @@ import (
 // @Success		200		{object}	common.Response
 // @Failure		500		{object}	common.Response
 // @Router			/role/{role_id} [delete]
-func DeleteRole(c *gin.Context) {
+func (h *Handler) DeleteRole(c *gin.Context) {
 	appG := common.Gin{C: c}
 	roleId, err := com.StrTo(c.Param("role_id")).Uint()
 	if utils.HandleError(c, http.StatusBadRequest, http.StatusBadRequest, "参数绑定失败", err) {
 		return
 	}
 
-	deleteSuccessful := roleService.DeleteRole(roleId)
+	deleteSuccessful := h.service.DeleteRole(roleId)
 	if !deleteSuccessful {
 		appG.Response(http.StatusOK, code.UnknownError, code.GetMsg(code.UnknownError), nil)
 		return
@@ -50,7 +61,7 @@ func DeleteRole(c *gin.Context) {
 // @Success		200		{object}	common.Response
 // @Failure		500		{object}	common.Response
 // @Router			/role [post]
-func CreateRole(c *gin.Context) {
+func (h *Handler) CreateRole(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var createRole roleService.CreateRoleStruct
@@ -65,7 +76,7 @@ func CreateRole(c *gin.Context) {
 		return
 	}
 
-	err = roleService.CreateRole(createRole)
+	err = h.service.CreateRole(createRole)
 	if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "添加新角色失败！", err) {
 		return
 	}
@@ -84,7 +95,7 @@ func CreateRole(c *gin.Context) {
 // @Success		200		{object}	common.Response
 // @Failure		500		{object}	common.Response
 // @Router			/role/{role_id} [put]
-func UpdateRole(c *gin.Context) {
+func (h *Handler) UpdateRole(c *gin.Context) {
 	appG := common.Gin{C: c}
 	roleId := com.StrTo(c.Param("role_id")).MustInt()
 
@@ -95,7 +106,7 @@ func UpdateRole(c *gin.Context) {
 		return
 	}
 
-	changeSuccessful := roleService.UpdateRole(roleId, updateRole)
+	changeSuccessful := h.service.UpdateRole(roleId, updateRole)
 	if !changeSuccessful {
 		appG.Response(http.StatusOK, code.UnknownError, code.GetMsg(code.UnknownError), nil)
 		return
@@ -115,7 +126,7 @@ func UpdateRole(c *gin.Context) {
 // @Success		200	{object}	common.Response
 // @Failure		500	{object}	common.Response
 // @Router			/role [get]
-func GetRoles(c *gin.Context) {
+func (h *Handler) GetRoles(c *gin.Context) {
 	appG := common.Gin{C: c}
 	pg, err := utils.GetPagination(c)
 	if err != nil {

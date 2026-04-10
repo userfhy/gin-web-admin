@@ -1,23 +1,35 @@
 package reportController
 
 import (
+	"net/http"
+
 	reportService "gin-web-admin/app/service/v1/report"
 	"gin-web-admin/common"
 	"gin-web-admin/utils/code"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-//	@Summary		Report Information
-//	@Description	User Report Information
-//	@Accept			json
-//	@Produce		json
-//	@Tags			Report
-//	@Param			payload	body		reportService.ReportStruct	true	"上报信息"
-//	@Success		200		{object}	common.Response
-//	@Router			/report [post]
-func Report(c *gin.Context) {
+type Handler struct {
+	service *reportService.Service
+}
+
+func NewHandler(service *reportService.Service) *Handler {
+	if service == nil {
+		panic("report handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
+// @Summary		Report Information
+// @Description	User Report Information
+// @Accept			json
+// @Produce		json
+// @Tags			Report
+// @Param			payload	body		reportService.ReportStruct	true	"上报信息"
+// @Success		200		{object}	common.Response
+// @Router			/report [post]
+func (h *Handler) Report(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	// 绑定 payload 到结构体
@@ -35,7 +47,7 @@ func Report(c *gin.Context) {
 	}
 
 	// 是否存在
-	var count = reportService.GetReportUserCountByPhoneAndActivityID(report.Phone, report.ActivityId)
+	var count = h.service.GetReportUserCountByPhoneAndActivityID(report.Phone, report.ActivityId)
 	if count >= 1 {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, "已经存在数据，请勿重复报名！", nil)
 		return
@@ -46,7 +58,7 @@ func Report(c *gin.Context) {
 	}
 
 	// 信息入库
-	var reportResult = reportService.ReportInformation(report, c.ClientIP())
+	var reportResult = h.service.ReportInformation(report, c.ClientIP())
 
 	if reportResult.ID == 0 {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "录入失败，请稍后再试。", nil)

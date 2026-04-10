@@ -2,6 +2,7 @@ package casbinService
 
 import (
 	model "gin-web-admin/app/models"
+	"gin-web-admin/internal/data"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/logging"
 )
@@ -19,7 +20,32 @@ type AddCasbinStruct struct {
 	V2 string `json:"v2" form:"v2" validate:"required,min=2,max=8" minLength:"2" maxLength:"8"`   // method
 }
 
+type Service struct {
+	store *data.Store
+}
+
+var defaultService *Service
+
+func NewService(store *data.Store) *Service {
+	return &Service{store: store}
+}
+
+func SetDefaultService(s *Service) {
+	defaultService = s
+}
+
+func serviceInstance() *Service {
+	if defaultService == nil {
+		panic("casbin service not initialized")
+	}
+	return defaultService
+}
+
 func CreateCasbin(n AddCasbinStruct) error {
+	return serviceInstance().CreateCasbin(n)
+}
+
+func (s *Service) CreateCasbin(n AddCasbinStruct) error {
 	return model.CreatCasbin(model.CasbinRuleM{
 		Ptype: "p",
 		V0:    n.V0,
@@ -29,6 +55,10 @@ func CreateCasbin(n AddCasbinStruct) error {
 }
 
 func UpdateCasbin(id int, u AddCasbinStruct) bool {
+	return serviceInstance().UpdateCasbin(id, u)
+}
+
+func (s *Service) UpdateCasbin(id int, u AddCasbinStruct) bool {
 	wheres := make(map[string]any)
 	wheres["id ="] = id
 
@@ -62,14 +92,37 @@ func (c *CasbinStruct) getConditionMaps() map[string]any {
 }
 
 func (c *CasbinStruct) Count() (int64, error) {
-	return model.GetTotal(model.CasbinRuleM{}, c.getConditionMaps())
+	return serviceInstance().count(*c)
 }
 
 func (c *CasbinStruct) GetAll() ([]*model.CasbinRuleM, error) {
-	casbins, err := model.GetCasbinRuleList(c.Pagination, c.getConditionMaps())
+	return serviceInstance().getAll(*c)
+}
+
+func CountCasbinRules(query CasbinStruct) (int64, error) {
+	return serviceInstance().count(query)
+}
+
+func GetCasbinRuleList(query CasbinStruct) ([]*model.CasbinRuleM, error) {
+	return serviceInstance().getAll(query)
+}
+
+func (s *Service) count(query CasbinStruct) (int64, error) {
+	return model.GetTotal(model.CasbinRuleM{}, query.getConditionMaps())
+}
+
+func (s *Service) getAll(query CasbinStruct) ([]*model.CasbinRuleM, error) {
+	casbins, err := model.GetCasbinRuleList(query.Pagination, query.getConditionMaps())
 	if err != nil {
 		return nil, err
 	}
-
 	return casbins, nil
+}
+
+func (s *Service) CountCasbinRules(query CasbinStruct) (int64, error) {
+	return s.count(query)
+}
+
+func (s *Service) GetCasbinRuleList(query CasbinStruct) ([]*model.CasbinRuleM, error) {
+	return s.getAll(query)
 }

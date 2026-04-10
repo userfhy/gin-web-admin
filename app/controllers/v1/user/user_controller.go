@@ -12,6 +12,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Handler struct {
+	service *userService.Service
+}
+
+func NewHandler(service *userService.Service) *Handler {
+	if service == nil {
+		panic("user handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
 // @Summary		创建用户
 // @Description	创建新用户
 // @Accept			json
@@ -22,7 +33,7 @@ import (
 // @Success		200		{object}	common.Response
 // @Failure		500		{object}	common.Response
 // @Router			/user [post]
-func CreateUser(c *gin.Context) {
+func (h *Handler) CreateUser(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var newUser userService.AddUserStruct
@@ -36,7 +47,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	err = userService.CreateUser(newUser)
+	err = h.service.CreateUser(newUser)
 	if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "添加新用户失败！", err) {
 		return
 	}
@@ -55,7 +66,7 @@ func CreateUser(c *gin.Context) {
 // @Success		200	{object}	common.Response
 // @Failure		500	{object}	common.Response
 // @Router			/user [get]
-func GetUsers(c *gin.Context) {
+func (h *Handler) GetUsers(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	pg, err := utils.GetPagination(c)

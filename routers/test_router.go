@@ -2,24 +2,18 @@ package routers
 
 import (
 	indexController "gin-web-admin/app/controllers/v1/index"
-	"gin-web-admin/app/middleware"
-	"gin-web-admin/common/sse"
-	"gin-web-admin/utils/system_monitor"
 	"gin-web-admin/views"
 	"text/template"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InitTestRouter(Router *gin.RouterGroup) {
-	test := Router.Group("/test").Use(
-		middleware.TranslationHandler(),
-	)
+func InitTestRouter(router *gin.RouterGroup, handler *indexController.Handler) {
+	test := router.Group("/test")
 	{
-		test.POST("/ping", indexController.Ping)
-		test.GET("/ping", indexController.Ping)
-		test.GET("/font", indexController.Test)
+		test.POST("/ping", handler.Ping)
+		test.GET("/ping", handler.Ping)
+		test.GET("/font", handler.Test)
 
 		// 修改SSE HTML模板加载方式
 		test.GET("/sse", func(c *gin.Context) {
@@ -32,32 +26,14 @@ func InitTestRouter(Router *gin.RouterGroup) {
 		})
 
 		//注册SSE路由
-		test.GET("/events", indexController.SSEService.Handler())
+		test.GET("/events", handler.Stream())
 
-		// 启动系统监控广播
-		go func() {
-			ticker := time.NewTicker(5 * time.Second)
-			for range ticker.C {
-				// 获取系统参数
-				stats, err := system_monitor.GetSystemStats()
-				if err != nil {
-					panic(err)
-				}
+		handler.StartSystemMonitorBroadcast()
 
-				indexController.SSEService.Broadcast(sse.Message{
-					Event: "system_status",
-					Data: gin.H{
-						"systemStats": stats.String(),
-						"clients":     indexController.SSEService.ClientCount(),
-					},
-				})
-			}
-		}()
-
-		test.POST("/send", indexController.SendStream)
+		test.POST("/send", handler.SendStream)
 
 		// 获取客户端数量
-		test.GET("/count", indexController.SSEClientCount)
+		test.GET("/count", handler.SSEClientCount)
 
 	}
 }

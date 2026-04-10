@@ -11,13 +11,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Handler struct {
+	service *deptService.Service
+}
+
+func NewHandler(service *deptService.Service) *Handler {
+	if service == nil {
+		panic("dept handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
 // GET /dept?tree=1
-func GetDeptList(c *gin.Context) {
+func (h *Handler) GetDeptList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	tree := c.DefaultQuery("tree", "")
 	if tree == "1" {
-		data, err := deptService.GetDeptTree()
+		data, err := h.service.GetDeptTree()
 		if utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "获取部门树失败", err) {
 			return
 		}
@@ -25,7 +36,7 @@ func GetDeptList(c *gin.Context) {
 		return
 	}
 
-	data, err := deptService.GetDeptList()
+	data, err := h.service.GetDeptList()
 	if utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "获取部门列表失败", err) {
 		return
 	}
@@ -33,14 +44,14 @@ func GetDeptList(c *gin.Context) {
 }
 
 // POST /dept
-func CreateDept(c *gin.Context) {
+func (h *Handler) CreateDept(c *gin.Context) {
 	appG := common.Gin{C: c}
 	var payload deptService.CreateDeptStruct
 	if err := c.ShouldBindJSON(&payload); utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, "参数绑定失败", err) {
 		return
 	}
 
-	err := deptService.CreateDept(payload)
+	err := h.service.CreateDept(payload)
 	if utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "创建部门失败", err) {
 		return
 	}
@@ -49,7 +60,7 @@ func CreateDept(c *gin.Context) {
 }
 
 // PUT /dept/:id
-func UpdateDept(c *gin.Context) {
+func (h *Handler) UpdateDept(c *gin.Context) {
 	appG := common.Gin{C: c}
 	id := com.StrTo(c.Param("id")).MustInt()
 
@@ -58,7 +69,7 @@ func UpdateDept(c *gin.Context) {
 		return
 	}
 
-	err := deptService.UpdateDept(id, payload)
+	err := h.service.UpdateDept(id, payload)
 	if utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "更新部门失败", err) {
 		return
 	}
@@ -67,11 +78,11 @@ func UpdateDept(c *gin.Context) {
 }
 
 // DELETE /dept/:id
-func DeleteDept(c *gin.Context) {
+func (h *Handler) DeleteDept(c *gin.Context) {
 	appG := common.Gin{C: c}
 	id := com.StrTo(c.Param("id")).MustInt()
 
-	err := deptService.DeleteDept(id)
+	err := h.service.DeleteDept(id)
 	if err != nil {
 		// 子部门存在：禁止删除
 		if err.Error() == "has child dept" {

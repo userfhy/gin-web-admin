@@ -1,13 +1,14 @@
 package authController
 
 import (
-	model "gin-web-admin/app/models"
+	"errors"
+	"net/http"
+
+	authService "gin-web-admin/app/service/v1/auth"
 	userService "gin-web-admin/app/service/v1/user"
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
-	"net/http"
-
 	"gin-web-admin/utils/logging"
 
 	"github.com/gin-gonic/gin"
@@ -15,15 +16,26 @@ import (
 
 var ExpireTimeFormat = "2006/01/02 15:04:05"
 
-//	@Summary		User Login
-//	@Description	用户登录
-//	@Accept			json
-//	@Produce		json
-//	@Tags			Auth
-//	@Param			payload	body		userService.AuthStruct	true	"user login"
-//	@Success		200		{object}	common.Response
-//	@Router			/login [post]
-func UserLogin(c *gin.Context) {
+type Handler struct {
+	service *authService.Service
+}
+
+func NewHandler(service *authService.Service) *Handler {
+	if service == nil {
+		panic("auth handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
+// @Summary		User Login
+// @Description	用户登录
+// @Accept			json
+// @Produce		json
+// @Tags			Auth
+// @Param			payload	body		userService.AuthStruct	true	"user login"
+// @Success		200		{object}	common.Response
+// @Router			/login [post]
+func (h *Handler) UserLogin(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	// 绑定 payload 到结构体
@@ -39,69 +51,42 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	data := make(map[string]any)
-	RCode := code.InvalidParams
-	isExist, userId, roleKey, isAdmin, status := model.CheckAuth(userLogin.Username, userLogin.Password)
-
-	if !isExist {
-		RCode = code.ErrorUserPasswordInvalid
-		appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), data)
+	result, err := h.service.Login(userLogin)
+	if err != nil {
+		switch {
+		case errors.Is(err, authService.ErrInvalidCredentials):
+			appG.Response(http.StatusOK, code.ErrorUserPasswordInvalid, code.GetMsg(code.ErrorUserPasswordInvalid), nil)
+		case errors.Is(err, authService.ErrUserDisabled):
+			appG.Response(http.StatusOK, code.ErrorAuth, "该用户已被禁用", nil)
+		default:
+			utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "登录失败", err)
+		}
 		return
 	}
 
-	if status == 0 {
-		appG.Response(http.StatusOK, code.ErrorAuth, "该用户已被禁用", data)
-		return
+	data := map[string]any{
+		"accessToken":  result.AccessToken,
+		"token":        result.AccessToken,
+		"refreshToken": result.RefreshToken,
+		"username":     result.Username,
+		"nickname":     result.Username,
+		"roles":        [1]string{result.RoleKey},
+		"expires":      result.ExpiresAt.Format(ExpireTimeFormat),
 	}
 
-	username := userLogin.Username
-	claims := utils.Claims{
-		UserId:   userId,
-		Username: username,
-		RoleKey:  roleKey,
-		IsAdmin:  isAdmin,
-	}
-
-	accessToken, expireTime, err := utils.GenerateToken(claims)
-	if utils.HandleError(c, http.StatusOK, code.AccessTokenFailure, code.GetMsg(code.AccessTokenFailure), err) {
-		logging.Println("Error generating access token: ", err)
-		return
-	}
-
-	// Implement and assign refresh token
-	refreshToken, _, refreshErr := utils.GenerateRefreshToken(claims)
-	if utils.HandleError(c, http.StatusOK, code.RefreshAccessTokenFailure, code.GetMsg(code.RefreshAccessTokenFailure), refreshErr) {
-		logging.Println("Error generating refresh token: ", refreshErr)
-		return
-	}
-
-	// Set the logged-in user information
-	userService.SetLoggedUserInfo(userId, refreshToken)
-	// logging.Println(errs)
-
-	// Prepare the response data
-	data["accessToken"] = accessToken
-	data["token"] = accessToken
-	data["refreshToken"] = refreshToken
-	data["username"] = username
-	data["nickname"] = username
-	data["roles"] = [1]string{roleKey}
-	data["expires"] = expireTime.Format(ExpireTimeFormat)
-
-	RCode = code.SUCCESS
-	appG.Response(http.StatusOK, RCode, "用户登录成功", data)
+	appG.Response(http.StatusOK, code.SUCCESS, "用户登录成功", data)
 }
 
-//	@Summary		Auth RefreshAccessToken
-//	@Description	刷新用户access_token
-//	@Accept			json
-//	@Produce		json
-//	@Security		ApiKeyAuth
-//	@Tags			Auth
-//	@Param			payload	body		userService.RefreshAccessTokenStruct	true	"根据refresh_token 刷新access_token"
-//	@Success		200		{object}	common.Response
-//	@Router			/refresh_token [post]
-func RefreshAccessToken(c *gin.Context) {
+// @Summary		Auth RefreshAccessToken
+// @Description	刷新用户access_token
+// @Accept			json
+// @Produce		json
+// @Security		ApiKeyAuth
+// @Tags			Auth
+// @Param			payload	body		userService.RefreshAccessTokenStruct	true	"根据refresh_token 刷新access_token"
+// @Success		200		{object}	common.Response
+// @Router			/refresh_token [post]
+func (h *Handler) RefreshAccessToken(c *gin.Context) {
 	appG := common.Gin{C: c}
 	var refreshAccessTokenhStruct userService.RefreshAccessTokenStruct
 	if err := c.ShouldBindJSON(&refreshAccessTokenhStruct); err != nil {
@@ -109,7 +94,7 @@ func RefreshAccessToken(c *gin.Context) {
 		return
 	}
 
-	data, err := userService.RefreshAccessToken(refreshAccessTokenhStruct.RefreshToken)
+	data, err := h.service.RefreshAccessToken(refreshAccessTokenhStruct.RefreshToken)
 	if utils.HandleError(c, http.StatusOK, code.ErrorAuthToken, "access_token刷新失败", err) {
 		logging.Println("Error token: ", err)
 		return
@@ -118,33 +103,36 @@ func RefreshAccessToken(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "刷新access_token成功！", data)
 }
 
-//	@Summary		User Logout
-//	@Description	用户登出
-//	@Accept			json
-//	@Produce		json
-//	@Security		ApiKeyAuth
-//	@Tags			User
-//	@Success		200	{object}	common.Response
-//	@Router			/user/logout [post]
-func UserLogout(c *gin.Context) {
+// @Summary		User Logout
+// @Description	用户登出
+// @Accept			json
+// @Produce		json
+// @Security		ApiKeyAuth
+// @Tags			User
+// @Success		200	{object}	common.Response
+// @Router			/user/logout [post]
+func (h *Handler) UserLogout(c *gin.Context) {
 	appG := common.Gin{C: c}
 	claims, _ := c.Get("claims")
 	user := claims.(*utils.Claims)
 
-	userService.JoinBlockList(user.UserId, c.GetHeader("Authorization")[7:])
+	token := c.GetHeader("Authorization")
+	if len(token) > 7 {
+		h.service.Logout(user.UserId, token[7:])
+	}
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", nil)
 }
 
-//	@Summary		修改密码
-//	@Description	密码修改
-//	@Accept			json
-//	@Produce		json
-//	@Security		ApiKeyAuth
-//	@Tags			User
-//	@Param			payload	body		userService.ChangePasswordStruct	true	"user change password"
-//	@Success		200		{object}	common.Response
-//	@Router			/user/change_password [put]
-func ChangePassword(c *gin.Context) {
+// @Summary		修改密码
+// @Description	密码修改
+// @Accept			json
+// @Produce		json
+// @Security		ApiKeyAuth
+// @Tags			User
+// @Param			payload	body		userService.ChangePasswordStruct	true	"user change password"
+// @Success		200		{object}	common.Response
+// @Router			/user/change_password [put]
+func (h *Handler) ChangePassword(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var userChangePassword userService.ChangePasswordStruct
@@ -163,50 +151,39 @@ func ChangePassword(c *gin.Context) {
 	claims, _ := c.Get("claims")
 	user := claims.(*utils.Claims)
 
-	isExist, userId, _, _, status := model.CheckAuth(user.Username, userChangePassword.OldPassword)
-	if !isExist {
-		RCode := code.ErrorUserOldPasswordInvalid
-		appG.Response(http.StatusOK, RCode, code.GetMsg(RCode), nil)
+	if err := h.service.ChangePassword(user.Username, userChangePassword); err != nil {
+		switch {
+		case errors.Is(err, authService.ErrInvalidCredentials):
+			appG.Response(http.StatusOK, code.ErrorUserOldPasswordInvalid, code.GetMsg(code.ErrorUserOldPasswordInvalid), nil)
+		case errors.Is(err, authService.ErrUserDisabled):
+			appG.Response(http.StatusOK, code.ErrorAuth, "该用户已被禁用", nil)
+		default:
+			appG.Response(http.StatusOK, code.UnknownError, code.GetMsg(code.UnknownError), nil)
+		}
 		return
 	}
 
-	if status == 0 {
-		appG.Response(http.StatusOK, code.ErrorAuth, "该用户已被禁用", nil)
-		return
+	token := c.GetHeader("Authorization")
+	if len(token) > 7 {
+		h.service.Logout(user.UserId, token[7:])
 	}
-
-	passwordChangeSuccessful := userService.ChangeUserPassword(userId, userChangePassword.NewPassword)
-	if !passwordChangeSuccessful {
-		appG.Response(http.StatusOK, code.UnknownError, code.GetMsg(code.UnknownError), nil)
-		return
-	}
-
-	userService.JoinBlockList(user.UserId, c.GetHeader("Authorization")[7:])
 	appG.Response(http.StatusOK, code.SUCCESS, code.GetMsg(code.SUCCESS), nil)
 }
 
-//	@Summary		当前登录用户信息
-//	@Description	当前登录用户信息
-//	@Accept			json
-//	@Produce		json
-//	@Security		ApiKeyAuth
-//	@Tags			User
-//	@Success		200	{object}	common.Response
-//	@Router			/user/logged_in [get]
-func GetLoggedInUser(c *gin.Context) {
+// @Summary		当前登录用户信息
+// @Description	当前登录用户信息
+// @Accept			json
+// @Produce		json
+// @Security		ApiKeyAuth
+// @Tags			User
+// @Success		200	{object}	common.Response
+// @Router			/user/logged_in [get]
+func (h *Handler) GetLoggedInUser(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	claims, _ := c.Get("claims")
 	user := claims.(*utils.Claims)
 
-	data := make(map[string]any, 0)
-	data["user_id"] = user.UserId
-	data["username"] = user.Username
-	data["roles"] = [...]string{user.RoleKey}
-	data["permissions"] = [...]string{""}
-	if user.IsAdmin {
-		data["permissions"] = [...]string{"*:*:*"}
-	}
-	//data["permissions"] = [...]string{"system:sysmenu:add"}
+	data := h.service.BuildLoggedInUserData(user)
 	appG.Response(http.StatusOK, code.SUCCESS, "当前登录用户信息", data)
 }

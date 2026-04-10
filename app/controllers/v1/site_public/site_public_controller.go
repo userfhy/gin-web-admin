@@ -12,9 +12,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetPublicCategories(c *gin.Context) {
+type Handler struct {
+	service *sitePublicService.Service
+}
+
+func NewHandler(service *sitePublicService.Service) *Handler {
+	if service == nil {
+		panic("site_public handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
+func (h *Handler) GetPublicCategories(c *gin.Context) {
 	appG := common.Gin{C: c}
-	list, err := sitePublicService.GetPublicCategories()
+	list, err := h.service.GetPublicCategories()
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "获取分类失败", nil)
 		return
@@ -22,9 +33,9 @@ func GetPublicCategories(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", list)
 }
 
-func GetPublicTags(c *gin.Context) {
+func (h *Handler) GetPublicTags(c *gin.Context) {
 	appG := common.Gin{C: c}
-	list, err := sitePublicService.GetPublicTags()
+	list, err := h.service.GetPublicTags()
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "获取标签失败", nil)
 		return
@@ -32,7 +43,7 @@ func GetPublicTags(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", list)
 }
 
-func GetPublicContentList(c *gin.Context) {
+func (h *Handler) GetPublicContentList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	pg, err := utils.GetPagination(c, utils.WithMaxPageSize(100))
@@ -41,7 +52,7 @@ func GetPublicContentList(c *gin.Context) {
 		return
 	}
 
-	data, err := sitePublicService.GetPublicContentList(sitePublicService.PublicContentQuery{
+	data, err := h.service.GetPublicContentList(sitePublicService.PublicContentQuery{
 		Pagination:   pg.Clone(),
 		Keyword:      c.Query("keyword"),
 		CategorySlug: c.Query("categorySlug"),
@@ -54,14 +65,14 @@ func GetPublicContentList(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
 }
 
-func GetPublicContentDetail(c *gin.Context) {
+func (h *Handler) GetPublicContentDetail(c *gin.Context) {
 	appG := common.Gin{C: c}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id <= 0 {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, "id 参数无效", nil)
 		return
 	}
-	data, err := sitePublicService.GetPublicContentDetailByID(id)
+	data, err := h.service.GetPublicContentDetailByID(id)
 	if err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
@@ -73,9 +84,9 @@ func GetPublicContentDetail(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
 }
 
-func GetPublicContentDetailBySlug(c *gin.Context) {
+func (h *Handler) GetPublicContentDetailBySlug(c *gin.Context) {
 	appG := common.Gin{C: c}
-	data, err := sitePublicService.GetPublicContentDetailBySlug(c.Param("slug"))
+	data, err := h.service.GetPublicContentDetailBySlug(c.Param("slug"))
 	if err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return

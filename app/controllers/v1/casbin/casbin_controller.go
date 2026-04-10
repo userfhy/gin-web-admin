@@ -1,16 +1,28 @@
 package casbinController
 
 import (
+	"net/http"
+
 	casbinService "gin-web-admin/app/service/v1/casbin"
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/casbin"
 	"gin-web-admin/utils/code"
 	"gin-web-admin/utils/com"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+type Handler struct {
+	service *casbinService.Service
+}
+
+func NewHandler(service *casbinService.Service) *Handler {
+	if service == nil {
+		panic("casbin handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
 
 // @Summary		创建规则
 // @Description	创建规则
@@ -22,7 +34,7 @@ import (
 // @Success		200		{object}	common.Response
 // @Failure		500		{object}	common.Response
 // @Router			/casbin [post]
-func CreateCasbin(c *gin.Context) {
+func (h *Handler) CreateCasbin(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var newCasbin casbinService.AddCasbinStruct
@@ -36,7 +48,7 @@ func CreateCasbin(c *gin.Context) {
 		return
 	}
 
-	err = casbinService.CreateCasbin(newCasbin)
+	err = h.service.CreateCasbin(newCasbin)
 	if utils.HandleError(c, http.StatusInternalServerError, http.StatusInternalServerError, "Path添加失败！", err) {
 		return
 	}
@@ -59,7 +71,7 @@ func CreateCasbin(c *gin.Context) {
 // @Success		200		{object}	common.Response
 // @Failure		500		{object}	common.Response
 // @Router			/casbin/{id} [put]
-func UpdateCasbin(c *gin.Context) {
+func (h *Handler) UpdateCasbin(c *gin.Context) {
 	appG := common.Gin{C: c}
 	id := com.StrTo(c.Param("id")).MustInt()
 
@@ -70,7 +82,7 @@ func UpdateCasbin(c *gin.Context) {
 		return
 	}
 
-	changeSuccessful := casbinService.UpdateCasbin(id, update)
+	changeSuccessful := h.service.UpdateCasbin(id, update)
 	if !changeSuccessful {
 		appG.Response(http.StatusOK, code.UnknownError, code.GetMsg(code.UnknownError), nil)
 		return
@@ -93,7 +105,7 @@ func UpdateCasbin(c *gin.Context) {
 // @Success		200		{object}	common.Response
 // @Failure		500		{object}	common.Response
 // @Router			/casbin/{id} [delete]
-func DeleteCasbin(c *gin.Context) {
+func (h *Handler) DeleteCasbin(c *gin.Context) {
 	appG := common.Gin{C: c}
 	//id := com.StrTo(c.Param("id")).MustInt()
 
@@ -122,7 +134,7 @@ func DeleteCasbin(c *gin.Context) {
 // @Success		200			{object}	common.Response
 // @Failure		500			{object}	common.Response
 // @Router			/casbin [get]
-func GetCasbinList(c *gin.Context) {
+func (h *Handler) GetCasbinList(c *gin.Context) {
 	appG := common.Gin{C: c}
 	groupBy := c.DefaultQuery("group_by", "")
 	pg, err := utils.GetPagination(c)
@@ -131,19 +143,19 @@ func GetCasbinList(c *gin.Context) {
 		return
 	}
 
-	casbinServiceObj := casbinService.CasbinStruct{
+	query := casbinService.CasbinStruct{
 		Pagination: pg.Clone(),
 		V0:         c.DefaultQuery("role", ""),
 		V1:         c.DefaultQuery("path", ""),
 		V2:         c.DefaultQuery("method", ""),
 	}
 
-	total, err := casbinServiceObj.Count()
+	total, err := h.service.CountCasbinRules(query)
 	if utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "获取页数失败", err) {
 		return
 	}
 
-	arr, err := casbinServiceObj.GetAll()
+	arr, err := h.service.GetCasbinRuleList(query)
 	if utils.HandleError(c, http.StatusInternalServerError, code.ERROR, "服务器错误", err) {
 		return
 	}

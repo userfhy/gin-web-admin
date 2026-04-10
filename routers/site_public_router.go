@@ -6,13 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitSitePublicRouter(Router *gin.RouterGroup) {
+func InitSitePublicRouter(Router *gin.RouterGroup, handler *sitePublicController.Handler) {
 	site := Router.Group("/site/public")
 	{
-		site.GET("/categories", sitePublicController.GetPublicCategories)
-		site.GET("/tags", sitePublicController.GetPublicTags)
-		site.GET("/contents", sitePublicController.GetPublicContentList)
-		site.GET("/contents/:id", sitePublicController.GetPublicContentDetail)
-		site.GET("/contents/slug/:slug", sitePublicController.GetPublicContentDetailBySlug)
+		site.GET("/categories", handler.GetPublicCategories)
+		site.GET("/tags", handler.GetPublicTags)
+		site.GET("/contents", handler.GetPublicContentList)
+		site.GET("/contents/:id", handler.GetPublicContentDetail)
+		site.GET("/contents/slug/:slug", handler.GetPublicContentDetailBySlug)
 	}
 }

@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	model "gin-web-admin/app/models"
+	sitePublicService "gin-web-admin/app/service/v1/site_public"
+	"gin-web-admin/internal/data"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/security"
 )
@@ -46,7 +48,32 @@ type UpdateSiteCategoryStruct struct {
 	Sort        int    `json:"sort"`
 }
 
+type Service struct {
+	store *data.Store
+}
+
+var defaultService *Service
+
+func NewService(store *data.Store) *Service {
+	return &Service{store: store}
+}
+
+func SetDefaultService(s *Service) {
+	defaultService = s
+}
+
+func serviceInstance() *Service {
+	if defaultService == nil {
+		panic("site category service not initialized")
+	}
+	return defaultService
+}
+
 func GetSiteCategoryList(query SiteCategoryQuery) (utils.PageResult, error) {
+	return serviceInstance().GetSiteCategoryList(query)
+}
+
+func (s *Service) GetSiteCategoryList(query SiteCategoryQuery) (utils.PageResult, error) {
 	list, total, err := model.GetSiteCategoryList(query.Pagination, query.Keyword, query.Status)
 	if err != nil {
 		return utils.PageResult{}, err
@@ -77,10 +104,18 @@ func GetSiteCategoryList(query SiteCategoryQuery) (utils.PageResult, error) {
 }
 
 func GetAllSiteCategories(status *int) ([]*model.SiteCategory, error) {
+	return serviceInstance().GetAllSiteCategories(status)
+}
+
+func (s *Service) GetAllSiteCategories(status *int) ([]*model.SiteCategory, error) {
 	return model.GetAllSiteCategories(status)
 }
 
 func CreateSiteCategory(payload CreateSiteCategoryStruct) error {
+	return serviceInstance().CreateSiteCategory(payload)
+}
+
+func (s *Service) CreateSiteCategory(payload CreateSiteCategoryStruct) error {
 	name := security.SanitizePlainText(payload.Name, 100)
 	slug := normalizeSlug(payload.Slug)
 	if name == "" {
@@ -98,16 +133,25 @@ func CreateSiteCategory(payload CreateSiteCategoryStruct) error {
 		return fmt.Errorf("slug already exists")
 	}
 
-	return model.CreateSiteCategory(model.SiteCategory{
+	if err := model.CreateSiteCategory(model.SiteCategory{
 		Name:        name,
 		Slug:        slug,
 		Description: security.SanitizePlainText(payload.Description, 500),
 		Status:      payload.Status,
 		Sort:        payload.Sort,
-	})
+	}); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicCategories()
+	sitePublicService.InvalidatePublicContent(0, "")
+	return nil
 }
 
 func UpdateSiteCategory(id int, payload UpdateSiteCategoryStruct) error {
+	return serviceInstance().UpdateSiteCategory(id, payload)
+}
+
+func (s *Service) UpdateSiteCategory(id int, payload UpdateSiteCategoryStruct) error {
 	name := security.SanitizePlainText(payload.Name, 100)
 	slug := normalizeSlug(payload.Slug)
 	if name == "" {
@@ -132,10 +176,19 @@ func UpdateSiteCategory(id int, payload UpdateSiteCategoryStruct) error {
 		"status":      payload.Status,
 		"sort":        payload.Sort,
 	}
-	return model.UpdateSiteCategory(id, data)
+	if err := model.UpdateSiteCategory(id, data); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicCategories()
+	sitePublicService.InvalidatePublicContent(0, "")
+	return nil
 }
 
 func DeleteSiteCategory(id int) error {
+	return serviceInstance().DeleteSiteCategory(id)
+}
+
+func (s *Service) DeleteSiteCategory(id int) error {
 	inUse, err := model.IsSiteCategoryInUse(id)
 	if err != nil {
 		return err
@@ -143,7 +196,12 @@ func DeleteSiteCategory(id int) error {
 	if inUse {
 		return fmt.Errorf("category in use")
 	}
-	return model.DeleteSiteCategory(id)
+	if err := model.DeleteSiteCategory(id); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicCategories()
+	sitePublicService.InvalidatePublicContent(0, "")
+	return nil
 }
 
 func validateSlug(slug string) error {

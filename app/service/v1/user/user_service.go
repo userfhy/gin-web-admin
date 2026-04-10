@@ -6,8 +6,10 @@ import (
 	"time"
 
 	model "gin-web-admin/app/models"
+	"gin-web-admin/internal/data"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
+	"gin-web-admin/utils/gredis"
 	"gin-web-admin/utils/logging"
 )
 
@@ -73,8 +75,45 @@ func (u *UserStruct) getConditionMaps() map[string]any {
 	return maps
 }
 
-// SetLoggedUserInfo 设置登录用户信息
-func SetLoggedUserInfo(userId uint, refreshToken string) error {
+type Service struct {
+	store *data.Store
+}
+
+const (
+	jwtBlacklistKeyPrefix = "jwt:blacklist:"
+	defaultBlacklistTTL   = 24 * time.Hour
+)
+
+var defaultService *Service
+
+func NewService(store *data.Store) *Service {
+	return &Service{store: store}
+}
+
+func SetDefaultService(service *Service) {
+	defaultService = service
+}
+
+func serviceInstance() *Service {
+	if defaultService == nil {
+		panic("user service not initialized")
+	}
+	return defaultService
+}
+
+// SetLoggedUserInfo 设置登录用户信息，返回旧的 refresh_token 便于失效处理
+func SetLoggedUserInfo(userId uint, refreshToken string) (string, error) {
+	return serviceInstance().SetLoggedUserInfo(userId, refreshToken)
+}
+
+func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string) (string, error) {
+	var (
+		oldRefresh = ""
+	)
+	if user, err := model.GetUser(map[string]any{"id": userId}); err == nil && user != nil {
+		oldRefresh = user.RefreshToken
+	}
+
 	wheres := map[string]any{
 		"id =": userId,
 	}
@@ -86,22 +125,26 @@ func SetLoggedUserInfo(userId uint, refreshToken string) error {
 
 	err, rowsAffected := model.Update(&model.Auth{}, wheres, updates)
 	if err != nil {
-		return fmt.Errorf("更新用户登录信息失败: %w", err)
+		return "", fmt.Errorf("更新用户登录信息失败: %w", err)
 	}
 	if rowsAffected == 0 {
-		return fmt.Errorf("未找到要更新的用户信息")
+		return "", fmt.Errorf("未找到要更新的用户信息")
 	}
-	return nil
+	return oldRefresh, nil
 }
 
-func RefreshAccessToken(RefreshToken string) (map[string]any, error) {
+func RefreshAccessToken(refreshToken string) (map[string]any, error) {
+	return serviceInstance().RefreshAccessToken(refreshToken)
+}
+
+func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error) {
 	data := make(map[string]any)
-	_, err := utils.ValidateToken(RefreshToken)
+	_, err := utils.ValidateToken(refreshToken)
 	if err != nil {
 		return data, err
 	}
 	// 判断 token 是否正确
-	user, _ := model.GetUser(map[string]any{"refresh_token": RefreshToken})
+	user, _ := model.GetUser(map[string]any{"refresh_token": refreshToken})
 	if user.ID == 0 {
 		return data, fmt.Errorf("该access_token对应的用户信息不存在")
 	}
@@ -126,6 +169,10 @@ func RefreshAccessToken(RefreshToken string) (map[string]any, error) {
 }
 
 func ChangeUserPassword(userId uint, newPassword string) bool {
+	return serviceInstance().ChangeUserPassword(userId, newPassword)
+}
+
+func (s *Service) ChangeUserPassword(userId uint, newPassword string) bool {
 	wheres := make(map[string]any)
 	wheres["id ="] = userId
 
@@ -136,21 +183,81 @@ func ChangeUserPassword(userId uint, newPassword string) bool {
 		logging.Println("修改用户密码失败！")
 		return false
 	}
+
 	return true
 }
 
 func JoinBlockList(userId uint, jwt string) {
+	serviceInstance().JoinBlockList(userId, jwt)
+}
+
+func (s *Service) JoinBlockList(userId uint, jwt string) {
+	if jwt == "" {
+		return
+	}
+	if err := s.cacheJWTBlacklist(userId, jwt); err != nil {
+		logging.Warnf("write jwt blacklist redis failed: %v", err)
+	}
 	_ = model.CreateBlockList(userId, jwt)
-	_, _ = model.Update(model.Auth{}, map[string]any{"id =": userId}, map[string]any{"refresh_token": userId})
+	_, _ = model.Update(model.Auth{}, map[string]any{"id =": userId}, map[string]any{"refresh_token": ""})
 }
 
 func InBlockList(jwt string) (int64, error) {
+	return serviceInstance().InBlockList(jwt)
+}
+
+func (s *Service) InBlockList(jwt string) (int64, error) {
+	if jwt == "" {
+		return 0, nil
+	}
+	ok, err := s.redisJWTBlocked(jwt)
+	if err != nil {
+		logging.Warnf("check jwt blacklist redis failed: %v", err)
+	} else if ok {
+		return 1, nil
+	} else if err == nil {
+		// redis 确认不存在，无需访问数据库
+		return 0, nil
+	}
+
 	wheres := make(map[string]any)
 	wheres["jwt ="] = jwt
 	return model.GetTotal(model.JwtBlacklist{}, wheres)
 }
 
+func (s *Service) cacheJWTBlacklist(userId uint, jwt string) error {
+	ttl := blacklistTTL(jwt)
+	if ttl <= 0 {
+		ttl = defaultBlacklistTTL
+	}
+	return gredis.SetWithTTL(jwtBlacklistKey(jwt), fmt.Sprintf("%d", userId), ttl)
+}
+
+func (s *Service) redisJWTBlocked(jwt string) (bool, error) {
+	return gredis.ExistsKey(jwtBlacklistKey(jwt))
+}
+
+func jwtBlacklistKey(jwt string) string {
+	return jwtBlacklistKeyPrefix + jwt
+}
+
+func blacklistTTL(jwt string) time.Duration {
+	claims, err := utils.ParseToken(jwt)
+	if err != nil || claims == nil || claims.ExpiresAt == nil {
+		return defaultBlacklistTTL
+	}
+	ttl := time.Until(claims.ExpiresAt.Time)
+	if ttl <= 0 {
+		return time.Minute
+	}
+	return ttl
+}
+
 func CreateUser(newUser AddUserStruct) error {
+	return serviceInstance().CreateUser(newUser)
+}
+
+func (s *Service) CreateUser(newUser AddUserStruct) error {
 	return model.CreatUser(model.Auth{
 		Username: strings.TrimSpace(newUser.Username),
 		Password: utils.EncodeUserPassword(newUser.Password),

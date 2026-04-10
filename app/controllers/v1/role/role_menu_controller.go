@@ -12,7 +12,7 @@ import (
 )
 
 // GET /role/:role_id/menu_ids
-func GetRoleMenuIds(c *gin.Context) {
+func (h *Handler) GetRoleMenuIds(c *gin.Context) {
 	appG := common.Gin{C: c}
 	roleId, err := com.StrTo(c.Param("role_id")).Uint()
 	if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, "参数绑定失败", err) {
@@ -28,7 +28,7 @@ func GetRoleMenuIds(c *gin.Context) {
 }
 
 // PUT /role/:role_id/menu_ids
-func SaveRoleMenuIds(c *gin.Context) {
+func (h *Handler) SaveRoleMenuIds(c *gin.Context) {
 	appG := common.Gin{C: c}
 	roleId, err := com.StrTo(c.Param("role_id")).Uint()
 	if utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, "参数绑定失败", err) {

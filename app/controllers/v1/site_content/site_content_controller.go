@@ -13,7 +13,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetSiteContentList(c *gin.Context) {
+type Handler struct {
+	service *siteContentService.Service
+}
+
+func NewHandler(service *siteContentService.Service) *Handler {
+	if service == nil {
+		panic("site content handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
+
+func (h *Handler) GetSiteContentList(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	pg, err := utils.GetPagination(c, utils.WithMaxPageSize(100))
@@ -48,7 +59,7 @@ func GetSiteContentList(c *gin.Context) {
 		tagID = &val
 	}
 
-	result, err := siteContentService.GetSiteContentList(siteContentService.SiteContentQuery{
+	result, err := h.service.GetSiteContentList(siteContentService.SiteContentQuery{
 		Pagination: pg.Clone(),
 		Keyword:    c.Query("keyword"),
 		Status:     status,
@@ -63,7 +74,7 @@ func GetSiteContentList(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", result)
 }
 
-func GetSiteContent(c *gin.Context) {
+func (h *Handler) GetSiteContent(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -72,7 +83,7 @@ func GetSiteContent(c *gin.Context) {
 		return
 	}
 
-	data, err := siteContentService.GetSiteContentDetail(id)
+	data, err := h.service.GetSiteContentDetail(id)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "获取官网内容详情失败", nil)
 		return
@@ -85,7 +96,7 @@ func GetSiteContent(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", data)
 }
 
-func CreateSiteContent(c *gin.Context) {
+func (h *Handler) CreateSiteContent(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	var payload siteContentService.CreateSiteContentStruct
@@ -94,7 +105,7 @@ func CreateSiteContent(c *gin.Context) {
 		return
 	}
 
-	if err := siteContentService.CreateSiteContent(payload); err != nil {
+	if err := h.service.CreateSiteContent(payload); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}
@@ -102,7 +113,7 @@ func CreateSiteContent(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "创建成功", nil)
 }
 
-func UpdateSiteContent(c *gin.Context) {
+func (h *Handler) UpdateSiteContent(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -117,7 +128,7 @@ func UpdateSiteContent(c *gin.Context) {
 		return
 	}
 
-	if err := siteContentService.UpdateSiteContent(id, payload); err != nil {
+	if err := h.service.UpdateSiteContent(id, payload); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}
@@ -125,7 +136,7 @@ func UpdateSiteContent(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "更新成功", nil)
 }
 
-func DeleteSiteContent(c *gin.Context) {
+func (h *Handler) DeleteSiteContent(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -134,7 +145,7 @@ func DeleteSiteContent(c *gin.Context) {
 		return
 	}
 
-	if err := siteContentService.DeleteSiteContent(id); err != nil {
+	if err := h.service.DeleteSiteContent(id); err != nil {
 		appG.Response(http.StatusInternalServerError, code.ERROR, "删除失败", nil)
 		return
 	}
@@ -142,7 +153,7 @@ func DeleteSiteContent(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "删除成功", nil)
 }
 
-func UpdateSiteContentStatus(c *gin.Context) {
+func (h *Handler) UpdateSiteContentStatus(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -157,7 +168,7 @@ func UpdateSiteContentStatus(c *gin.Context) {
 		return
 	}
 
-	if err := siteContentService.UpdateSiteContentStatus(id, payload); err != nil {
+	if err := h.service.UpdateSiteContentStatus(id, payload); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}

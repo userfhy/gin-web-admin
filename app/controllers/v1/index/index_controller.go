@@ -3,41 +3,30 @@ package indexController
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+	"strings"
+
+	testService "gin-web-admin/app/service/v1/test"
 	"gin-web-admin/common"
 	"gin-web-admin/common/sse"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
 	"gin-web-admin/utils/logging"
-	"net/http"
-	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-func init() {
-	// 初始化日志系统
-	logging.Setup("sse-service", &logging.Option{
-		LogLevel:   "debug",
-		Formatter:  "text",
-		OutputPath: "",
-	})
+type Handler struct {
+	service *testService.Service
 }
 
-// 初始化SSE服务
-var SSEService = sse.NewSSE(
-	sse.WithConfig(sse.Config{
-		HeartbeatInterval: 10 * time.Second,
-		ChannelBufferSize: 50,
-		WriteTimeout:      30 * time.Second,
-		MaxClientMessages: 10000,
-	}),
-	sse.WithSendFailHandler(func(clientID string, msg sse.Message) {
-		logging.Printf("重要消息发送失败: client=%s event=%s", clientID, msg.Event)
-	}),
-	sse.WithLogger(&sse.LogrusAdapter{}),
-)
+func NewHandler(service *testService.Service) *Handler {
+	if service == nil {
+		panic("test handler requires non-nil service")
+	}
+	return &Handler{service: service}
+}
 
 // @Summary		Ping
 // @Description	Test Ping
@@ -47,7 +36,7 @@ var SSEService = sse.NewSSE(
 // @Tags			Test
 // @Success		200	{object}	common.Response
 // @Router			/test/ping [get]
-func Ping(c *gin.Context) {
+func (h *Handler) Ping(c *gin.Context) {
 	appG := common.Gin{C: c}
 	appG.Response(http.StatusOK, code.SUCCESS, "pong", nil)
 }
@@ -60,7 +49,7 @@ func Ping(c *gin.Context) {
 // @Success	200		{object}	common.Response
 // @Failure	500		{object}	common.Response
 // @Router		/test/font [get]
-func Test(c *gin.Context) {
+func (h *Handler) Test(c *gin.Context) {
 	appG := common.Gin{C: c}
 
 	base64 := c.DefaultQuery("base64", "")
@@ -90,8 +79,12 @@ func Test(c *gin.Context) {
 // @Produce	text/event-stream
 // @Tags		Test
 // @Router		/test/events [get]
-func Stream(c *gin.Context) {
+func (h *Handler) Stream() gin.HandlerFunc {
+	return h.service.SSEHandler()
+}
 
+func (h *Handler) StartSystemMonitorBroadcast() {
+	h.service.StartSystemStatsBroadcast()
 }
 
 // 请求/响应结构体
@@ -117,7 +110,7 @@ type ErrorResponse struct {
 // @Failure 404 {object} ErrorResponse "客户端不存在"
 // @Failure 503 {object} ErrorResponse "服务不可用"
 // @Router  /test/send [post]
-func SendStream(c *gin.Context) {
+func (h *Handler) SendStream(c *gin.Context) {
 	var req SendRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		logging.Warn("无效的请求格式: ", err)
@@ -144,7 +137,7 @@ func SendStream(c *gin.Context) {
 
 	// 处理广播逻辑
 	if req.ClientID == "" {
-		SSEService.Broadcast(sse.Message{
+		h.service.Broadcast(sse.Message{
 			Event: req.Event,
 			Data:  req.Data,
 		})
@@ -153,7 +146,7 @@ func SendStream(c *gin.Context) {
 	}
 
 	// 点对点发送
-	if err := SSEService.Send(req.ClientID, sse.Message{
+	if err := h.service.Send(req.ClientID, sse.Message{
 		Event: req.Event,
 		Data:  req.Data,
 	}); err != nil {
@@ -182,6 +175,6 @@ func SendStream(c *gin.Context) {
 // @Produce	json
 // @Tags		Test
 // @Router		/test/count [get]
-func SSEClientCount(c *gin.Context) {
-	c.JSON(200, gin.H{"count": SSEService.ClientCount()})
+func (h *Handler) SSEClientCount(c *gin.Context) {
+	c.JSON(200, gin.H{"count": h.service.ClientCount()})
 }

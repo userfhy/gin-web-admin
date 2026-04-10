@@ -6,11 +6,7 @@ import (
 	"github.com/casbin/casbin/v3"
 )
 
-var (
-	CasbinEnforcer *casbin.SyncedEnforcer
-)
-
+// SetupCasbin 初始化 Casbin 并返回实例，调用方自行保存引用。
 func SetupCasbin() *casbin.SyncedEnforcer {
-	CasbinEnforcer = model.SetupCasbin()
-	return CasbinEnforcer
+	return model.SetupCasbin()
 }

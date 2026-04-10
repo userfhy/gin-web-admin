@@ -2,14 +2,13 @@ package routers
 
 import (
 	reportController "gin-web-admin/app/controllers/v1/report"
-	"gin-web-admin/app/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 
-func InitReportRouter(Router *gin.RouterGroup) {
-	report := Router.Group("/report").Use(
-		middleware.TranslationHandler())
+func InitReportRouter(router *gin.RouterGroup, handler *reportController.Handler) {
+	report := router.Group("/report")
 	{
-		report.POST("", reportController.Report)
+		report.POST("", handler.Report)
 	}
 }

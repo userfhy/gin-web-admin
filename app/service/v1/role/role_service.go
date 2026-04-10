@@ -2,6 +2,8 @@ package roleService
 
 import (
 	model "gin-web-admin/app/models"
+	sysService "gin-web-admin/app/service/v1/sys"
+	"gin-web-admin/internal/data"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/logging"
 )
@@ -27,7 +29,32 @@ type CreateRoleStruct struct {
 	UpdateRoleStruct
 }
 
+type Service struct {
+	store *data.Store
+}
+
+var defaultService *Service
+
+func NewService(store *data.Store) *Service {
+	return &Service{store: store}
+}
+
+func SetDefaultService(s *Service) {
+	defaultService = s
+}
+
+func serviceInstance() *Service {
+	if defaultService == nil {
+		panic("role service not initialized")
+	}
+	return defaultService
+}
+
 func DeleteRole(roleId uint) bool {
+	return serviceInstance().DeleteRole(roleId)
+}
+
+func (s *Service) DeleteRole(roleId uint) bool {
 	wheres := make(map[string]any)
 	wheres["role_id"] = roleId
 	_, rowsAffected := model.SoftDelete(&model.Role{RoleId: roleId})
@@ -35,18 +62,31 @@ func DeleteRole(roleId uint) bool {
 		logging.Println("删除Role失败！")
 		return false
 	}
+	sysService.InvalidateRouteCache()
 	return true
 }
 
 func CreateRole(newRole CreateRoleStruct) error {
-	return model.CreateRole(model.Role{
+	return serviceInstance().CreateRole(newRole)
+}
+
+func (s *Service) CreateRole(newRole CreateRoleStruct) error {
+	if err := model.CreateRole(model.Role{
 		RoleKey:  newRole.RoleKey,
 		RoleName: newRole.RoleName,
 		Remark:   newRole.Remark,
-	})
+	}); err != nil {
+		return err
+	}
+	sysService.InvalidateRouteCache()
+	return nil
 }
 
 func UpdateRole(roleId int, u UpdateRoleStruct) bool {
+	return serviceInstance().UpdateRole(roleId, u)
+}
+
+func (s *Service) UpdateRole(roleId int, u UpdateRoleStruct) bool {
 	wheres := make(map[string]any)
 	wheres["role_id ="] = roleId
 
@@ -58,6 +98,7 @@ func UpdateRole(roleId int, u UpdateRoleStruct) bool {
 		logging.Println("修改Role失败！")
 		return false
 	}
+	sysService.InvalidateRouteCache()
 	return true
 }
 

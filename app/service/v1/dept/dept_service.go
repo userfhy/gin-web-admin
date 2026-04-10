@@ -2,18 +2,19 @@ package deptService
 
 import (
 	model "gin-web-admin/app/models"
+	"gin-web-admin/internal/data"
 )
 
 type DeptTreeNode struct {
-	ID       int            `json:"id"`
-	ParentID int            `json:"parentId"`
-	DeptName string         `json:"deptName"`
-	OrderNum int            `json:"orderNum"`
-	Leader   string         `json:"leader"`
-	Phone    string         `json:"phone"`
-	Email    string         `json:"email"`
-	Status   int            `json:"status"`
-	Remark   string         `json:"remark"`
+	ID       int             `json:"id"`
+	ParentID int             `json:"parentId"`
+	DeptName string          `json:"deptName"`
+	OrderNum int             `json:"orderNum"`
+	Leader   string          `json:"leader"`
+	Phone    string          `json:"phone"`
+	Email    string          `json:"email"`
+	Status   int             `json:"status"`
+	Remark   string          `json:"remark"`
 	Children []*DeptTreeNode `json:"children,omitempty"`
 }
 
@@ -39,11 +40,40 @@ type UpdateDeptStruct struct {
 	Remark   string `json:"remark"`
 }
 
+type Service struct {
+	store *data.Store
+}
+
+var defaultService *Service
+
+func NewService(store *data.Store) *Service {
+	return &Service{store: store}
+}
+
+func SetDefaultService(s *Service) {
+	defaultService = s
+}
+
+func serviceInstance() *Service {
+	if defaultService == nil {
+		panic("dept service not initialized")
+	}
+	return defaultService
+}
+
 func GetDeptList() ([]*model.Dept, error) {
+	return serviceInstance().GetDeptList()
+}
+
+func (s *Service) GetDeptList() ([]*model.Dept, error) {
 	return model.GetAllDepts(nil)
 }
 
 func GetDeptTree() ([]*DeptTreeNode, error) {
+	return serviceInstance().GetDeptTree()
+}
+
+func (s *Service) GetDeptTree() ([]*DeptTreeNode, error) {
 	list, err := model.GetAllDepts(nil)
 	if err != nil {
 		return nil, err
@@ -75,7 +105,6 @@ func GetDeptTree() ([]*DeptTreeNode, error) {
 		}
 		p := idMap[n.ParentID]
 		if p == nil {
-			// 父节点不存在时，视作根节点
 			roots = append(roots, n)
 			continue
 		}
@@ -86,6 +115,10 @@ func GetDeptTree() ([]*DeptTreeNode, error) {
 }
 
 func CreateDept(payload CreateDeptStruct) error {
+	return serviceInstance().CreateDept(payload)
+}
+
+func (s *Service) CreateDept(payload CreateDeptStruct) error {
 	dept := model.Dept{
 		ParentID: payload.ParentID,
 		DeptName: payload.DeptName,
@@ -100,6 +133,10 @@ func CreateDept(payload CreateDeptStruct) error {
 }
 
 func UpdateDept(id int, payload UpdateDeptStruct) error {
+	return serviceInstance().UpdateDept(id, payload)
+}
+
+func (s *Service) UpdateDept(id int, payload UpdateDeptStruct) error {
 	data := map[string]any{}
 	if payload.ParentID != 0 {
 		data["parent_id"] = payload.ParentID
@@ -117,5 +154,12 @@ func UpdateDept(id int, payload UpdateDeptStruct) error {
 }
 
 func DeleteDept(id int) error {
-	return model.DeleteDept(id)
+	return serviceInstance().DeleteDept(id)
+}
+
+func (s *Service) DeleteDept(id int) error {
+	if err := model.DeleteDept(id); err != nil {
+		return err
+	}
+	return nil
 }

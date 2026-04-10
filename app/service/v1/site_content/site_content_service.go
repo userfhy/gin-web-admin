@@ -9,6 +9,8 @@ import (
 	"unicode/utf8"
 
 	model "gin-web-admin/app/models"
+	sitePublicService "gin-web-admin/app/service/v1/site_public"
+	"gin-web-admin/internal/data"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/security"
 
@@ -77,7 +79,32 @@ type UpdateSiteContentStatusStruct struct {
 	Status int `json:"status" binding:"oneof=0 1"`
 }
 
+type Service struct {
+	store *data.Store
+}
+
+var defaultService *Service
+
+func NewService(store *data.Store) *Service {
+	return &Service{store: store}
+}
+
+func SetDefaultService(s *Service) {
+	defaultService = s
+}
+
+func serviceInstance() *Service {
+	if defaultService == nil {
+		panic("site content service not initialized")
+	}
+	return defaultService
+}
+
 func GetSiteContentList(query SiteContentQuery) (utils.PageResult, error) {
+	return serviceInstance().GetSiteContentList(query)
+}
+
+func (s *Service) GetSiteContentList(query SiteContentQuery) (utils.PageResult, error) {
 	list, total, err := model.GetSiteContentList(query.Pagination, query.Keyword, query.Status, query.CategoryID, query.TagID)
 	if err != nil {
 		return utils.PageResult{}, err
@@ -90,6 +117,10 @@ func GetSiteContentList(query SiteContentQuery) (utils.PageResult, error) {
 }
 
 func GetSiteContentDetail(id int) (*SiteContentVO, error) {
+	return serviceInstance().GetSiteContentDetail(id)
+}
+
+func (s *Service) GetSiteContentDetail(id int) (*SiteContentVO, error) {
 	row, err := model.GetSiteContentByID(id)
 	if err != nil || row == nil {
 		return nil, err
@@ -102,6 +133,10 @@ func GetSiteContentDetail(id int) (*SiteContentVO, error) {
 }
 
 func CreateSiteContent(payload CreateSiteContentStruct) error {
+	return serviceInstance().CreateSiteContent(payload)
+}
+
+func (s *Service) CreateSiteContent(payload CreateSiteContentStruct) error {
 	title := security.SanitizePlainText(payload.Title, 150)
 	slug := normalizeSlug(payload.Slug)
 	categoryIDs := uniqueSortedIDs(payload.CategoryIDs)
@@ -144,7 +179,7 @@ func CreateSiteContent(payload CreateSiteContentStruct) error {
 		content.PublishedAt = &now
 	}
 
-	return model.DB().Transaction(func(tx *gorm.DB) error {
+	if err := model.DB().Transaction(func(tx *gorm.DB) error {
 		if err := model.CreateSiteContentTx(tx, content); err != nil {
 			return err
 		}
@@ -152,10 +187,20 @@ func CreateSiteContent(payload CreateSiteContentStruct) error {
 			return err
 		}
 		return model.ReplaceSiteContentTagsTx(tx, content.ID, tagIDs)
-	})
+	}); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicContent(content.ID, content.Slug)
+	sitePublicService.InvalidatePublicCategories()
+	sitePublicService.InvalidatePublicTags()
+	return nil
 }
 
 func UpdateSiteContent(id int, payload UpdateSiteContentStruct) error {
+	return serviceInstance().UpdateSiteContent(id, payload)
+}
+
+func (s *Service) UpdateSiteContent(id int, payload UpdateSiteContentStruct) error {
 	title := security.SanitizePlainText(payload.Title, 150)
 	slug := normalizeSlug(payload.Slug)
 	categoryIDs := uniqueSortedIDs(payload.CategoryIDs)
@@ -206,7 +251,7 @@ func UpdateSiteContent(id int, payload UpdateSiteContentStruct) error {
 		data["published_at"] = now
 	}
 
-	return model.DB().Transaction(func(tx *gorm.DB) error {
+	if err := model.DB().Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&model.SiteContent{}).Where("id = ?", id).Updates(data).Error; err != nil {
 			return err
 		}
@@ -214,10 +259,23 @@ func UpdateSiteContent(id int, payload UpdateSiteContentStruct) error {
 			return err
 		}
 		return model.ReplaceSiteContentTagsTx(tx, id, tagIDs)
-	})
+	}); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicContent(id, slug)
+	if old.Slug != slug {
+		sitePublicService.InvalidatePublicContent(0, old.Slug)
+	}
+	sitePublicService.InvalidatePublicCategories()
+	sitePublicService.InvalidatePublicTags()
+	return nil
 }
 
 func UpdateSiteContentStatus(id int, payload UpdateSiteContentStatusStruct) error {
+	return serviceInstance().UpdateSiteContentStatus(id, payload)
+}
+
+func (s *Service) UpdateSiteContentStatus(id int, payload UpdateSiteContentStatusStruct) error {
 	old, err := model.GetSiteContentByID(id)
 	if err != nil {
 		return err
@@ -231,11 +289,28 @@ func UpdateSiteContentStatus(id int, payload UpdateSiteContentStatusStruct) erro
 		now := time.Now()
 		publishedAt = &now
 	}
-	return model.UpdateSiteContentStatus(id, payload.Status, publishedAt)
+	if err := model.UpdateSiteContentStatus(id, payload.Status, publishedAt); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicContent(id, old.Slug)
+	sitePublicService.InvalidatePublicCategories()
+	sitePublicService.InvalidatePublicTags()
+	return nil
 }
 
 func DeleteSiteContent(id int) error {
-	return model.DB().Transaction(func(tx *gorm.DB) error {
+	return serviceInstance().DeleteSiteContent(id)
+}
+
+func (s *Service) DeleteSiteContent(id int) error {
+	row, err := model.GetSiteContentByID(id)
+	if err != nil {
+		return err
+	}
+	if row == nil {
+		return fmt.Errorf("content not found")
+	}
+	if err := model.DB().Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("content_id = ?", id).Delete(&model.SiteContentCategory{}).Error; err != nil {
 			return err
 		}
@@ -243,7 +318,13 @@ func DeleteSiteContent(id int) error {
 			return err
 		}
 		return tx.Delete(&model.SiteContent{}, id).Error
-	})
+	}); err != nil {
+		return err
+	}
+	sitePublicService.InvalidatePublicContent(id, row.Slug)
+	sitePublicService.InvalidatePublicCategories()
+	sitePublicService.InvalidatePublicTags()
+	return nil
 }
 
 func toSiteContentVOList(list []*model.SiteContent) ([]SiteContentVO, error) {
