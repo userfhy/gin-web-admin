@@ -117,6 +117,8 @@ func Setup() {
 		&SiteContentCategory{},
 		&SiteTag{},
 		&SiteContentTag{},
+		&DictType{},
+		&DictData{},
 		&AuditLog{},
 	); err != nil {
 		log.Fatalf("auto migrate failed: %v", err)

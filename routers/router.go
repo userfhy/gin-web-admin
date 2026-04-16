@@ -4,6 +4,8 @@ import (
 	authController "gin-web-admin/app/controllers/v1/auth"
 	casbinController "gin-web-admin/app/controllers/v1/casbin"
 	deptController "gin-web-admin/app/controllers/v1/dept"
+	dictDataController "gin-web-admin/app/controllers/v1/dict_data"
+	dictTypeController "gin-web-admin/app/controllers/v1/dict_type"
 	indexController "gin-web-admin/app/controllers/v1/index"
 	menuController "gin-web-admin/app/controllers/v1/menu"
 	reportController "gin-web-admin/app/controllers/v1/report"
@@ -18,6 +20,8 @@ import (
 	authService "gin-web-admin/app/service/v1/auth"
 	casbinService "gin-web-admin/app/service/v1/casbin"
 	deptService "gin-web-admin/app/service/v1/dept"
+	dictDataService "gin-web-admin/app/service/v1/dict_data"
+	dictTypeService "gin-web-admin/app/service/v1/dict_type"
 	menuService "gin-web-admin/app/service/v1/menu"
 	reportService "gin-web-admin/app/service/v1/report"
 	roleService "gin-web-admin/app/service/v1/role"
@@ -42,6 +46,8 @@ type Dependencies struct {
 	MenuService         *menuService.Service
 	ReportService       *reportService.Service
 	DeptService         *deptService.Service
+	DictTypeService     *dictTypeService.Service
+	DictDataService     *dictDataService.Service
 	SiteCategoryService *siteCategoryService.Service
 	SiteContentService  *siteContentService.Service
 	SiteTagService      *siteTagService.Service
@@ -62,6 +68,8 @@ func InitRouter(r *gin.Engine, deps Dependencies) *gin.Engine {
 	menuHandler := menuController.NewHandler(deps.MenuService)
 	reportHandler := reportController.NewHandler(deps.ReportService)
 	deptHandler := deptController.NewHandler(deps.DeptService)
+	dictTypeHandler := dictTypeController.NewHandler(deps.DictTypeService)
+	dictDataHandler := dictDataController.NewHandler(deps.DictDataService)
 	siteCategoryHandler := siteCategoryController.NewHandler(deps.SiteCategoryService)
 	siteContentHandler := siteContentController.NewHandler(deps.SiteContentService)
 	siteTagHandler := siteTagController.NewHandler(deps.SiteTagService)
@@ -94,6 +102,8 @@ func InitRouter(r *gin.Engine, deps Dependencies) *gin.Engine {
 	InitReportRouter(translationOnly, reportHandler)             // 上报
 	InitMenuRouter(authzGroup, menuHandler)                      // 菜单管理
 	InitDeptRouter(authzGroup, deptHandler)                      // 部门管理
+	InitDictTypeRouter(authzGroup, dictTypeHandler)              // 字典类型管理
+	InitDictDataRouter(authzGroup, dictDataHandler)              // 字典数据管理
 	InitSiteContentRouter(authzGroup, siteContentHandler)        // 企业官网内容管理
 	InitSiteCategoryRouter(authzGroup, siteCategoryHandler)      // 企业官网分类管理
 	InitSiteTagRouter(authzGroup, siteTagHandler)                // 企业官网标签管理

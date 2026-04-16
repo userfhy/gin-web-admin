@@ -13,6 +13,8 @@ import (
 	authService "gin-web-admin/app/service/v1/auth"
 	casbinService "gin-web-admin/app/service/v1/casbin"
 	deptService "gin-web-admin/app/service/v1/dept"
+	dictDataService "gin-web-admin/app/service/v1/dict_data"
+	dictTypeService "gin-web-admin/app/service/v1/dict_type"
 	menuService "gin-web-admin/app/service/v1/menu"
 	reportService "gin-web-admin/app/service/v1/report"
 	roleService "gin-web-admin/app/service/v1/role"
@@ -57,6 +59,10 @@ func Run(opts Options) error {
 
 	deptSvc := deptService.NewService(container.Store)
 
+	dictTypeSvc := dictTypeService.NewService(container.Store)
+
+	dictDataSvc := dictDataService.NewService(container.Store)
+
 	siteCategorySvc := siteCategoryService.NewService(container.Store)
 
 	siteContentSvc := siteContentService.NewService(container.Store)
@@ -79,6 +85,8 @@ func Run(opts Options) error {
 		MenuService:         menuSvc,
 		ReportService:       reportSvc,
 		DeptService:         deptSvc,
+		DictTypeService:     dictTypeSvc,
+		DictDataService:     dictDataSvc,
 		SiteCategoryService: siteCategorySvc,
 		SiteContentService:  siteContentSvc,
 		SiteTagService:      siteTagSvc,

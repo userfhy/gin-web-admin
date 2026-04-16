@@ -163,7 +163,7 @@ CREATE TABLE `gin_menu` (
   `show_link` tinyint(1) DEFAULT NULL COMMENT '是否显示链接',
   `show_parent` tinyint(1) DEFAULT NULL COMMENT '是否显示父级菜单',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of gin_menu
@@ -175,6 +175,7 @@ INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`,
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (4, 1, 1, 'menus.pureSystemMenu', 'SystemMenu', '/system/menu/index', 'system/menu/index', 0, NULL, 'ep:menu', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (5, 1, 1, 'menus.pureSystemApi', 'SystemAPI', '/system/api/index', 'system/api/index', 0, NULL, 'ep:list', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (6, 1, 1, 'menus.pureDept', 'SystemDept', '/system/dept/index', 'system/dept/index', 0, NULL, 'ri:git-branch-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (38, 1, 1, 'menus.pureDictManage', 'SystemDict', '/system/dict/index', 'system/dict/index', 0, NULL, 'ep:files', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (7, 0, 0, 'menus.pureSysMonitor', '', '/monitor', NULL, 2, NULL, 'ep:monitor', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (8, 7, 1, 'menus.pureOnlineUser', 'OnlineUser', '/monitor/online-user', 'monitor/online/index', 0, NULL, 'ri:user-voice-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` (`id`, `parent_id`, `menu_type`, `title`, `name`, `path`, `component`, `rank`, `redirect`, `icon`, `extra_icon`, `enter_transition`, `leave_transition`, `active_path`, `auths`, `frame_src`, `frame_loading`, `keep_alive`, `hidden_tag`, `fixed_tag`, `show_link`, `show_parent`) VALUES (9, 7, 1, 'menus.pureLoginLog', 'LoginLog', '/monitor/login-logs', 'monitor/logs/login/index', 0, NULL, 'ri:window-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
@@ -310,6 +311,7 @@ INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 34);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 35);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 36);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 37);
+INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (1, 38);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 12);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 13);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 14);
@@ -332,6 +334,62 @@ INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 30);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 31);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 32);
 INSERT INTO `gin_role_menu` (`role_id`, `menu_id`) VALUES (2, 33);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_dict_type
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_dict_type`;
+CREATE TABLE `gin_dict_type` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(100) NOT NULL COMMENT '字典名称',
+  `type` varchar(100) NOT NULL COMMENT '字典类型',
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态(1启用0停用)',
+  `sort` bigint NOT NULL DEFAULT '0' COMMENT '排序值(越小越靠前)',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_dict_type` (`type`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_dict_type
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_dict_type` (`id`, `name`, `type`, `status`, `sort`, `remark`, `created_at`, `updated_at`) VALUES (1, '用户状态', 'sys_user_status', 1, 1, '系统用户状态', '2026-04-16 10:00:00.000', '2026-04-16 10:00:00.000');
+INSERT INTO `gin_dict_type` (`id`, `name`, `type`, `status`, `sort`, `remark`, `created_at`, `updated_at`) VALUES (2, '通用开关', 'sys_common_status', 1, 2, '通用启停状态', '2026-04-16 10:00:00.000', '2026-04-16 10:00:00.000');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gin_dict_data
+-- ----------------------------
+DROP TABLE IF EXISTS `gin_dict_data`;
+CREATE TABLE `gin_dict_data` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `dict_type` varchar(100) NOT NULL COMMENT '字典类型',
+  `label` varchar(100) NOT NULL COMMENT '字典标签',
+  `value` varchar(100) NOT NULL COMMENT '字典键值',
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态(1启用0停用)',
+  `sort` bigint NOT NULL DEFAULT '0' COMMENT '排序值(越小越靠前)',
+  `css_class` varchar(100) DEFAULT NULL COMMENT 'CSS类名',
+  `list_class` varchar(50) DEFAULT NULL COMMENT '回显样式',
+  `is_default` int NOT NULL DEFAULT '0' COMMENT '是否默认(1是0否)',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `created_at` datetime(3) DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_dict_data_type` (`dict_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of gin_dict_data
+-- ----------------------------
+BEGIN;
+INSERT INTO `gin_dict_data` (`id`, `dict_type`, `label`, `value`, `status`, `sort`, `css_class`, `list_class`, `is_default`, `remark`, `created_at`, `updated_at`) VALUES (1, 'sys_user_status', '启用', '1', 1, 1, '', 'success', 1, '启用状态', '2026-04-16 10:00:00.000', '2026-04-16 10:00:00.000');
+INSERT INTO `gin_dict_data` (`id`, `dict_type`, `label`, `value`, `status`, `sort`, `css_class`, `list_class`, `is_default`, `remark`, `created_at`, `updated_at`) VALUES (2, 'sys_user_status', '停用', '0', 1, 2, '', 'danger', 0, '停用状态', '2026-04-16 10:00:00.000', '2026-04-16 10:00:00.000');
+INSERT INTO `gin_dict_data` (`id`, `dict_type`, `label`, `value`, `status`, `sort`, `css_class`, `list_class`, `is_default`, `remark`, `created_at`, `updated_at`) VALUES (3, 'sys_common_status', '开启', '1', 1, 1, '', 'success', 1, '开启', '2026-04-16 10:00:00.000', '2026-04-16 10:00:00.000');
+INSERT INTO `gin_dict_data` (`id`, `dict_type`, `label`, `value`, `status`, `sort`, `css_class`, `list_class`, `is_default`, `remark`, `created_at`, `updated_at`) VALUES (4, 'sys_common_status', '关闭', '0', 1, 2, '', 'info', 0, '关闭', '2026-04-16 10:00:00.000', '2026-04-16 10:00:00.000');
 COMMIT;
 
 -- ----------------------------
