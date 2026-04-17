@@ -198,7 +198,7 @@ func (s *Service) blockTokenOnly(jwt string) {
 
 func expiresAtString(claims *utils.Claims, now time.Time) string {
 	if claims != nil && claims.ExpiresAt != nil {
-		return claims.ExpiresAt.Time.Format(time.RFC3339)
+		return claims.ExpiresAt.Format(time.RFC3339)
 	}
 	return now.Add(defaultOnlineSessionTTL).Format(time.RFC3339)
 }

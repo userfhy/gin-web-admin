@@ -9,6 +9,7 @@ import (
 	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
+	"gin-web-admin/utils/logging"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/websocket"
@@ -118,7 +119,11 @@ func (h *Handler) StreamServerMonitor(c *gin.Context) {
 		serverRetry    = 3 * time.Second
 	)
 	websocket.Handler(func(conn *websocket.Conn) {
-		defer conn.Close()
+		defer func() {
+			if err := conn.Close(); err != nil {
+				logging.Warnf("close server monitor websocket failed: %v", err)
+			}
+		}()
 
 		type streamMessage struct {
 			Event string `json:"event"`
