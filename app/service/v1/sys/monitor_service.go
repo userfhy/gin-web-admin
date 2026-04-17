@@ -35,20 +35,21 @@ type ServerMonitorStreamVO struct {
 	Warnings         []MonitorWarning                `json:"warnings"`
 }
 
+const (
+	monitorSampleInterval   = 10 * time.Second
+	monitorHistoryRetention = 24 * time.Hour
+	monitorHistoryLimit     = int(monitorHistoryRetention / monitorSampleInterval)
+	cpuWarnThreshold        = 85
+	memoryWarnThreshold     = 90
+	swapWarnThreshold       = 80
+	diskWarnThreshold       = 90
+)
+
 var (
 	monitorOnce    sync.Once
 	monitorMu      sync.RWMutex
-	monitorHistory = make([]system_monitor.MonitorSample, 0, 90)
+	monitorHistory = make([]system_monitor.MonitorSample, 0, monitorHistoryLimit)
 	monitorSeq     uint64
-)
-
-const (
-	monitorSampleInterval = 10 * time.Second
-	monitorHistoryLimit   = 90
-	cpuWarnThreshold      = 85
-	memoryWarnThreshold   = 90
-	swapWarnThreshold     = 80
-	diskWarnThreshold     = 90
 )
 
 func (s *Service) GetServerMonitor() (*ServerMonitorVO, error) {
