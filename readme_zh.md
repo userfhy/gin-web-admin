@@ -432,7 +432,7 @@ GET /v1/api/dict/data?pageNum=1&pageSize=50&dictType=sys_user_status&label=启
 ### Git 钩子
 
 - 仓库提供 `githooks/pre-commit`，执行 `git config core.hooksPath githooks` 即可启用本地钩子。
-- 钩子会顺序执行 `golangci-lint run` 与 `GOCACHE=/tmp/gocache go test ./...`，确保与 CI 一致，失败则阻止提交。
+- 钩子要求本地安装 `golangci-lint` v2，并会顺序执行 `golangci-lint run` 与 `GOCACHE=/tmp/gocache go test ./...`，确保与 CI 一致，失败则阻止提交。
 - 临时跳过可设置 `SKIP_GIT_HOOKS=1` 再提交（请在修复后恢复）。
 
 ## 观测与日志

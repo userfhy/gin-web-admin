@@ -409,7 +409,7 @@ Who should read this: engineers running self-checks before commit, integration t
 ### Git Hooks
 
 - Repo ships a ready-to-use hook at `githooks/pre-commit`. Enable it via `git config core.hooksPath githooks`.
-- The hook runs `golangci-lint run` and `GOCACHE=/tmp/gocache go test ./...` just like CI; failures block the commit.
+- The hook requires `golangci-lint` v2 and runs `golangci-lint run` plus `GOCACHE=/tmp/gocache go test ./...` just like CI; failures block the commit.
 - Set `SKIP_GIT_HOOKS=1` when you intentionally need to skip checks (hotfix, WIP, etc.).
 
 ## Observability & Logs

@@ -11,6 +11,14 @@ if ! command -v golangci-lint >/dev/null 2>&1; then
 	exit 1
 fi
 
+golangci_version_output="$(golangci-lint version 2>/dev/null || true)"
+if [[ ! "$golangci_version_output" =~ version\ v?2\. ]]; then
+	echo "[pre-commit] 需要 golangci-lint v2，当前版本不兼容仓库中的 .golangci.yml" >&2
+	echo "[pre-commit] 当前输出: ${golangci_version_output:-unknown}" >&2
+	echo "[pre-commit] 请升级到 v2 后重试，或设置 SKIP_GIT_HOOKS=1 临时跳过" >&2
+	exit 1
+fi
+
 echo "[pre-commit] golangci-lint run"
 golangci-lint run
 
