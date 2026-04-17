@@ -93,6 +93,10 @@ func (s *Service) GetAllDictTypes(status *int) ([]*model.DictType, error) {
 	return model.GetAllDictTypes(status)
 }
 
+func (s *Service) RefreshDictCache() error {
+	return refreshDictCache()
+}
+
 func (s *Service) CreateDictType(payload CreateDictTypeStruct) error {
 	name := security.SanitizePlainText(payload.Name, 100)
 	dictType := normalizeDictType(payload.Type)
@@ -111,13 +115,16 @@ func (s *Service) CreateDictType(payload CreateDictTypeStruct) error {
 		return fmt.Errorf("dict type already exists")
 	}
 
-	return model.CreateDictType(model.DictType{
+	if err := model.CreateDictType(model.DictType{
 		Name:   name,
 		Type:   dictType,
 		Status: payload.Status,
 		Sort:   payload.Sort,
 		Remark: security.SanitizePlainText(payload.Remark, 500),
-	})
+	}); err != nil {
+		return err
+	}
+	return refreshDictCache(dictType)
 }
 
 func (s *Service) UpdateDictType(id int, payload UpdateDictTypeStruct) error {
@@ -146,7 +153,7 @@ func (s *Service) UpdateDictType(id int, payload UpdateDictTypeStruct) error {
 		return fmt.Errorf("dict type already exists")
 	}
 
-	return model.DB().Transaction(func(tx *gorm.DB) error {
+	if err := model.DB().Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&model.DictType{}).Where("id = ?", id).Updates(map[string]any{
 			"name":   name,
 			"type":   dictType,
@@ -163,7 +170,14 @@ func (s *Service) UpdateDictType(id int, payload UpdateDictTypeStruct) error {
 			}
 		}
 		return nil
-	})
+	}); err != nil {
+		return err
+	}
+
+	if old.Type != dictType {
+		return refreshDictCache(old.Type, dictType)
+	}
+	return refreshDictCache(dictType)
 }
 
 func (s *Service) DeleteDictType(id int) error {
@@ -182,7 +196,10 @@ func (s *Service) DeleteDictType(id int) error {
 	if inUse {
 		return fmt.Errorf("dict type in use")
 	}
-	return model.DeleteDictType(id)
+	if err := model.DeleteDictType(id); err != nil {
+		return err
+	}
+	return refreshDictCache(row.Type)
 }
 
 func validateDictType(dictType string) error {

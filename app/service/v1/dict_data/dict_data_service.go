@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	model "gin-web-admin/app/models"
+	dictTypeService "gin-web-admin/app/service/v1/dict_type"
 	"gin-web-admin/internal/data"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/security"
@@ -60,6 +61,9 @@ func NewService(store *data.Store) *Service {
 }
 
 func (s *Service) GetDictDataList(query DictDataQuery) (utils.PageResult, error) {
+	if cached, ok, err := getCachedDictDataPage(query); err == nil && ok {
+		return cached, nil
+	}
 	list, total, err := model.GetDictDataList(query.Pagination, query.DictType, query.Label, query.Status)
 	if err != nil {
 		return utils.PageResult{}, err
@@ -72,7 +76,10 @@ func (s *Service) CreateDictData(payload CreateDictDataStruct) error {
 	if err != nil {
 		return err
 	}
-	return model.CreateDictData(row)
+	if err := model.CreateDictData(row); err != nil {
+		return err
+	}
+	return dictTypeService.NewService(s.store).RefreshDictCache()
 }
 
 func (s *Service) UpdateDictData(id int, payload UpdateDictDataStruct) error {
@@ -88,7 +95,7 @@ func (s *Service) UpdateDictData(id int, payload UpdateDictDataStruct) error {
 	if err != nil {
 		return err
 	}
-	return model.UpdateDictData(id, map[string]any{
+	if err := model.UpdateDictData(id, map[string]any{
 		"dict_type":  row.DictType,
 		"label":      row.Label,
 		"value":      row.Value,
@@ -98,7 +105,10 @@ func (s *Service) UpdateDictData(id int, payload UpdateDictDataStruct) error {
 		"list_class": row.ListClass,
 		"is_default": row.IsDefault,
 		"remark":     row.Remark,
-	})
+	}); err != nil {
+		return err
+	}
+	return dictTypeService.NewService(s.store).RefreshDictCache()
 }
 
 func (s *Service) DeleteDictData(id int) error {
@@ -109,7 +119,10 @@ func (s *Service) DeleteDictData(id int) error {
 	if row == nil {
 		return fmt.Errorf("dict data not found")
 	}
-	return model.DeleteDictData(id)
+	if err := model.DeleteDictData(id); err != nil {
+		return err
+	}
+	return dictTypeService.NewService(s.store).RefreshDictCache()
 }
 
 func buildDictDataModel(dictType, label, value string, status, sort int, cssClass, listClass string, isDefault int, remark string) (model.DictData, error) {
@@ -152,4 +165,36 @@ func buildDictDataModel(dictType, label, value string, status, sort int, cssClas
 		IsDefault: isDefault,
 		Remark:    remark,
 	}, nil
+}
+
+func getCachedDictDataPage(query DictDataQuery) (utils.PageResult, bool, error) {
+	dictType := strings.TrimSpace(strings.ToLower(query.DictType))
+	if dictType == "" || strings.TrimSpace(query.Label) != "" {
+		return utils.PageResult{}, false, nil
+	}
+	if query.Status == nil || *query.Status != 1 {
+		return utils.PageResult{}, false, nil
+	}
+
+	cached, found, err := dictTypeService.LoadCachedDictData(dictType)
+	if err != nil || !found {
+		return utils.PageResult{}, false, err
+	}
+
+	page := query.Pagination.Clone()
+	total := int64(len(cached))
+	if total == 0 {
+		return page.Result([]dictTypeService.CachedDictItem{}, 0), true, nil
+	}
+
+	offset := page.Offset()
+	if offset >= int(total) {
+		return page.Result([]dictTypeService.CachedDictItem{}, total), true, nil
+	}
+
+	end := offset + page.Limit()
+	if end > int(total) {
+		end = int(total)
+	}
+	return page.Result(cached[offset:end], total), true, nil
 }

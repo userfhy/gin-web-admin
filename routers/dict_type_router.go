@@ -11,6 +11,7 @@ func InitDictTypeRouter(router *gin.RouterGroup, handler *dictTypeController.Han
 	{
 		dictType.GET("", handler.GetDictTypeList)
 		dictType.GET("/all", handler.GetAllDictTypes)
+		dictType.POST("/refresh-cache", handler.RefreshDictCache)
 		dictType.POST("", handler.CreateDictType)
 		dictType.PUT("/:id", handler.UpdateDictType)
 		dictType.DELETE("/:id", handler.DeleteDictType)

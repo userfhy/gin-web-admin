@@ -145,6 +145,9 @@ func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error
 	if err != nil {
 		return data, fmt.Errorf("%s", code.GetMsg(code.AccessTokenFailure))
 	}
+	if err := s.SaveOnlineSession(accessToken, &claims, user.LastLoginIP, ""); err != nil {
+		logging.Warnf("save online session on refresh token failed: %v", err)
+	}
 
 	data["expires"] = expireTime.Format("2006/01/02 15:04:05")
 	data["accessToken"] = accessToken
@@ -182,6 +185,7 @@ func (s *Service) JoinBlockList(userId uint, jwt string) {
 	}
 	_ = model.CreateBlockList(userId, jwt)
 	_, _ = model.Update(model.Auth{}, map[string]any{"id =": userId}, map[string]any{"refresh_token": ""})
+	s.RemoveOnlineSession(userId)
 }
 
 func (s *Service) InBlockList(jwt string) (int64, error) {

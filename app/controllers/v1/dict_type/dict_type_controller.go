@@ -98,6 +98,16 @@ func (h *Handler) CreateDictType(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "创建成功", nil)
 }
 
+func (h *Handler) RefreshDictCache(c *gin.Context) {
+	appG := common.Gin{C: c}
+
+	if err := h.service.RefreshDictCache(); err != nil {
+		appG.Response(http.StatusInternalServerError, code.ERROR, "刷新字典缓存失败", nil)
+		return
+	}
+	appG.Response(http.StatusOK, code.SUCCESS, "刷新字典缓存成功", nil)
+}
+
 func (h *Handler) UpdateDictType(c *gin.Context) {
 	appG := common.Gin{C: c}
 

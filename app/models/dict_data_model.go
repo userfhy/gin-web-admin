@@ -70,6 +70,19 @@ func GetDictDataList(pg utils.Pagination, dictType, label string, status *int) (
 	return list, total, nil
 }
 
+func GetAllDictData(status *int) ([]*DictData, error) {
+	var list []*DictData
+	query := db.Model(&DictData{})
+	if status != nil {
+		query = query.Where("status = ?", *status)
+	}
+	err := query.Order("dict_type ASC").Order("sort ASC").Order("id ASC").Find(&list).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return list, nil
+}
+
 func CreateDictData(row DictData) error {
 	return db.Create(&row).Error
 }
