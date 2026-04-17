@@ -3,6 +3,7 @@ package roleService
 import (
 	model "gin-web-admin/app/models"
 	sysService "gin-web-admin/app/service/v1/sys"
+	userService "gin-web-admin/app/service/v1/user"
 	"gin-web-admin/internal/data"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/logging"
@@ -50,6 +51,7 @@ func (s *Service) DeleteRole(roleId uint) bool {
 		return false
 	}
 	sysService.InvalidateRouteCache()
+	userService.InvalidateAllAuthProfileCache()
 	return true
 }
 
@@ -82,6 +84,7 @@ func (s *Service) UpdateRole(roleId int, u UpdateRoleStruct) bool {
 		return false
 	}
 	sysService.InvalidateRouteCache()
+	userService.InvalidateAllAuthProfileCache()
 	return true
 }
 

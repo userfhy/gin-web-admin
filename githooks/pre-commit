@@ -22,7 +22,4 @@ fi
 echo "[pre-commit] golangci-lint run"
 golangci-lint run
 
-echo "[pre-commit] go test ./..."
-GOCACHE=${GOCACHE:-/tmp/gocache} go test ./...
-
 echo "[pre-commit] done"

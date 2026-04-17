@@ -4,7 +4,6 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	model "gin-web-admin/app/models"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/gredis"
 	"gin-web-admin/utils/logging"
@@ -136,13 +135,13 @@ func (s *Service) SaveOnlineSession(token string, claims *utils.Claims, ip, user
 		nickname = existing.Nickname
 	}
 	if existing == nil || existing.Token != token {
-		user, err := model.GetUser(map[string]any{"id": claims.UserId})
-		if err != nil || user == nil {
+		profile, err := s.GetAuthProfile(claims.UserId)
+		if err != nil || profile == nil {
 			return err
 		}
-		roleID = user.RoleId
-		roleName = user.Role.RoleName
-		nickname = user.Nickname
+		roleID = profile.RoleID
+		roleName = profile.RoleName
+		nickname = profile.Nickname
 	}
 
 	session := OnlineSession{

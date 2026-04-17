@@ -94,8 +94,12 @@ func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string, ip string)
 	var (
 		oldRefresh = ""
 	)
-	if user, err := model.GetUser(map[string]any{"id": userId}); err == nil && user != nil {
-		oldRefresh = user.RefreshToken
+	profile, err := s.GetAuthProfile(userId)
+	if err != nil {
+		logging.Warnf("load auth profile cache failed: %v", err)
+	}
+	if profile != nil {
+		oldRefresh = profile.RefreshToken
 	}
 
 	wheres := map[string]any{
@@ -119,6 +123,16 @@ func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string, ip string)
 	if rowsAffected == 0 {
 		return "", fmt.Errorf("未找到要更新的用户信息")
 	}
+
+	if profile != nil {
+		profile.RefreshToken = refreshToken
+		if ip != "" {
+			profile.LastLoginIP = ip
+		}
+		if gredis.RedisConn != nil {
+			gredis.SetJSONAsync(authProfileCacheKey(userId), profile, authProfileCacheTTL)
+		}
+	}
 	return oldRefresh, nil
 }
 
@@ -128,30 +142,37 @@ func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error
 	if err != nil {
 		return data, err
 	}
-	// 判断 token 是否正确
-	user, _ := model.GetUser(map[string]any{"refresh_token": refreshToken})
-	if user.ID == 0 {
+	claims, err := utils.ParseToken(refreshToken)
+	if err != nil || claims == nil || claims.UserId == 0 {
 		return data, fmt.Errorf("该access_token对应的用户信息不存在")
 	}
 
-	claims := utils.Claims{
-		UserId:   user.ID,
-		Username: user.Username,
-		RoleKey:  user.Role.RoleKey,
-		IsAdmin:  user.Role.IsAdmin,
+	profile, err := s.GetAuthProfile(claims.UserId)
+	if err != nil {
+		return data, err
+	}
+	if profile == nil || profile.RefreshToken != refreshToken {
+		return data, fmt.Errorf("该access_token对应的用户信息不存在")
 	}
 
-	accessToken, expireTime, err := utils.GenerateToken(claims)
+	tokenClaims := utils.Claims{
+		UserId:   profile.UserID,
+		Username: profile.Username,
+		RoleKey:  profile.RoleKey,
+		IsAdmin:  profile.IsAdmin,
+	}
+
+	accessToken, expireTime, err := utils.GenerateToken(tokenClaims)
 	if err != nil {
 		return data, fmt.Errorf("%s", code.GetMsg(code.AccessTokenFailure))
 	}
-	if err := s.SaveOnlineSession(accessToken, &claims, user.LastLoginIP, ""); err != nil {
+	if err := s.SaveOnlineSession(accessToken, &tokenClaims, profile.LastLoginIP, ""); err != nil {
 		logging.Warnf("save online session on refresh token failed: %v", err)
 	}
 
 	data["expires"] = expireTime.Format("2006/01/02 15:04:05")
 	data["accessToken"] = accessToken
-	data["refreshToken"] = user.RefreshToken
+	data["refreshToken"] = profile.RefreshToken
 
 	return data, nil
 }
@@ -173,6 +194,8 @@ func (s *Service) ChangeUserPassword(userId uint, newPassword string) error {
 		return fmt.Errorf("修改用户密码失败，用户不存在或未更新")
 	}
 
+	s.InvalidateAuthProfile(userId)
+
 	return nil
 }
 
@@ -185,6 +208,7 @@ func (s *Service) JoinBlockList(userId uint, jwt string) {
 	}
 	_ = model.CreateBlockList(userId, jwt)
 	_, _ = model.Update(model.Auth{}, map[string]any{"id =": userId}, map[string]any{"refresh_token": ""})
+	s.UpdateAuthProfileRefreshToken(userId, "")
 	s.RemoveOnlineSession(userId)
 }
 

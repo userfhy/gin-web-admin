@@ -72,6 +72,8 @@ func (s *Service) Login(payload userService.AuthStruct, clientIP string) (LoginR
 		return LoginResult{}, ErrInvalidCredentials
 	}
 
+	s.userService.CacheAuthProfile(user)
+
 	claims := utils.Claims{
 		UserId:   user.ID,
 		Username: user.Username,
@@ -141,6 +143,7 @@ func (s *Service) ChangePassword(username string, payload userService.ChangePass
 	if err := security.ValidatePasswordComplexity(payload.NewPassword); err != nil {
 		return err
 	}
+	s.userService.CacheAuthProfile(user)
 	return s.userService.ChangeUserPassword(user.ID, payload.NewPassword)
 }
 

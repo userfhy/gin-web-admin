@@ -88,6 +88,7 @@ func (s *Service) ForceOffline(userID uint) error {
 		_ = model.CreateBlockList(userID, session.Token)
 	}
 	_, _ = model.Update(model.Auth{}, map[string]any{"id =": userID}, map[string]any{"refresh_token": ""})
+	userService.InvalidateAuthProfileCache(userID)
 	_, _ = gredis.Delete(fmt.Sprintf("sys:online:user:%d", userID))
 	return nil
 }
