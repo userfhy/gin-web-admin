@@ -99,9 +99,7 @@ func invalidateAuthProfile(userID uint) {
 	if userID == 0 || gredis.RedisConn == nil {
 		return
 	}
-	if _, err := gredis.Delete(authProfileCacheKey(userID)); err != nil {
-		// ignore cache delete failures
-	}
+	_, _ = gredis.Delete(authProfileCacheKey(userID))
 }
 
 func InvalidateAuthProfileCache(userID uint) {
