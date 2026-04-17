@@ -173,6 +173,36 @@ func DeleteByPrefix(prefix string) (int, error) {
 	return total, nil
 }
 
+// KeysByPrefix 获取指定前缀的所有 key
+func KeysByPrefix(prefix string) ([]string, error) {
+	if RedisConn == nil {
+		return nil, fmt.Errorf("redis not initialized")
+	}
+	conn := RedisConn.Get()
+	defer closeConn(conn)
+
+	cursor := 0
+	match := prefix + "*"
+	keys := make([]string, 0)
+
+	for {
+		values, err := redis.Values(conn.Do("SCAN", cursor, "MATCH", match, "COUNT", 100))
+		if err != nil {
+			return keys, err
+		}
+		var batch []string
+		if _, err := redis.Scan(values, &cursor, &batch); err != nil {
+			return keys, err
+		}
+		keys = append(keys, batch...)
+		if cursor == 0 {
+			break
+		}
+	}
+
+	return keys, nil
+}
+
 // DeleteByPrefixAsync 异步删除指定前缀，避免阻塞调用方
 func DeleteByPrefixAsync(prefix string) {
 	if RedisConn == nil {

@@ -33,21 +33,21 @@ type SystemStats struct {
 
 // 新增 HostStats 结构体
 type HostStats struct {
-	Hostname     string
-	Uptime       uint64
-	BootTime     string
-	OS           string
-	Platform     string
-	KernelArch   string
-	ProcessCount uint64
-	Users        []UserInfo
+	Hostname     string     `json:"hostname"`
+	Uptime       uint64     `json:"uptime"`
+	BootTime     string     `json:"bootTime"`
+	OS           string     `json:"os"`
+	Platform     string     `json:"platform"`
+	KernelArch   string     `json:"kernelArch"`
+	ProcessCount uint64     `json:"processCount"`
+	Users        []UserInfo `json:"users"`
 }
 
 type UserInfo struct {
-	User     string
-	Terminal string
-	Host     string
-	Started  int
+	User     string `json:"user"`
+	Terminal string `json:"terminal"`
+	Host     string `json:"host"`
+	Started  int    `json:"started"`
 }
 
 // 其他原有结构体保持不变...

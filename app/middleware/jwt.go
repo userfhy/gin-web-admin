@@ -57,6 +57,13 @@ func JWTHandler(userSvc *userService.Service) gin.HandlerFunc {
 			rCode = code.AuthTokenInBlockList
 		}
 
+		if rCode == code.SUCCESS && claims != nil && claims.UserId > 0 {
+			active, activeErr := userSvc.HasActiveOnlineSession(claims.UserId, token)
+			if activeErr != nil || !active {
+				rCode = code.AuthTokenInBlockList
+			}
+		}
+
 		if rCode != code.SUCCESS {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": rCode,
@@ -68,6 +75,7 @@ func JWTHandler(userSvc *userService.Service) gin.HandlerFunc {
 			return
 		}
 		// 存储登录用户信息
+		_ = userSvc.SaveOnlineSession(token, claims, c.ClientIP(), c.GetHeader("User-Agent"))
 		c.Set("claims", claims)
 		c.Next()
 	}
