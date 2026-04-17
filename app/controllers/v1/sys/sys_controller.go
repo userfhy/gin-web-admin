@@ -1,7 +1,6 @@
 package sysController
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"gin-web-admin/utils/code"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/net/websocket"
 )
 
 type Handler struct {
@@ -117,84 +117,78 @@ func (h *Handler) StreamServerMonitor(c *gin.Context) {
 		streamInterval = 5 * time.Second
 		serverRetry    = 3 * time.Second
 	)
+	websocket.Handler(func(conn *websocket.Conn) {
+		defer conn.Close()
 
-	c.Writer.Header().Set("Content-Type", "text/event-stream")
-	c.Writer.Header().Set("Cache-Control", "no-cache")
-	c.Writer.Header().Set("Connection", "keep-alive")
-	c.Writer.Header().Set("X-Accel-Buffering", "no")
-
-	flusher, ok := c.Writer.(http.Flusher)
-	if !ok {
-		c.Status(http.StatusInternalServerError)
-		return
-	}
-
-	writeEvent := func(event string, seq uint64, payload any) bool {
-		body, err := json.Marshal(payload)
-		if err != nil {
-			return false
+		type streamMessage struct {
+			Event string `json:"event"`
+			Data  any    `json:"data"`
 		}
-		_, _ = c.Writer.Write([]byte("id: " + strconv.FormatUint(seq, 10) + "\n"))
-		_, _ = c.Writer.Write([]byte("retry: " + strconv.FormatInt(serverRetry.Milliseconds(), 10) + "\n"))
-		_, _ = c.Writer.Write([]byte("event: " + event + "\n"))
-		_, _ = c.Writer.Write([]byte("data: " + string(body) + "\n\n"))
-		flusher.Flush()
-		return true
-	}
 
-	sendInit := func() bool {
-		result, err := h.service.GetServerMonitorStreamInit(serverRetry)
-		if err != nil {
-			return writeEvent("error", 0, gin.H{
-				"code": code.ERROR,
-				"msg":  "获取服务器监控失败",
-				"meta": gin.H{
-					"serverRetryMs": serverRetry.Milliseconds(),
-				},
+		writeMessage := func(event string, payload any) bool {
+			if err := websocket.JSON.Send(conn, streamMessage{
+				Event: event,
+				Data:  payload,
+			}); err != nil {
+				return false
+			}
+			return true
+		}
+
+		sendInit := func() bool {
+			result, err := h.service.GetServerMonitorStreamInit(serverRetry)
+			if err != nil {
+				return writeMessage("error", gin.H{
+					"code": code.ERROR,
+					"msg":  "获取服务器监控失败",
+					"meta": gin.H{
+						"serverRetryMs": serverRetry.Milliseconds(),
+					},
+				})
+			}
+			return writeMessage("server_monitor_init", gin.H{
+				"code": code.SUCCESS,
+				"msg":  "ok",
+				"data": result,
 			})
 		}
-		return writeEvent("server_monitor_init", result.Seq, gin.H{
-			"code": code.SUCCESS,
-			"msg":  "ok",
-			"data": result,
-		})
-	}
 
-	sendAppend := func() bool {
-		result, err := h.service.GetServerMonitorStreamDelta(serverRetry)
-		if err != nil {
-			return writeEvent("error", 0, gin.H{
-				"code": code.ERROR,
-				"msg":  "获取服务器监控失败",
-				"meta": gin.H{
-					"serverRetryMs": serverRetry.Milliseconds(),
-				},
+		sendAppend := func() bool {
+			result, err := h.service.GetServerMonitorStreamDelta(serverRetry)
+			if err != nil {
+				return writeMessage("error", gin.H{
+					"code": code.ERROR,
+					"msg":  "获取服务器监控失败",
+					"meta": gin.H{
+						"serverRetryMs": serverRetry.Milliseconds(),
+					},
+				})
+			}
+			return writeMessage("server_monitor_append", gin.H{
+				"code": code.SUCCESS,
+				"msg":  "ok",
+				"data": result,
 			})
 		}
-		return writeEvent("server_monitor_append", result.Seq, gin.H{
-			"code": code.SUCCESS,
-			"msg":  "ok",
-			"data": result,
-		})
-	}
 
-	if !sendInit() {
-		return
-	}
-
-	ticker := time.NewTicker(streamInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-c.Request.Context().Done():
+		if !sendInit() {
 			return
-		case <-ticker.C:
-			if !sendAppend() {
+		}
+
+		ticker := time.NewTicker(streamInterval)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-c.Request.Context().Done():
 				return
+			case <-ticker.C:
+				if !sendAppend() {
+					return
+				}
 			}
 		}
-	}
+	}).ServeHTTP(c.Writer, c.Request)
 }
 
 func (h *Handler) GetLoginLogs(c *gin.Context) {

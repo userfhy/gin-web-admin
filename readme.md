@@ -4,6 +4,12 @@
 
 Gin-based admin backend featuring user/role management, CMS-style menu/content modules, Casbin authorization, Redis caching, and async route loading. Frontend companion: [web-admin-frontend](https://github.com/userfhy/web-admin-frontend).
 
+## Quick Paths
+
+- Frontend engineers: start with [Frontend Dictionary Usage](#frontend-dictionary-usage) and [Frontend Integration Guide](#frontend-integration-guide)
+- Backend engineers: start with [Architecture & Boot Flow](#architecture--boot-flow) and [Module Development Checklist](#module-development-checklist)
+- Integration/troubleshooting: start with [Redis & Caching Strategy](#redis--caching-strategy) and [Swagger API Docs](#swagger-api-docs)
+
 ## Table of Contents
 
 1. [Highlights](#highlights)
@@ -12,13 +18,15 @@ Gin-based admin backend featuring user/role management, CMS-style menu/content m
 4. [Configuration & Run Modes](#configuration--run-modes)
 5. [Architecture & Boot Flow](#architecture--boot-flow)
 6. [Redis & Caching Strategy](#redis--caching-strategy)
-7. [Module Development Checklist](#module-development-checklist)
-8. [Testing & Quality](#testing--quality)
-9. [Observability & Logs](#observability--logs)
-10. [Swagger API Docs](#swagger-api-docs)
-11. [Parameter Validation Tips](#parameter-validation-tips)
-12. [Cross Compilation](#cross-compilation)
-13. [License](#license)
+7. [Frontend Dictionary Usage](#frontend-dictionary-usage)
+8. [Frontend Integration Guide](#frontend-integration-guide)
+9. [Module Development Checklist](#module-development-checklist)
+10. [Testing & Quality](#testing--quality)
+11. [Observability & Logs](#observability--logs)
+12. [Swagger API Docs](#swagger-api-docs)
+13. [Parameter Validation Tips](#parameter-validation-tips)
+14. [Cross Compilation](#cross-compilation)
+15. [License](#license)
 
 ---
 
@@ -28,9 +36,10 @@ Gin-based admin backend featuring user/role management, CMS-style menu/content m
 - 🔐 **Layered authorization** – JWT + Redis blacklist + Casbin RBAC, plus async menu/route cache for faster front-end bootstrap.
 - 🚀 **Redis caching suite** – categories/tags/content, async routes, JWT blacklist, etc., all reuse `utils/gredis` helpers with async set/delete.
 - 🧭 **Swagger/OpenAPI ready** – `swag init` produces up-to-date API docs for easy integration.
-- 🧰 **Utility toolbox** – pagination, validator wrappers, SSE helpers, logging, translation middleware.
+- 🧰 **Utility toolbox** – pagination, validator wrappers, WebSocket-based monitor push, logging, translation middleware.
 - 🏗️ **Cross-platform builds** – sample scripts for Windows/Linux static binaries.
 - 🔒 **Account security** – password complexity policy, IP whitelist, login lockouts, and audit logs for login/critical operations.
+- 📈 **Ops monitoring** – online-user tracking, force-offline controls, audit log views, and server-monitor snapshots with WebSocket push.
 
 ## Project Layout
 
@@ -115,6 +124,8 @@ flowchart TD
 
 All Redis access goes through `utils/gredis`, which provides sync/async set/delete, JSON helpers, prefix scans, etc. Always reuse this pool—no extra clients.
 
+Who should read this: backend engineers, operators, and frontend engineers who need to understand Redis keys and cache-hit behavior.
+
 ### Key Spaces & Suggested TTL
 
 | Cache key/prefix            | Purpose                                | TTL/Policy           | Invalidated by                                     |
@@ -124,6 +135,8 @@ All Redis access goes through `utils/gredis`, which provides sync/async set/dele
 | `site:content:id:<id>`     | Content detail by ID                   | `[site].CacheTTL`              | `InvalidatePublicContent(id, slug)`                |
 | `site:content:slug:<slug>` | Content detail by slug                 | `[site].CacheTTL`              | same as above                                      |
 | `site:content:list:*`      | Paginated content list cache           | `[site].CacheTTL`              | Any category/tag/content mutation (delete prefix)  |
+| `sys:dict:data:<dictType>` | Enabled dict entries for one dict type | persistent, rebuild on refresh/write | `dictTypeService.RefreshDictCache()`         |
+| `sys:dict:data:all`        | Snapshot of all dict caches            | persistent, rebuild on refresh/write | `dictTypeService.RefreshDictCache()`         |
 | `sys:routes:<roleKey>`     | Async routes (menu tree)               | 10m                  | `sysService.InvalidateRouteCache()`                |
 | `jwt:blacklist:<jwt>`      | JWT blacklist (logout/password change) | token remaining TTL  | `userService.JoinBlockList()`                      |
 
@@ -149,15 +162,224 @@ All Redis access goes through `utils/gredis`, which provides sync/async set/dele
    redis-cli --scan --pattern 'sys:routes:*'
    ```
    Role-menu binding changes should clear the prefix.
+4. **Dictionary cache**
+   ```bash
+   redis-cli --scan --pattern 'sys:dict:data:*'
+   redis-cli GET sys:dict:data:sys_user_status | jq
+   ```
+   Calling `POST /v1/api/dict/type/refresh-cache` should populate Redis keys for dictionaries. Dict type/data writes also rebuild the cache automatically.
 
 ### FAQ
 
 - **Why does JWT middleware still hit the DB?** Redis blacklist is checked first; DB queries only happen when Redis returns "not found" (or Redis is unavailable).
+- **When does dictionary reading hit Redis?** `GET /v1/api/dict/data` uses Redis first when the request is an exact `dictType` lookup, with no `label` filter, and `status=1`. Fuzzy search or empty status still goes to the DB path.
 - **What else can be cached?** Consider frequently read reference data (dropdowns, public settings, announcements). Use a dedicated prefix + TTL + invalidator.
+
+## Frontend Dictionary Usage
+
+There are two common frontend scenarios:
+
+Who should read this: frontend engineers, and backend engineers defining dictionary access conventions for frontend consumers.
+
+1. the admin dictionary management page
+2. business pages that need label/value dictionaries for selects or table rendering
+
+### 1. Admin dictionary page
+
+- Dict type list: `GET /v1/api/dict/type`
+- All enabled dict types: `GET /v1/api/dict/type/all?status=1`
+- Dict data under one type: `GET /v1/api/dict/data?pageNum=1&pageSize=50&dictType=sys_user_status&status=1`
+- Manually rebuild Redis dict cache: `POST /v1/api/dict/type/refresh-cache`
+
+The companion frontend project `web-admin-frontend` already wraps these APIs:
+
+- `src/api/dictType.ts`: `getDictTypeList`, `getAllDictTypes`, `refreshDictTypeCache`
+- `src/api/dictData.ts`: `getDictDataList`
+
+### 2. Business forms/tables
+
+Recommended flow:
+
+1. Load dictionary data at page init with `dictType + status=1`.
+2. Convert the returned list into a `value -> label` map for table rendering.
+3. Reuse the same list for select options.
+4. If an admin just changed dictionary data, call the refresh-cache API first, then reload the dictionary list.
+
+TypeScript example:
+
+```ts
+import { getDictDataList } from "@/api/dictData";
+
+export async function loadUserStatusDict() {
+  const res = await getDictDataList({
+    pageNum: 1,
+    pageSize: 50,
+    dictType: "sys_user_status",
+    status: 1
+  });
+
+  const list = res?.data?.list ?? [];
+  const valueLabelMap = new Map(list.map(item => [item.value, item.label]));
+
+  return {
+    options: list.map(item => ({
+      label: item.label,
+      value: item.value
+    })),
+    valueLabelMap
+  };
+}
+```
+
+Table rendering example:
+
+```ts
+const { options, valueLabelMap } = await loadUserStatusDict();
+
+const columns = [
+  {
+    label: "User Status",
+    prop: "status",
+    formatter: ({ status }) => valueLabelMap.get(String(status)) ?? "-"
+  }
+];
+```
+
+### 3. Cache-friendly request pattern
+
+If you want dictionary reads to hit Redis instead of MySQL on every request, keep the request shape simple:
+
+- pass exact `dictType`
+- pass `status=1`
+- do not pass `label`
+
+Recommended:
+
+```http
+GET /v1/api/dict/data?pageNum=1&pageSize=50&dictType=sys_user_status&status=1
+```
+
+Not recommended:
+
+```http
+GET /v1/api/dict/data?pageNum=1&pageSize=50&dictType=sys_user_status&status=
+GET /v1/api/dict/data?pageNum=1&pageSize=50&dictType=sys_user_status&label=en
+```
+
+Why:
+
+- `status=1` matches the enabled dictionary cache stored in Redis
+- empty `status` falls back to the DB query path
+- `label` triggers fuzzy search, which also falls back to the DB query path
+
+## Frontend Integration Guide
+
+This section is for frontend integration work and summarizes the most common backend touchpoints. Companion frontend project: `web-admin-frontend`.
+
+Who should read this: frontend engineers integrating this backend for the first time, or full-stack engineers aligning frontend/backend API conventions.
+
+### 1. Login and token lifecycle
+
+Recommended flow:
+
+1. call the login API and get `token / refreshToken`
+2. persist them on the frontend
+3. attach `Authorization` to subsequent requests
+4. call the refresh-token API when the access token expires
+5. call the logout API instead of only clearing local storage
+
+Notes:
+
+- old tokens are pushed into the Redis blacklist
+- after logout or password change, the frontend should clear user state and redirect to login
+- force-offline invalidates both refresh-token state and the active online-session record; protected APIs will reject the old access token on the next request
+
+### 2. Dynamic menus and routes
+
+The menu system follows the pattern: `role -> menu -> frontend async routes`.
+
+Recommended flow:
+
+1. fetch current user info after login
+2. request async routes/menu tree for the current role
+3. transform the response into frontend async routes and register them
+4. reload the route tree after backend menu or role-menu changes
+
+Notes:
+
+- backend route cache is stored in Redis as `sys:routes:<roleKey>`
+- menu, role, and role-menu changes automatically invalidate that cache
+
+### 3. Dictionaries
+
+For detailed dictionary usage, see the previous section: [Frontend Dictionary Usage](#frontend-dictionary-usage).
+
+Only one rule is repeated here:
+
+- reuse the same in-page dictionary dataset instead of requesting the same `dictType` multiple times for tables, forms, and filters
+
+### 4. Pagination
+
+The backend supports these pagination aliases:
+
+- page number: `pageNum` / `page` / `p`
+- page size: `pageSize` / `size` / `n`
+
+Recommended frontend request shape:
+
+```ts
+{
+  pageNum: 1,
+  pageSize: 10
+}
+```
+
+Typical paginated response:
+
+```json
+{
+  "list": [],
+  "total": 0,
+  "pageSize": 10,
+  "currentPage": 1,
+  "pageCount": 0,
+  "hasNext": false,
+  "hasPrev": false
+}
+```
+
+### 5. API-layer organization
+
+Recommended frontend API split:
+
+- `src/api/auth.ts`: login, logout, refresh token
+- `src/api/user.ts`: current user info
+- `src/api/menu.ts` or `src/api/route.ts`: async menus/routes
+- `src/api/dictType.ts`: dict types and cache refresh
+- `src/api/dictData.ts`: dict data
+
+Recommended common response handling:
+
+- read `res.data` on success
+- prefer `res.msg || res.message` for errors
+- centralize `401` handling and redirect logic
+
+### 6. Suggested integration order
+
+If you are wiring a brand new frontend project to this backend, use this order:
+
+1. login, logout, refresh token
+2. current user info
+3. dynamic menus/routes
+4. generic paginated list pages
+5. dictionaries
+6. then detail pages and business forms
 
 ## Module Development Checklist
 
 > Goal: keep advancing the "Service + Handler + Router + Tests" DI pattern while aligning cache/permission/docs.
+
+Who should read this: engineers adding new backend modules, APIs, or cache-enabled features.
 
 1. **Models & migrations (`app/models`, `sql/`)** – define structs, relations, pagination queries; manage DDL scripts in `sql/`, avoid production AutoMigrate.
 2. **Service layer (`app/service/v1/<module>`)** – `type Service struct { store *data.Store }`, inject other services if needed, expose receiver methods only, reuse `utils/gredis` for cache.
@@ -169,6 +391,8 @@ All Redis access goes through `utils/gredis`, which provides sync/async set/dele
 8. **Validation** – `GOCACHE=/tmp/.gocache go test ./...`, `go run ./cmd/server` for manual verification; double-check Redis state for cache-heavy modules.
 
 ## Testing & Quality
+
+Who should read this: engineers running self-checks before commit, integration testing, or regression verification.
 
 | Scenario               | Command / Steps                                                |
 |------------------------|----------------------------------------------------------------|
@@ -190,6 +414,8 @@ All Redis access goes through `utils/gredis`, which provides sync/async set/dele
 
 ## Observability & Logs
 
+Who should read this: engineers or operators troubleshooting runtime issues, cache invalidation behavior, or production logging.
+
 ```
 $ go run main.go
 2020/06/28 15:42:40 [info] Redis connected 192.168.3.5:6379 DB: 0
@@ -203,8 +429,13 @@ Recommendations:
 - Set `setting.ServerSetting.RunMode=release` or `GIN_MODE=release` in production.
 - Keep INFO/WARN logs for cache invalidation, JWT blacklist writes, Casbin refreshes to simplify troubleshooting.
 - Integrate with ELK/Loki/etc. by extending `utils/logging` if needed.
+- Server monitor snapshots are exposed both as REST (`GET /v1/api/sys/server-monitor`) and WebSocket (`GET /v1/api/sys/server-monitor/ws?token=<accessToken>`).
+- Audit-log pages in the frontend map to login logs, operation logs, and system logs backed by `gin_audit_log`.
+- Online-user force-offline relies on Redis online-session state; if Redis is disabled, the list/force-offline feature is unavailable.
 
 ## Swagger API Docs
+
+Who should read this: frontend and backend engineers who need a quick reference for endpoints, request parameters, and response shapes.
 
 - Browse at `BASE_URL/swagger/index.html`.
 - Generate via:
@@ -216,6 +447,8 @@ swag init
 - Preview screenshots: `img/swagger_preview.png`, `img/swagger_preview_2.png`.
 
 ## Parameter Validation Tips
+
+Who should read this: backend engineers adding request validation, translated validation messages, or form rules.
 
 Using `validator.v10` through `common.CheckBindStructParameter`:
 

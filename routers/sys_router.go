@@ -13,7 +13,7 @@ func InitSysRouter(router *gin.RouterGroup, handler *sysController.Handler) {
 		sys.GET("/online-users", handler.GetOnlineUsers)
 		sys.DELETE("/online-users/:userId", handler.ForceOffline)
 		sys.GET("/server-monitor", handler.GetServerMonitor)
-		sys.GET("/server-monitor/stream", handler.StreamServerMonitor)
+		sys.GET("/server-monitor/ws", handler.StreamServerMonitor)
 		sys.GET("/login-logs", handler.GetLoginLogs)
 		sys.DELETE("/login-logs", handler.DeleteLoginLogs)
 		sys.GET("/operation-logs", handler.GetOperationLogs)
