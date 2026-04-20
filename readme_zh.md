@@ -70,6 +70,22 @@ go run ./cmd/server
 - 默认监听 `:8081`，可通过 `conf/app.toml` 的 `server.http_port` 调整。
 - 若希望直接 `go run main.go`，其内部同样调用 `cmd/server`。
 
+### 可选：嵌入前端 Dist
+
+如果希望由 Go 服务直接从二进制中提供前端页面，请使用前端配套项目的 Go 静态构建模式：
+
+```bash
+cd /path/to/web-admin-frontend
+pnpm install
+pnpm run build:go
+cp -r dist/. /home/fhy/myGo/gin-web-admin/views/dist/
+```
+
+- `pnpm build` 保持前端默认独立部署配置不变。
+- `pnpm run build:go` 会使用前端的 `go-static` 模式，发布路径为 `/admin/`，接口前缀为 `/v1/api`。
+- 后端通过 [`views/embed.go`](./views/embed.go) 嵌入 `views/dist`，替换静态文件后需要重新编译或重启 Go 服务。
+- 嵌入后的后台入口：`BASE_URL/admin`
+
 ## 配置与运行模式
 
 - 所有配置读取自 `conf/app.toml`，可以按照环境（dev/staging/prod）复制多份文件。
@@ -275,6 +291,25 @@ GET /v1/api/dict/data?pageNum=1&pageSize=50&dictType=sys_user_status&label=启
 这一节面向前端同学，整理后台管理系统最常见的几个接入点。配套前端项目：`web-admin-frontend`。
 
 适合阅读对象：第一次接入本项目后台接口的前端开发，或需要统一接口约定的全栈开发。
+
+### 嵌入式前端构建
+
+对于配套前端项目 `web-admin-frontend`，建议区分两种构建方式：
+
+- `pnpm build`：前端默认部署模式，保留根路径 `/` 和接口前缀 `/api`
+- `pnpm run build:go`：Go 静态嵌入模式，使用 `/admin/` 和 `/v1/api`
+
+在本后端中使用嵌入模式时，按下面顺序操作：
+
+1. 在前端项目执行 `pnpm run build:go`
+2. 将生成的 `dist` 内容复制到 [`views/dist`](./views/dist)
+3. 重新编译或重启 Go 服务
+4. 访问 `BASE_URL/admin`
+
+补充说明：
+
+- 当前后端不会再将 `/` 自动跳转到 `/admin`
+- 嵌入静态资源的入口代码位于 [`routers/router.go`](./routers/router.go) 与 [`views/embed.go`](./views/embed.go)
 
 ### 1. 登录与 Token 生命周期
 

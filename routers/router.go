@@ -1,6 +1,10 @@
 package routers
 
 import (
+	"io/fs"
+	"net/http"
+	"path"
+
 	authController "gin-web-admin/app/controllers/v1/auth"
 	casbinController "gin-web-admin/app/controllers/v1/casbin"
 	deptController "gin-web-admin/app/controllers/v1/dept"
@@ -32,6 +36,7 @@ import (
 	sysService "gin-web-admin/app/service/v1/sys"
 	testService "gin-web-admin/app/service/v1/test"
 	userService "gin-web-admin/app/service/v1/user"
+	"gin-web-admin/views"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/gin-gonic/gin"
@@ -114,8 +119,91 @@ func InitRouter(r *gin.Engine, deps Dependencies) *gin.Engine {
 		InitSwaggerRouter(r) // swagger docs
 	}
 
+	mountEmbeddedWeb(r)
+
 	// 路由列表
 	sysController.Routers = r.Routes()
 
 	return r
+}
+
+func mountEmbeddedWeb(r *gin.Engine) {
+	distFS, err := fs.Sub(views.WebStaticFS, "dist")
+	if err != nil {
+		panic(err)
+	}
+
+	serveIndex := func(c *gin.Context) {
+		data, err := fs.ReadFile(distFS, "index.html")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"msg": "failed to load index.html"})
+			return
+		}
+		c.Data(http.StatusOK, "text/html; charset=utf-8", data)
+	}
+
+	r.GET("/favicon.ico", func(c *gin.Context) {
+		serveEmbeddedFile(c, distFS, "favicon.ico")
+	})
+
+	r.GET("/static/*filepath", func(c *gin.Context) {
+		serveEmbeddedFile(c, distFS, path.Join("static", c.Param("filepath")))
+	})
+
+	r.GET("/admin", serveIndex)
+
+	r.GET("/admin/*filepath", func(c *gin.Context) {
+		filePath := path.Clean(c.Param("filepath"))
+		if filePath == "." || filePath == "/" {
+			serveIndex(c)
+			return
+		}
+
+		filePath = filePath[1:]
+		if filePath == "favicon.ico" {
+			serveEmbeddedFile(c, distFS, "favicon.ico")
+			return
+		}
+		if len(filePath) > len("static/") && filePath[:7] == "static/" {
+			serveEmbeddedFile(c, distFS, filePath)
+			return
+		}
+		if fileExists(distFS, filePath) {
+			c.FileFromFS(filePath, http.FS(distFS))
+			return
+		}
+
+		if path.Ext(filePath) != "" {
+			c.JSON(http.StatusNotFound, gin.H{"msg": "not found"})
+			return
+		}
+
+		serveIndex(c)
+	})
+}
+
+func fileExists(distFS fs.FS, name string) bool {
+	file, err := distFS.Open(name)
+	if err != nil {
+		return false
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+
+	info, err := file.Stat()
+	if err != nil {
+		return false
+	}
+
+	return !info.IsDir()
+}
+
+func serveEmbeddedFile(c *gin.Context, distFS fs.FS, name string) {
+	if !fileExists(distFS, name) {
+		c.JSON(http.StatusNotFound, gin.H{"msg": "not found"})
+		return
+	}
+
+	c.FileFromFS(name, http.FS(distFS))
 }

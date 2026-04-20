@@ -70,6 +70,22 @@ go run ./cmd/server
 - Default listen address: `:8081` (`server.http_port` in `conf/app.toml`).
 - `go run main.go` delegates to the same bootstrap logic.
 
+### Optional: Embed Frontend Dist
+
+If you want the Go service to serve the frontend directly from the binary, use the companion frontend project's dedicated Go-static build mode:
+
+```bash
+cd /path/to/web-admin-frontend
+pnpm install
+pnpm run build:go
+cp -r dist/. /home/fhy/myGo/gin-web-admin/views/dist/
+```
+
+- `pnpm build` keeps the frontend's default standalone deployment settings.
+- `pnpm run build:go` uses the frontend `go-static` mode (`/admin/` public path, `/v1/api` API base) for this backend.
+- The backend embeds `views/dist` via [`views/embed.go`](./views/embed.go), so you must rebuild or restart the Go service after replacing those files.
+- Admin entry after embedding: `BASE_URL/admin`
+
 ## Configuration & Run Modes
 
 - Config options live in `conf/app.toml`; copy the sample per environment (dev/stg/prod).
@@ -277,6 +293,25 @@ Why:
 This section is for frontend integration work and summarizes the most common backend touchpoints. Companion frontend project: `web-admin-frontend`.
 
 Who should read this: frontend engineers integrating this backend for the first time, or full-stack engineers aligning frontend/backend API conventions.
+
+### Embedded Frontend Build
+
+For the companion frontend project `web-admin-frontend`, keep these two build modes separate:
+
+- `pnpm build`: default frontend deployment, root path `/`, API base `/api`
+- `pnpm run build:go`: Go static embedding mode, root path `/admin/`, API base `/v1/api`
+
+When using the embedded mode in this backend:
+
+1. Run `pnpm run build:go` in the frontend project.
+2. Copy the generated `dist` contents into [`views/dist`](./views/dist).
+3. Rebuild or restart the Go service.
+4. Visit `BASE_URL/admin`.
+
+Notes:
+
+- This backend no longer redirects `/` to `/admin`.
+- Embedded assets are served through [`routers/router.go`](./routers/router.go) and embedded via [`views/embed.go`](./views/embed.go).
 
 ### 1. Login and token lifecycle
 

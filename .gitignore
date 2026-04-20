@@ -5,3 +5,4 @@ conf/app.ini
 conf/app.toml
 vendor/
 tmp/
+views/dist/
