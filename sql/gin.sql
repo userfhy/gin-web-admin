@@ -11,7 +11,7 @@
  Target Server Version : 90600 (9.6.0)
  File Encoding         : 65001
 
- Date: 17/04/2026 14:49:41
+ Date: 20/04/2026 12:49:19
 */
 
 SET NAMES utf8mb4;
@@ -68,7 +68,7 @@ CREATE TABLE `gin_audit_log`  (
   INDEX `idx_audit_user`(`user_id` ASC) USING BTREE,
   INDEX `idx_gin_audit_log_category`(`category` ASC) USING BTREE,
   INDEX `idx_gin_audit_log_user_id`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 56 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of gin_audit_log
@@ -104,7 +104,7 @@ CREATE TABLE `gin_auth`  (
 -- ----------------------------
 -- Records of gin_auth
 -- ----------------------------
-INSERT INTO `gin_auth` VALUES (1, '2024-05-10 16:39:36.066', '2026-04-17 13:34:08.641', NULL, 1, 1, '2026-04-17 13:34:08.640', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzc2OTYwMDAwLCJpYXQiOjE3NzY0MDQwNDh9.IAXxoln0oesA88iLGgRSlkRtc8kHay2YtJC0Y71OU-w', 0, NULL, '127.0.0.1');
+INSERT INTO `gin_auth` VALUES (1, '2024-05-10 16:39:36.066', '2026-04-20 12:46:56.318', NULL, 1, 1, '2026-04-20 12:46:56.302', 'admin', 'fhy', '13839999999', 'aa@qq.com', 2, 'a203793c127cf17027b2cadbbff95355', '', 0, NULL, '127.0.0.1');
 INSERT INTO `gin_auth` VALUES (2, '2024-05-10 16:39:36.066', '2026-01-30 11:09:31.753', NULL, 2, 1, '2026-01-30 11:09:31.753', 'editor', NULL, NULL, NULL, 2, 'a203793c127cf17027b2cadbbff95355', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImVkaXRvciIsInJvbGVfa2V5IjoiZWRpdG9yIiwiaXNfYWRtaW4iOmZhbHNlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzcwMzA3MjAwLCJpYXQiOjE3Njk3NDI1NzF9.YsRC6J1VXClDI_h2_-u3T1bCfh-duJasVkIE7aBiEcc', 0, NULL, NULL);
 INSERT INTO `gin_auth` VALUES (3, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor2', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '3', 0, NULL, NULL);
 INSERT INTO `gin_auth` VALUES (4, '2024-05-27 10:36:22.000', '2024-05-27 10:36:22.000', NULL, 2, 0, '2024-05-21 16:19:12.097', 'editor3', NULL, NULL, NULL, 1, 'a203793c127cf17027b2cadbbff95355', '4', 0, NULL, NULL);
@@ -202,15 +202,11 @@ CREATE TABLE `gin_jwt_blacklist`  (
   `jwt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_blog_jwt_blacklist_deleted_at`(`deleted_at` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 92 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 105 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of gin_jwt_blacklist
 -- ----------------------------
-INSERT INTO `gin_jwt_blacklist` VALUES (88, '2026-04-16 09:09:02.278', '2026-04-16 09:09:02.278', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzc2MzU1MjAwLCJpYXQiOjE3NzU4MDExNTR9.j2yFZ2xDfDFIePy6hUS6hNdKxV0zMD4k3dajERfDNW8');
-INSERT INTO `gin_jwt_blacklist` VALUES (89, '2026-04-16 09:31:27.289', '2026-04-16 09:31:27.289', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzc2MzA4OTQyLCJpYXQiOjE3NzYzMDE3NDJ9.Rl_MQkVAC4Rxt8yciNU1P3-c_cPKvDPQq3rIT7m1N98');
-INSERT INTO `gin_jwt_blacklist` VALUES (90, '2026-04-17 12:26:35.692', '2026-04-17 12:26:35.692', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzc2NDAyOTgxLCJpYXQiOjE3NzYzOTU3ODF9.BvuBjlfI-bSt-LbdHkKsKP2PX4bPZxTPWtgmxA7GvXk');
-INSERT INTO `gin_jwt_blacklist` VALUES (91, '2026-04-17 12:27:54.270', '2026-04-17 12:27:54.270', NULL, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZV9rZXkiOiJhZG1pbiIsImlzX2FkbWluIjp0cnVlLCJpc3MiOiJnaW4td2ViLWFkbWluIiwiZXhwIjoxNzc2NDA3MjAwLCJpYXQiOjE3NzY0MDAwMDB9.YO4kRYNy4fcYHXDB7tLd0tPKnIDFSztOWMGaqGg3zs4');
 
 -- ----------------------------
 -- Table structure for gin_menu
@@ -245,45 +241,45 @@ CREATE TABLE `gin_menu`  (
 -- ----------------------------
 -- Records of gin_menu
 -- ----------------------------
-INSERT INTO `gin_menu` VALUES (1, 0, 0, 'menus.pureSysManagement', '', '/system', NULL, 1, NULL, 'ri:settings-3-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (2, 1, 1, 'menus.pureUser', 'SystemUser', '/system/user/index', 'system/user/index', 0, NULL, 'ri:admin-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (3, 1, 1, 'menus.pureRole', 'SystemRole', '/system/role/index', 'system/role/index', 0, NULL, 'ri:admin-fill', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (4, 1, 1, 'menus.pureSystemMenu', 'SystemMenu', '/system/menu/index', 'system/menu/index', 0, NULL, 'ep:menu', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (5, 1, 1, 'menus.pureSystemApi', 'SystemAPI', '/system/api/index', 'system/api/index', 0, NULL, 'ep:list', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (6, 1, 1, 'menus.pureDept', 'SystemDept', '/system/dept/index', 'system/dept/index', 0, NULL, 'ri:git-branch-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (7, 0, 0, 'menus.pureSysMonitor', '', '/monitor', NULL, 2, NULL, 'ep:monitor', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (8, 7, 1, 'menus.pureOnlineUser', 'OnlineUser', '/monitor/online-user', 'monitor/online/index', 0, NULL, 'ri:user-voice-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (9, 7, 1, 'menus.pureLoginLog', 'LoginLog', '/monitor/login-logs', 'monitor/logs/login/index', 0, NULL, 'ri:window-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (10, 7, 1, 'menus.pureOperationLog', 'OperationLog', '/monitor/operation-logs', 'monitor/logs/operation/index', 0, NULL, 'ri:history-fill', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (11, 7, 1, 'menus.pureSystemLog', 'SystemLog', '/monitor/system-logs', 'monitor/logs/system/index', 0, NULL, 'ri:file-search-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (12, 0, 0, 'menus.purePermission', '', '/permission', NULL, 3, NULL, 'ep:lollipop', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (13, 12, 1, 'menus.purePermissionPage', 'PermissionPage', '/permission/page/index', 'permission/page/index', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (14, 12, 0, 'menus.purePermissionButton', '', '/permission/button', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (15, 14, 1, 'menus.purePermissionButtonRouter', 'PermissionButtonRouter', '/permission/button/router', 'permission/button/index', 0, NULL, '', NULL, NULL, NULL, '', 'permission:btn:add,permission:btn:edit,permission:btn:delete', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (16, 14, 1, 'menus.purePermissionButtonLogin', 'PermissionButtonLogin', '/permission/button/login', 'permission/button/perms', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (17, 0, 0, 'menus.pureExternalPage', '', '/iframe', NULL, 4, NULL, 'ri:links-fill', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (18, 17, 0, 'menus.pureEmbeddedDoc', '', '/iframe/embedded', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (19, 18, 1, 'menus.pureColorHuntDoc', 'FrameColorHunt', '/iframe/colorhunt', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://colorhunt.co/', NULL, 1, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (20, 18, 1, 'menus.pureUiGradients', 'FrameUiGradients', '/iframe/uigradients', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://uigradients.com/', NULL, 1, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (21, 18, 1, 'menus.pureEpDoc', 'FrameEp', '/iframe/ep', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://element-plus.org/zh-CN/', NULL, 1, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (22, 18, 1, 'menus.pureTailwindcssDoc', 'FrameTailwindcss', '/iframe/tailwindcss', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://tailwindcss.com/docs/installation', NULL, 1, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (23, 18, 1, 'menus.pureVueDoc', 'FrameVue', '/iframe/vue3', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://cn.vuejs.org/', NULL, 1, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (24, 18, 1, 'menus.pureViteDoc', 'FrameVite', '/iframe/vite', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://cn.vitejs.dev/', NULL, 1, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (25, 18, 1, 'menus.purePiniaDoc', 'FramePinia', '/iframe/pinia', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://pinia.vuejs.org/zh/index.html', NULL, 1, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (26, 18, 1, 'menus.pureRouterDoc', 'FrameRouter', '/iframe/vue-router', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://router.vuejs.org/zh/', NULL, 1, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (27, 17, 0, 'menus.pureExternalDoc', '', '/iframe/external', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (28, 27, 1, 'menus.pureExternalLink', 'https://pure-admin.cn/', '/external', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (29, 27, 1, 'menus.pureUtilsLink', 'https://pure-admin-utils.netlify.app/', '/pureUtilsLink', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (30, 0, 0, 'menus.pureTabs', '', '/tabs', NULL, 5, NULL, 'ri:bookmark-2-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (31, 30, 1, 'menus.pureTabs', 'Tabs', '/tabs/index', 'tabs/index', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (1, 0, 0, '系统管理', '', '/system', NULL, 1, NULL, 'ri:settings-3-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (2, 1, 1, '用户管理', 'SystemUser', '/system/user/index', 'system/user/index', 0, NULL, 'ri:admin-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (3, 1, 1, '角色管理', 'SystemRole', '/system/role/index', 'system/role/index', 0, NULL, 'ri:admin-fill', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (4, 1, 1, '菜单管理', 'SystemMenu', '/system/menu/index', 'system/menu/index', 0, NULL, 'ep:menu', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (5, 1, 1, 'API接口管理', 'SystemAPI', '/system/api/index', 'system/api/index', 0, NULL, 'ep:list', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (6, 1, 1, '部门管理', 'SystemDept', '/system/dept/index', 'system/dept/index', 0, NULL, 'ri:git-branch-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (7, 0, 0, '系统监控', '', '/monitor', NULL, 2, NULL, 'ep:monitor', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (8, 7, 1, '在线用户', 'OnlineUser', '/monitor/online-user', 'monitor/online/index', 0, NULL, 'ri:user-voice-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (9, 7, 1, '登录日志', 'LoginLog', '/monitor/login-logs', 'monitor/logs/login/index', 0, NULL, 'ri:window-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (10, 7, 1, '操作日志', 'OperationLog', '/monitor/operation-logs', 'monitor/logs/operation/index', 0, NULL, 'ri:history-fill', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (11, 7, 1, '系统日志', 'SystemLog', '/monitor/system-logs', 'monitor/logs/system/index', 0, NULL, 'ri:file-search-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (12, 0, 0, '权限管理', '', '/permission', NULL, 3, NULL, 'ep:lollipop', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (13, 12, 1, '页面权限', 'PermissionPage', '/permission/page/index', 'permission/page/index', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (14, 12, 0, '按钮权限', '', '/permission/button', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (15, 14, 1, '路由返回按钮权限', 'PermissionButtonRouter', '/permission/button/router', 'permission/button/index', 0, NULL, '', NULL, NULL, NULL, '', 'permission:btn:add,permission:btn:edit,permission:btn:delete', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (16, 14, 1, '登录接口返回按钮权限', 'PermissionButtonLogin', '/permission/button/login', 'permission/button/perms', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (17, 0, 0, '外部页面', '', '/iframe', NULL, 4, NULL, 'ri:links-fill', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (18, 17, 0, '文档内嵌', '', '/iframe/embedded', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (19, 18, 1, '调色板', 'FrameColorHunt', '/iframe/colorhunt', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://colorhunt.co/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (20, 18, 1, '渐变色', 'FrameUiGradients', '/iframe/uigradients', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://uigradients.com/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (21, 18, 1, 'element-plus', 'FrameEp', '/iframe/ep', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://element-plus.org/zh-CN/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (22, 18, 1, 'tailwindcss', 'FrameTailwindcss', '/iframe/tailwindcss', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://tailwindcss.com/docs/installation', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (23, 18, 1, 'vue3', 'FrameVue', '/iframe/vue3', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://cn.vuejs.org/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (24, 18, 1, 'vite', 'FrameVite', '/iframe/vite', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://cn.vitejs.dev/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (25, 18, 1, 'pinia', 'FramePinia', '/iframe/pinia', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://pinia.vuejs.org/zh/index.html', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (26, 18, 1, 'vue-router', 'FrameRouter', '/iframe/vue-router', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', 'https://router.vuejs.org/zh/', NULL, 1, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (27, 17, 0, '文档外链', '', '/iframe/external', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (28, 27, 1, 'vue-pure-admin', 'https://pure-admin.cn/', '/external', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (29, 27, 1, 'pure-admin-utils', 'https://pure-admin-utils.netlify.app/', '/pureUtilsLink', NULL, 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (30, 0, 0, '标签页操作', '', '/tabs', NULL, 5, NULL, 'ri:bookmark-2-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (31, 30, 1, '标签页操作', 'Tabs', '/tabs/index', 'tabs/index', 0, NULL, '', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` VALUES (32, 30, 1, '', 'TabQueryDetail', '/tabs/query-detail', NULL, 0, NULL, '', NULL, NULL, NULL, '/tabs/index', '', '', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO `gin_menu` VALUES (33, 30, 1, '', 'TabParamsDetail', '/tabs/params-detail/:id', 'params-detail', 0, NULL, '', NULL, NULL, NULL, '/tabs/index', '', '', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO `gin_menu` VALUES (34, 0, 0, '官网管理', '', '/site', NULL, 6, NULL, 'ri:global-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` VALUES (35, 34, 1, '内容管理', 'SiteContent', '/site/content/index', 'site/content/index', 0, NULL, 'ri:article-line', NULL, NULL, NULL, '', '', '', NULL, 1, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` VALUES (36, 34, 1, '类别管理', 'SiteCategory', '/site/category/index', 'site/category/index', 0, NULL, 'ri:price-tag-3-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 INSERT INTO `gin_menu` VALUES (37, 34, 1, '标签管理', 'SiteTag', '/site/tag/index', 'site/tag/index', 0, NULL, 'ri:price-tag-2-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (38, 1, 1, 'menus.pureDictManage', 'SystemDict', '/system/dict/index', 'system/dict/index', 0, NULL, 'ep:files', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
-INSERT INTO `gin_menu` VALUES (39, 7, 1, 'menus.pureServerMonitor', 'ServerMonitor', '/monitor/server', 'monitor/server/index', 0, NULL, 'ri:line-chart-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (38, 1, 1, '字典管理', 'SystemDict', '/system/dict/index', 'system/dict/index', 0, NULL, 'ep:files', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
+INSERT INTO `gin_menu` VALUES (39, 7, 1, '服务器监控', 'ServerMonitor', '/monitor/server', 'monitor/server/index', 0, NULL, 'ri:line-chart-line', NULL, NULL, NULL, '', '', '', NULL, 0, NULL, NULL, 1, NULL);
 
 -- ----------------------------
 -- Table structure for gin_report
