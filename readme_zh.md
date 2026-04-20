@@ -83,8 +83,20 @@ cp -r dist/. /home/fhy/myGo/gin-web-admin/views/dist/
 
 - `pnpm build` 保持前端默认独立部署配置不变。
 - `pnpm run build:go` 会使用前端的 `go-static` 模式，发布路径为 `/admin/`，接口前缀为 `/v1/api`。
-- 后端通过 [`views/embed.go`](./views/embed.go) 嵌入 `views/dist`，替换静态文件后需要重新编译或重启 Go 服务。
-- 嵌入后的后台入口：`BASE_URL/admin`
+- 后端默认构建不会把前端静态资源打进二进制：
+
+```bash
+go build
+```
+
+- 如需将 `views/dist` 真正打包进 Go 二进制，请显式添加 `embed_frontend` tag：
+
+```bash
+go build -tags embed_frontend
+```
+
+- 默认的 `go test ./...` / GitHub CI 不依赖 `views/dist`。
+- 使用 `-tags embed_frontend` 构建后的后台入口：`BASE_URL/admin`
 
 ## 配置与运行模式
 
@@ -299,17 +311,23 @@ GET /v1/api/dict/data?pageNum=1&pageSize=50&dictType=sys_user_status&label=启
 - `pnpm build`：前端默认部署模式，保留根路径 `/` 和接口前缀 `/api`
 - `pnpm run build:go`：Go 静态嵌入模式，使用 `/admin/` 和 `/v1/api`
 
+对于本后端，也建议区分两种构建方式：
+
+- `go build`：默认模式，不将前端静态资源打进二进制
+- `go build -tags embed_frontend`：将 `views/dist` 嵌入二进制
+
 在本后端中使用嵌入模式时，按下面顺序操作：
 
 1. 在前端项目执行 `pnpm run build:go`
 2. 将生成的 `dist` 内容复制到 [`views/dist`](./views/dist)
-3. 重新编译或重启 Go 服务
+3. 执行 `go build -tags embed_frontend`
 4. 访问 `BASE_URL/admin`
 
 补充说明：
 
 - 当前后端不会再将 `/` 自动跳转到 `/admin`
-- 嵌入静态资源的入口代码位于 [`routers/router.go`](./routers/router.go) 与 [`views/embed.go`](./views/embed.go)
+- 默认 CI / `go test ./...` 不依赖 `views/dist`
+- 嵌入静态资源的入口代码位于 [`routers/router.go`](./routers/router.go)，构建切换逻辑位于 [`views/embed.go`](./views/embed.go)、[`views/web_dist_local.go`](./views/web_dist_local.go)、[`views/web_dist_embed.go`](./views/web_dist_embed.go)
 
 ### 1. 登录与 Token 生命周期
 
@@ -532,13 +550,39 @@ if msg, err := common.CheckBindStructParameter(page, c); err != nil {
 ## 交叉编译
 
 ```bash
-# Windows
+# Windows 纯后端二进制
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
   go build -a -ldflags '-extldflags "-static"' .
 
-# Linux
+# Linux 纯后端二进制
 CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' .
 ```
+
+如果需要交叉编译“内嵌前端静态资源”的二进制，请先准备 `views/dist`：
+
+```bash
+cd /path/to/web-admin-frontend
+pnpm run build:go
+cp -r dist/. /home/fhy/myGo/gin-web-admin/views/dist/
+```
+
+然后使用 `embed_frontend` tag 编译：
+
+```bash
+# Windows 内嵌前端二进制
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
+  go build -tags embed_frontend -a -ldflags '-extldflags "-static"' .
+
+# Linux 内嵌前端二进制
+CGO_ENABLED=0 \
+  go build -tags embed_frontend -a -ldflags '-extldflags "-static"' .
+```
+
+说明：
+
+- 默认 `go build` / `go test ./...` 不依赖 `views/dist`
+- 使用 `-tags embed_frontend` 时，`views/dist` 必须在编译时存在
+- 嵌入前端后，后台访问入口为 `BASE_URL/admin`
 
 ## License
 

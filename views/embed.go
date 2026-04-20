@@ -6,6 +6,3 @@ import "embed"
 
 //go:embed sse/testSSE.html
 var SSEStaticFS embed.FS
-
-//go:embed all:dist
-var WebStaticFS embed.FS

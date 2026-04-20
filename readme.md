@@ -83,8 +83,20 @@ cp -r dist/. /home/fhy/myGo/gin-web-admin/views/dist/
 
 - `pnpm build` keeps the frontend's default standalone deployment settings.
 - `pnpm run build:go` uses the frontend `go-static` mode (`/admin/` public path, `/v1/api` API base) for this backend.
-- The backend embeds `views/dist` via [`views/embed.go`](./views/embed.go), so you must rebuild or restart the Go service after replacing those files.
-- Admin entry after embedding: `BASE_URL/admin`
+- Default backend build does not embed frontend assets into the binary:
+
+```bash
+go build
+```
+
+- To embed `views/dist` into the Go binary, build with the `embed_frontend` tag:
+
+```bash
+go build -tags embed_frontend
+```
+
+- Default `go test ./...` / CI runs do not require `views/dist`.
+- Embedded admin entry after building with `-tags embed_frontend`: `BASE_URL/admin`
 
 ## Configuration & Run Modes
 
@@ -301,17 +313,23 @@ For the companion frontend project `web-admin-frontend`, keep these two build mo
 - `pnpm build`: default frontend deployment, root path `/`, API base `/api`
 - `pnpm run build:go`: Go static embedding mode, root path `/admin/`, API base `/v1/api`
 
+For this backend, keep these two Go build modes separate:
+
+- `go build`: default mode, no frontend assets embedded into the binary
+- `go build -tags embed_frontend`: embed `views/dist` into the binary
+
 When using the embedded mode in this backend:
 
 1. Run `pnpm run build:go` in the frontend project.
 2. Copy the generated `dist` contents into [`views/dist`](./views/dist).
-3. Rebuild or restart the Go service.
+3. Build the backend with `go build -tags embed_frontend`.
 4. Visit `BASE_URL/admin`.
 
 Notes:
 
 - This backend no longer redirects `/` to `/admin`.
-- Embedded assets are served through [`routers/router.go`](./routers/router.go) and embedded via [`views/embed.go`](./views/embed.go).
+- Default CI / `go test ./...` does not depend on `views/dist`.
+- Embedded assets are served through [`routers/router.go`](./routers/router.go) and selected via build tags in [`views/embed.go`](./views/embed.go), [`views/web_dist_local.go`](./views/web_dist_local.go), and [`views/web_dist_embed.go`](./views/web_dist_embed.go).
 
 ### 1. Login and token lifecycle
 
@@ -506,13 +524,39 @@ if msg, err := common.CheckBindStructParameter(page, c); err != nil {
 ## Cross Compilation
 
 ```bash
-# Windows
+# Windows backend-only binary
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
   go build -a -ldflags '-extldflags "-static"' .
 
-# Linux
+# Linux backend-only binary
 CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' .
 ```
+
+To cross-compile a binary with the frontend embedded, prepare `views/dist` first:
+
+```bash
+cd /path/to/web-admin-frontend
+pnpm run build:go
+cp -r dist/. /home/fhy/myGo/gin-web-admin/views/dist/
+```
+
+Then build with the `embed_frontend` tag:
+
+```bash
+# Windows binary with embedded frontend
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
+  go build -tags embed_frontend -a -ldflags '-extldflags "-static"' .
+
+# Linux binary with embedded frontend
+CGO_ENABLED=0 \
+  go build -tags embed_frontend -a -ldflags '-extldflags "-static"' .
+```
+
+Notes:
+
+- Default `go build` / `go test ./...` does not require `views/dist`.
+- `-tags embed_frontend` requires `views/dist` to exist at build time.
+- After embedding, the admin UI is available at `BASE_URL/admin`.
 
 ## License
 

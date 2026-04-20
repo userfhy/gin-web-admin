@@ -128,7 +128,7 @@ func InitRouter(r *gin.Engine, deps Dependencies) *gin.Engine {
 }
 
 func mountEmbeddedWeb(r *gin.Engine) {
-	distFS, err := fs.Sub(views.WebStaticFS, "dist")
+	distFS, err := views.WebStaticRoot()
 	if err != nil {
 		panic(err)
 	}
