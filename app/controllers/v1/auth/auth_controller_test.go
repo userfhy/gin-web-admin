@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gin-web-admin/common"
 	authService "gin-web-admin/app/service/v1/auth"
 	userService "gin-web-admin/app/service/v1/user"
+	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
 
@@ -23,7 +23,7 @@ func init() {
 
 type mockAuthService struct {
 	loginFunc           func(userService.AuthStruct, string) (authService.LoginResult, error)
-	refreshFunc         func(string) (map[string]any, error)
+	refreshFunc         func(string, string, string) (map[string]any, error)
 	changePasswordFunc  func(string, userService.ChangePasswordStruct) error
 	buildLoggedUserFunc func(*utils.Claims) map[string]any
 }
@@ -32,9 +32,9 @@ func (m *mockAuthService) Login(payload userService.AuthStruct, ip string) (auth
 	return m.loginFunc(payload, ip)
 }
 
-func (m *mockAuthService) RefreshAccessToken(token string) (map[string]any, error) {
+func (m *mockAuthService) RefreshAccessToken(token, clientIP, userAgent string) (map[string]any, error) {
 	if m.refreshFunc != nil {
-		return m.refreshFunc(token)
+		return m.refreshFunc(token, clientIP, userAgent)
 	}
 	return map[string]any{}, nil
 }

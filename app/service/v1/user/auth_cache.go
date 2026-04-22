@@ -13,17 +13,16 @@ const (
 )
 
 type AuthProfileCache struct {
-	UserID       uint   `json:"userId"`
-	Username     string `json:"username"`
-	Nickname     string `json:"nickname"`
-	RoleID       uint   `json:"roleId"`
-	RoleName     string `json:"roleName"`
-	RoleKey      string `json:"roleKey"`
-	IsAdmin      bool   `json:"isAdmin"`
-	Status       int    `json:"status"`
-	Password     string `json:"password"`
-	RefreshToken string `json:"refreshToken"`
-	LastLoginIP  string `json:"lastLoginIP"`
+	UserID      uint   `json:"userId"`
+	Username    string `json:"username"`
+	Nickname    string `json:"nickname"`
+	RoleID      uint   `json:"roleId"`
+	RoleName    string `json:"roleName"`
+	RoleKey     string `json:"roleKey"`
+	IsAdmin     bool   `json:"isAdmin"`
+	Status      int    `json:"status"`
+	Password    string `json:"password"`
+	LastLoginIP string `json:"lastLoginIP"`
 }
 
 func authProfileCacheKey(userID uint) string {
@@ -39,17 +38,16 @@ func buildAuthProfileCache(user *model.Auth) *AuthProfileCache {
 		return nil
 	}
 	return &AuthProfileCache{
-		UserID:       user.ID,
-		Username:     user.Username,
-		Nickname:     user.Nickname,
-		RoleID:       user.RoleId,
-		RoleName:     user.Role.RoleName,
-		RoleKey:      user.Role.RoleKey,
-		IsAdmin:      user.Role.IsAdmin,
-		Status:       user.Status,
-		Password:     user.Password,
-		RefreshToken: user.RefreshToken,
-		LastLoginIP:  user.LastLoginIP,
+		UserID:      user.ID,
+		Username:    user.Username,
+		Nickname:    user.Nickname,
+		RoleID:      user.RoleId,
+		RoleName:    user.Role.RoleName,
+		RoleKey:     user.Role.RoleKey,
+		IsAdmin:     user.Role.IsAdmin,
+		Status:      user.Status,
+		Password:    user.Password,
+		LastLoginIP: user.LastLoginIP,
 	}
 }
 
@@ -104,18 +102,6 @@ func invalidateAuthProfile(userID uint) {
 
 func InvalidateAuthProfileCache(userID uint) {
 	invalidateAuthProfile(userID)
-}
-
-func (s *Service) UpdateAuthProfileRefreshToken(userID uint, refreshToken string) {
-	if userID == 0 || gredis.RedisConn == nil {
-		return
-	}
-	profile, err := s.GetAuthProfile(userID)
-	if err != nil || profile == nil {
-		return
-	}
-	profile.RefreshToken = refreshToken
-	gredis.SetJSONAsync(authProfileCacheKey(userID), profile, authProfileCacheTTL)
 }
 
 func InvalidateAllAuthProfileCache() {

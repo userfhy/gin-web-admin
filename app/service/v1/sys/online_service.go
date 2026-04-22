@@ -2,18 +2,12 @@ package sysService
 
 import (
 	"fmt"
-	model "gin-web-admin/app/models"
+	"strings"
+	"time"
+
 	userService "gin-web-admin/app/service/v1/user"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/gredis"
-	"gin-web-admin/utils/logging"
-	"strings"
-	"time"
-)
-
-const (
-	jwtBlacklistKeyPrefix = "jwt:blacklist:"
-	defaultBlacklistTTL   = 24 * time.Hour
 )
 
 type OnlineUserQuery struct {
@@ -23,7 +17,8 @@ type OnlineUserQuery struct {
 }
 
 type ForceOfflineStruct struct {
-	UserID uint `json:"userId" binding:"required"`
+	UserID    uint   `json:"userId" binding:"required"`
+	SessionID string `json:"sessionId"`
 }
 
 func (s *Service) GetOnlineUserList(query OnlineUserQuery) (utils.PageResult, error) {
@@ -70,26 +65,32 @@ func (s *Service) GetOnlineUserList(query OnlineUserQuery) (utils.PageResult, er
 	return page.Result(list[offset:end], total), nil
 }
 
-func (s *Service) ForceOffline(userID uint) error {
+func (s *Service) ForceOffline(userID uint, sessionID string) error {
 	if userID == 0 {
 		return fmt.Errorf("user id is required")
 	}
-
-	var session userService.OnlineSession
-	found, err := gredis.GetJSON(fmt.Sprintf("sys:online:user:%d", userID), &session)
+	userSvc := userService.NewService(s.store)
+	if strings.TrimSpace(sessionID) != "" {
+		return userSvc.RemoveOnlineSessionBySessionID(userID, sessionID, true)
+	}
+	keys, err := gredis.KeysByPrefix(fmt.Sprintf("sys:online:user:%d:", userID))
 	if err != nil {
 		return err
 	}
-
-	if found && session.Token != "" {
-		if err := gredis.SetWithTTL(jwtBlacklistKey(session.Token), fmt.Sprintf("%d", userID), blacklistTTL(session.Token)); err != nil {
-			logging.Warnf("force offline write blacklist failed: %v", err)
-		}
-		_ = model.CreateBlockList(userID, session.Token)
+	if len(keys) > 1 {
+		return fmt.Errorf("multiple active sessions found; sessionId is required")
 	}
-	_, _ = model.Update(model.Auth{}, map[string]any{"id =": userID}, map[string]any{"refresh_token": ""})
-	userService.InvalidateAuthProfileCache(userID)
-	_, _ = gredis.Delete(fmt.Sprintf("sys:online:user:%d", userID))
+	if len(keys) == 1 {
+		var item userService.OnlineSession
+		found, getErr := gredis.GetJSON(keys[0], &item)
+		if getErr != nil {
+			return getErr
+		}
+		if found && item.SessionID != "" {
+			return userSvc.RemoveOnlineSessionBySessionID(userID, item.SessionID, true)
+		}
+	}
+	userSvc.InvalidateAllUserSessions(userID, true)
 	return nil
 }
 
@@ -111,20 +112,4 @@ func sortOnlineSessions(list []userService.OnlineSession) {
 func parseTime(value string) time.Time {
 	t, _ := time.Parse(time.RFC3339, value)
 	return t
-}
-
-func jwtBlacklistKey(jwt string) string {
-	return jwtBlacklistKeyPrefix + jwt
-}
-
-func blacklistTTL(jwt string) time.Duration {
-	claims, err := utils.ParseToken(jwt)
-	if err != nil || claims == nil || claims.ExpiresAt == nil {
-		return defaultBlacklistTTL
-	}
-	ttl := time.Until(claims.ExpiresAt.Time)
-	if ttl <= 0 {
-		return time.Minute
-	}
-	return ttl
 }

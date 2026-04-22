@@ -95,7 +95,7 @@ func (h *Handler) ForceOffline(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, "无效用户ID", nil)
 		return
 	}
-	if err := h.service.ForceOffline(uint(id)); err != nil {
+	if err := h.service.ForceOffline(uint(id), c.Query("sessionId")); err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
 	}

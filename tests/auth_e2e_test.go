@@ -7,10 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gin-web-admin/common"
 	authController "gin-web-admin/app/controllers/v1/auth"
 	authService "gin-web-admin/app/service/v1/auth"
 	userService "gin-web-admin/app/service/v1/user"
+	"gin-web-admin/common"
 	"gin-web-admin/utils"
 	"gin-web-admin/utils/code"
 
@@ -27,7 +27,7 @@ func (s *e2eStubAuthService) Login(_ userService.AuthStruct, _ string) (authServ
 	return s.result, s.err
 }
 
-func (s *e2eStubAuthService) RefreshAccessToken(string) (map[string]any, error) {
+func (s *e2eStubAuthService) RefreshAccessToken(string, string, string) (map[string]any, error) {
 	return map[string]any{}, nil
 }
 

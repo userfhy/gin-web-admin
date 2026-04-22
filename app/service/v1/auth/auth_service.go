@@ -90,14 +90,10 @@ func (s *Service) Login(payload userService.AuthStruct, clientIP string) (LoginR
 		return LoginResult{}, err
 	}
 
-	oldRefresh, err := s.userService.SetLoggedUserInfo(user.ID, refreshToken, clientIP)
-	if err != nil {
+	if err := s.userService.SetLoggedUserInfo(user.ID, refreshToken, clientIP); err != nil {
 		return LoginResult{}, err
 	}
-	if oldRefresh != "" && oldRefresh != refreshToken {
-		s.userService.JoinBlockList(user.ID, oldRefresh)
-	}
-	if err := s.userService.SaveOnlineSession(accessToken, &claims, clientIP, ""); err != nil {
+	if err := s.userService.CreateLoginSession(accessToken, refreshToken, &claims, clientIP, ""); err != nil {
 		return LoginResult{}, err
 	}
 
@@ -114,8 +110,8 @@ func (s *Service) Login(payload userService.AuthStruct, clientIP string) (LoginR
 	}, nil
 }
 
-func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error) {
-	return s.userService.RefreshAccessToken(refreshToken)
+func (s *Service) RefreshAccessToken(refreshToken, ip, userAgent string) (map[string]any, error) {
+	return s.userService.RefreshAccessToken(refreshToken, ip, userAgent)
 }
 
 func (s *Service) Logout(userID uint, token string) {
@@ -123,7 +119,6 @@ func (s *Service) Logout(userID uint, token string) {
 		return
 	}
 	s.userService.JoinBlockList(userID, token)
-	s.userService.RemoveOnlineSession(userID)
 }
 
 func (s *Service) ChangePassword(username string, payload userService.ChangePasswordStruct) error {

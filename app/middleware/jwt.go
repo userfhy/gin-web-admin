@@ -75,7 +75,7 @@ func JWTHandler(userSvc *userService.Service) gin.HandlerFunc {
 			return
 		}
 		// 存储登录用户信息
-		_ = userSvc.SaveOnlineSession(token, claims, c.ClientIP(), c.GetHeader("User-Agent"))
+		_ = userSvc.TouchOnlineSession(token, claims, c.ClientIP(), c.GetHeader("User-Agent"))
 		c.Set("claims", claims)
 		c.Next()
 	}

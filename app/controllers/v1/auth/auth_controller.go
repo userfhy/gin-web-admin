@@ -18,7 +18,7 @@ var ExpireTimeFormat = "2006/01/02 15:04:05"
 
 type AuthService interface {
 	Login(payload userService.AuthStruct, clientIP string) (authService.LoginResult, error)
-	RefreshAccessToken(refreshToken string) (map[string]any, error)
+	RefreshAccessToken(refreshToken, clientIP, userAgent string) (map[string]any, error)
 	Logout(userID uint, token string)
 	ChangePassword(username string, payload userService.ChangePasswordStruct) error
 	BuildLoggedInUserData(claims *utils.Claims) map[string]any
@@ -107,7 +107,7 @@ func (h *Handler) RefreshAccessToken(c *gin.Context) {
 		return
 	}
 
-	data, err := h.service.RefreshAccessToken(refreshAccessTokenhStruct.RefreshToken)
+	data, err := h.service.RefreshAccessToken(refreshAccessTokenhStruct.RefreshToken, c.ClientIP(), c.GetHeader("User-Agent"))
 	if utils.HandleError(c, http.StatusOK, code.ErrorAuthToken, "access_token刷新失败", err) {
 		logging.Println("Error token: ", err)
 		return

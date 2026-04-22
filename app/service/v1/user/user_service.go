@@ -90,18 +90,7 @@ func NewService(store *data.Store) *Service {
 	return &Service{store: store}
 }
 
-func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string, ip string) (string, error) {
-	var (
-		oldRefresh = ""
-	)
-	profile, err := s.GetAuthProfile(userId)
-	if err != nil {
-		logging.Warnf("load auth profile cache failed: %v", err)
-	}
-	if profile != nil {
-		oldRefresh = profile.RefreshToken
-	}
-
+func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string, ip string) error {
 	wheres := map[string]any{
 		"id =": userId,
 	}
@@ -118,25 +107,27 @@ func (s *Service) SetLoggedUserInfo(userId uint, refreshToken string, ip string)
 
 	rowsAffected, err := model.Update(&model.Auth{}, wheres, updates)
 	if err != nil {
-		return "", fmt.Errorf("更新用户登录信息失败: %w", err)
+		return fmt.Errorf("更新用户登录信息失败: %w", err)
 	}
 	if rowsAffected == 0 {
-		return "", fmt.Errorf("未找到要更新的用户信息")
+		return fmt.Errorf("未找到要更新的用户信息")
 	}
 
-	if profile != nil {
-		profile.RefreshToken = refreshToken
-		if ip != "" {
-			profile.LastLoginIP = ip
-		}
+	profile, err := s.GetAuthProfile(userId)
+	if err != nil {
+		logging.Warnf("load auth profile cache failed: %v", err)
+		return nil
+	}
+	if profile != nil && ip != "" {
+		profile.LastLoginIP = ip
 		if gredis.RedisConn != nil {
 			gredis.SetJSONAsync(authProfileCacheKey(userId), profile, authProfileCacheTTL)
 		}
 	}
-	return oldRefresh, nil
+	return nil
 }
 
-func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error) {
+func (s *Service) RefreshAccessToken(refreshToken, ip, userAgent string) (map[string]any, error) {
 	data := make(map[string]any)
 	_, err := utils.ValidateToken(refreshToken)
 	if err != nil {
@@ -148,10 +139,7 @@ func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error
 	}
 
 	profile, err := s.GetAuthProfile(claims.UserId)
-	if err != nil {
-		return data, err
-	}
-	if profile == nil || profile.RefreshToken != refreshToken {
+	if err != nil || profile == nil {
 		return data, fmt.Errorf("该access_token对应的用户信息不存在")
 	}
 
@@ -166,13 +154,20 @@ func (s *Service) RefreshAccessToken(refreshToken string) (map[string]any, error
 	if err != nil {
 		return data, fmt.Errorf("%s", code.GetMsg(code.AccessTokenFailure))
 	}
-	if err := s.SaveOnlineSession(accessToken, &tokenClaims, profile.LastLoginIP, ""); err != nil {
-		logging.Warnf("save online session on refresh token failed: %v", err)
+	if gredis.RedisConn != nil {
+		if err := s.RefreshOnlineSessionAccessToken(accessToken, refreshToken, &tokenClaims, ip, userAgent); err != nil {
+			return data, err
+		}
+	} else {
+		user, getErr := model.GetUser(map[string]any{"id": claims.UserId})
+		if getErr != nil || user == nil || user.RefreshToken != refreshToken {
+			return data, fmt.Errorf("该access_token对应的用户信息不存在")
+		}
 	}
 
 	data["expires"] = expireTime.Format("2006/01/02 15:04:05")
 	data["accessToken"] = accessToken
-	data["refreshToken"] = profile.RefreshToken
+	data["refreshToken"] = refreshToken
 
 	return data, nil
 }
@@ -194,6 +189,7 @@ func (s *Service) ChangeUserPassword(userId uint, newPassword string) error {
 		return fmt.Errorf("修改用户密码失败，用户不存在或未更新")
 	}
 
+	s.InvalidateAllUserSessions(userId, true)
 	s.InvalidateAuthProfile(userId)
 
 	return nil
@@ -207,9 +203,7 @@ func (s *Service) JoinBlockList(userId uint, jwt string) {
 		logging.Warnf("write jwt blacklist redis failed: %v", err)
 	}
 	_ = model.CreateBlockList(userId, jwt)
-	_, _ = model.Update(model.Auth{}, map[string]any{"id =": userId}, map[string]any{"refresh_token": ""})
-	s.UpdateAuthProfileRefreshToken(userId, "")
-	s.RemoveOnlineSession(userId)
+	s.RemoveOnlineSessionByAccessToken(userId, jwt)
 }
 
 func (s *Service) InBlockList(jwt string) (int64, error) {
