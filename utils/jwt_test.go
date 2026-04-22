@@ -8,7 +8,11 @@ import (
 )
 
 func TestGenerateAndParseToken(t *testing.T) {
-	setting.AppSetting = &setting.App{JwtSecret: "unit-test-secret"}
+	setting.AppSetting = &setting.App{
+		JwtSecret:       "unit-test-secret",
+		AccessTokenTTL:  setting.Duration(2 * time.Hour),
+		RefreshTokenTTL: setting.Duration(7 * 24 * time.Hour),
+	}
 	claims := Claims{UserId: 9, Username: "tester", RoleKey: "admin", IsAdmin: true}
 
 	start := time.Now()
@@ -38,7 +42,11 @@ func TestGenerateAndParseToken(t *testing.T) {
 }
 
 func TestValidateToken(t *testing.T) {
-	setting.AppSetting = &setting.App{JwtSecret: "unit-test-secret"}
+	setting.AppSetting = &setting.App{
+		JwtSecret:       "unit-test-secret",
+		AccessTokenTTL:  setting.Duration(2 * time.Hour),
+		RefreshTokenTTL: setting.Duration(7 * 24 * time.Hour),
+	}
 	token, _, err := GenerateToken(Claims{UserId: 1, Username: "user", RoleKey: "role", IsAdmin: false})
 	if err != nil {
 		t.Fatalf("GenerateToken error: %v", err)
@@ -54,5 +62,33 @@ func TestValidateToken(t *testing.T) {
 
 	if _, err := ValidateToken("invalid.token.value"); err == nil {
 		t.Fatal("expected validation error for invalid token")
+	}
+}
+
+func TestGenerateTokenUsesConfiguredTTL(t *testing.T) {
+	setting.AppSetting = &setting.App{
+		JwtSecret:       "unit-test-secret",
+		AccessTokenTTL:  setting.Duration(30 * time.Minute),
+		RefreshTokenTTL: setting.Duration(10 * 24 * time.Hour),
+	}
+
+	start := time.Now()
+	_, expire, err := GenerateToken(Claims{UserId: 1, Username: "user", RoleKey: "role"})
+	if err != nil {
+		t.Fatalf("GenerateToken error: %v", err)
+	}
+	diff := expire.Sub(start)
+	if diff < 30*time.Minute-2*time.Second || diff > 30*time.Minute+2*time.Second {
+		t.Fatalf("unexpected access token ttl %v", diff)
+	}
+
+	start = time.Now()
+	_, refreshExpire, err := GenerateRefreshToken(Claims{UserId: 1, Username: "user", RoleKey: "role"})
+	if err != nil {
+		t.Fatalf("GenerateRefreshToken error: %v", err)
+	}
+	diff = refreshExpire.Sub(start)
+	if diff < 10*24*time.Hour-2*time.Second || diff > 10*24*time.Hour+2*time.Second {
+		t.Fatalf("unexpected refresh token ttl %v", diff)
 	}
 }

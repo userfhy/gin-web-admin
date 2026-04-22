@@ -297,14 +297,6 @@ func (s *Service) getOnlineSessionRecordByRefreshToken(refreshToken string) (*on
 	return s.getOnlineSessionRecordByKey(sessionKey)
 }
 
-func (s *Service) getOnlineSessionByKey(sessionKey string) (*OnlineSession, error) {
-	record, err := s.getOnlineSessionRecordByKey(sessionKey)
-	if err != nil || record == nil {
-		return nil, err
-	}
-	return &record.OnlineSession, nil
-}
-
 func (s *Service) getOnlineSessionRecordByKey(sessionKey string) (*onlineSessionRecord, error) {
 	if sessionKey == "" || gredis.RedisConn == nil {
 		return nil, nil

@@ -19,16 +19,12 @@ type Claims struct {
 
 // GenerateToken generates an access token used for auth
 func GenerateToken(userClaims Claims) (string, time.Time, error) {
-	return generateToken(userClaims, time.Hour*2)
+	return generateToken(userClaims, setting.AppSetting.AccessTokenTTL.Std())
 }
 
 // GenerateRefreshToken generates a refresh token used for auth
 func GenerateRefreshToken(userClaims Claims) (string, time.Time, error) {
-	nowTime := time.Now()
-	// RefreshToken 7天后零点过期
-	var timeExpiresNumber = time.Hour * 24 * 7
-	expireTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location()).Add(timeExpiresNumber)
-	return generateToken(userClaims, expireTime.Sub(nowTime))
+	return generateToken(userClaims, setting.AppSetting.RefreshTokenTTL.Std())
 }
 
 // generateToken generates a JWT token with a specified duration from now

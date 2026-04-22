@@ -1,8 +1,11 @@
 package setting
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -18,13 +21,47 @@ type Config struct {
 	Site     Site
 }
 
+type Duration time.Duration
+
+func (d *Duration) UnmarshalText(text []byte) error {
+	raw := strings.TrimSpace(string(text))
+	if raw == "" {
+		*d = 0
+		return nil
+	}
+
+	if dur, err := time.ParseDuration(raw); err == nil {
+		*d = Duration(dur)
+		return nil
+	}
+
+	unit := raw[len(raw)-1]
+	if unit != 'd' && unit != 'D' {
+		return fmt.Errorf("invalid duration %q", raw)
+	}
+
+	value, err := strconv.ParseFloat(strings.TrimSpace(raw[:len(raw)-1]), 64)
+	if err != nil {
+		return fmt.Errorf("invalid day duration %q: %w", raw, err)
+	}
+
+	*d = Duration(time.Duration(value * float64(24*time.Hour)))
+	return nil
+}
+
+func (d Duration) Std() time.Duration {
+	return time.Duration(d)
+}
+
 type App struct {
 	JwtSecret        string
 	PasswordSalt     string
 	PrefixUrl        string
 	TimeFormat       string
 	EnabledCORS      bool
-	ExpireTimeFormat string `toml:"ExpireTimeFormat"` // 解决字段名不一致问题
+	AccessTokenTTL   Duration `toml:"AccessTokenTTL"`
+	RefreshTokenTTL  Duration `toml:"RefreshTokenTTL"`
+	ExpireTimeFormat string   `toml:"ExpireTimeFormat"` // 解决字段名不一致问题
 }
 
 var AppSetting = &App{}
@@ -149,5 +186,11 @@ func Setup() {
 	}
 	if SiteSetting.CacheTTL <= 0 {
 		SiteSetting.CacheTTL = 15 * time.Minute
+	}
+	if AppSetting.AccessTokenTTL.Std() <= 0 {
+		AppSetting.AccessTokenTTL = Duration(2 * time.Hour)
+	}
+	if AppSetting.RefreshTokenTTL.Std() <= 0 {
+		AppSetting.RefreshTokenTTL = Duration(7 * 24 * time.Hour)
 	}
 }
