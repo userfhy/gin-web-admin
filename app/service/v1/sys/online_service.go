@@ -27,11 +27,11 @@ func (s *Service) GetOnlineUserList(query OnlineUserQuery) (utils.PageResult, er
 		return utils.PageResult{}, err
 	}
 
+	userSvc := userService.NewService(s.store)
 	list := make([]userService.OnlineSession, 0, len(keys))
 	for _, key := range keys {
-		var item userService.OnlineSession
-		found, err := gredis.GetJSON(key, &item)
-		if err != nil || !found {
+		item, err := userSvc.GetActiveOnlineSessionByKey(key)
+		if err != nil || item == nil {
 			continue
 		}
 		if username := strings.TrimSpace(strings.ToLower(query.Username)); username != "" &&
@@ -42,7 +42,7 @@ func (s *Service) GetOnlineUserList(query OnlineUserQuery) (utils.PageResult, er
 		if ip := strings.TrimSpace(query.IP); ip != "" && !strings.Contains(item.IP, ip) {
 			continue
 		}
-		list = append(list, item)
+		list = append(list, *item)
 	}
 
 	sortOnlineSessions(list)
@@ -77,18 +77,21 @@ func (s *Service) ForceOffline(userID uint, sessionID string) error {
 	if err != nil {
 		return err
 	}
-	if len(keys) > 1 {
-		return fmt.Errorf("multiple active sessions found; sessionId is required")
-	}
-	if len(keys) == 1 {
-		var item userService.OnlineSession
-		found, getErr := gredis.GetJSON(keys[0], &item)
+	activeSessions := make([]userService.OnlineSession, 0, len(keys))
+	for _, key := range keys {
+		item, getErr := userSvc.GetActiveOnlineSessionByKey(key)
 		if getErr != nil {
 			return getErr
 		}
-		if found && item.SessionID != "" {
-			return userSvc.RemoveOnlineSessionBySessionID(userID, item.SessionID, true)
+		if item != nil {
+			activeSessions = append(activeSessions, *item)
 		}
+	}
+	if len(activeSessions) > 1 {
+		return fmt.Errorf("multiple active sessions found; sessionId is required")
+	}
+	if len(activeSessions) == 1 && activeSessions[0].SessionID != "" {
+		return userSvc.RemoveOnlineSessionBySessionID(userID, activeSessions[0].SessionID, true)
 	}
 	userSvc.InvalidateAllUserSessions(userID, true)
 	return nil

@@ -267,6 +267,18 @@ func (s *Service) GetOnlineSessionByAccessToken(accessToken string) (*OnlineSess
 	return &record.OnlineSession, nil
 }
 
+func (s *Service) GetActiveOnlineSessionByKey(sessionKey string) (*OnlineSession, error) {
+	record, err := s.getOnlineSessionRecordByKey(sessionKey)
+	if err != nil || record == nil {
+		return nil, err
+	}
+	active, err := s.isSessionAccessActive(record)
+	if err != nil || !active {
+		return nil, err
+	}
+	return &record.OnlineSession, nil
+}
+
 func (s *Service) getOnlineSessionRecordByAccessToken(accessToken string) (*onlineSessionRecord, error) {
 	if accessToken == "" || gredis.RedisConn == nil {
 		return nil, nil
@@ -372,6 +384,27 @@ func (s *Service) deleteOnlineSession(session onlineSessionRecord) {
 	if _, err := gredis.DeleteKeys(keys...); err != nil {
 		logging.Warnf("delete online session failed: %v", err)
 	}
+}
+
+func (s *Service) isSessionAccessActive(session *onlineSessionRecord) (bool, error) {
+	if session == nil || session.Token == "" {
+		return false, nil
+	}
+	if isSessionExpired(session.ExpiresAt) {
+		return false, nil
+	}
+	return gredis.ExistsKey(onlineAccessKey(session.Token))
+}
+
+func isSessionExpired(expiresAt string) bool {
+	if strings.TrimSpace(expiresAt) == "" {
+		return true
+	}
+	expireAtTime, err := time.Parse(time.RFC3339, expiresAt)
+	if err != nil {
+		return true
+	}
+	return !expireAtTime.After(time.Now())
 }
 
 func (s *Service) blockTokenOnly(jwt string) {
