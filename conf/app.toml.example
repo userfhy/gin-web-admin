@@ -44,8 +44,8 @@ RequireLowercase = true
 RequireNumber = false
 RequireSpecial = false
 # After LoginMaxAttempts failures lock account for LoginLockoutMinutes
-LoginMaxAttempts = 5
-LoginLockoutMinutes = 15
+LoginMaxAttempts = 8
+LoginLockoutMinutes = 60
 # Leave empty to allow all IPs; support single IP or CIDR
 IPWhitelist = ["127.0.0.1/32", "::1"]
 

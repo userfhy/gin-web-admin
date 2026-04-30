@@ -163,7 +163,7 @@ func (h *Handler) GetSecurityTimeline(c *gin.Context) {
 		return
 	}
 
-	pg, err := utils.GetPagination(c, utils.WithDefaultPageSize(5), utils.WithMaxPageSize(50))
+	pg, err := utils.GetPagination(c, utils.WithDefaultPageSize(10), utils.WithMaxPageSize(50))
 	if err != nil {
 		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
 		return
