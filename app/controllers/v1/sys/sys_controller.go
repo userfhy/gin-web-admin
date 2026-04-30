@@ -66,6 +66,25 @@ func (h *Handler) GetRouterList(c *gin.Context) {
 	appG.Response(http.StatusOK, code.SUCCESS, "获取存在路由列表成功", data)
 }
 
+func (h *Handler) GetPermissionVisualization(c *gin.Context) {
+	appG := common.Gin{C: c}
+
+	routes := make([]sysService.BackendRoute, 0, len(Routers))
+	for _, route := range Routers {
+		routes = append(routes, sysService.BackendRoute{
+			Method: route.Method,
+			Path:   route.Path,
+		})
+	}
+
+	result, err := h.service.GetPermissionVisualization(routes)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, code.ERROR, "获取权限可视化数据失败", nil)
+		return
+	}
+	appG.Response(http.StatusOK, code.SUCCESS, "ok", result)
+}
+
 func (h *Handler) GetOnlineUsers(c *gin.Context) {
 	appG := common.Gin{C: c}
 

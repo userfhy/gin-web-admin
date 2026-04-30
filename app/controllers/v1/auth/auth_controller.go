@@ -68,7 +68,14 @@ func (h *Handler) UserLogin(c *gin.Context) {
 		case errors.Is(err, authService.ErrUserDisabled):
 			appG.Response(http.StatusOK, code.ErrorAuth, "该用户已被禁用", nil)
 		case errors.Is(err, authService.ErrAccountLocked):
-			appG.Response(http.StatusTooManyRequests, code.ErrorAuth, "账号已锁定，请稍后再试", nil)
+			data := gin.H{}
+			message := "账号已锁定，请稍后再试"
+			if lockedUntil, ok := authService.LockedUntilFromError(err); ok {
+				formatted := lockedUntil.Format(ExpireTimeFormat)
+				message = "账号已锁定，解锁时间：" + formatted
+				data["lockedUntil"] = formatted
+			}
+			appG.Response(http.StatusTooManyRequests, code.ErrorAuth, message, data)
 		case errors.Is(err, authService.ErrIPNotAllowed):
 			appG.Response(http.StatusForbidden, code.ErrorAuth, "当前 IP 未被授权登录", nil)
 		default:

@@ -10,6 +10,7 @@ func InitSysRouter(router *gin.RouterGroup, handler *sysController.Handler) {
 	sys := router.Group("/sys")
 	{
 		sys.GET("/router", handler.GetRouterList) // 路由列表
+		sys.GET("/permission-visualization", handler.GetPermissionVisualization)
 		sys.GET("/online-users", handler.GetOnlineUsers)
 		sys.DELETE("/online-users/:userId", handler.ForceOffline)
 		sys.GET("/server-monitor", handler.GetServerMonitor)

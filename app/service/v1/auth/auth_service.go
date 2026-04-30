@@ -21,6 +21,29 @@ var (
 	ErrIPNotAllowed       = errors.New("ip not allowed")
 )
 
+type AccountLockedError struct {
+	LockedUntil time.Time
+}
+
+func (e *AccountLockedError) Error() string {
+	if e == nil || e.LockedUntil.IsZero() {
+		return ErrAccountLocked.Error()
+	}
+	return fmt.Sprintf("%s until %s", ErrAccountLocked.Error(), e.LockedUntil.Format(time.RFC3339))
+}
+
+func (e *AccountLockedError) Is(target error) bool {
+	return target == ErrAccountLocked
+}
+
+func LockedUntilFromError(err error) (time.Time, bool) {
+	var lockedErr *AccountLockedError
+	if errors.As(err, &lockedErr) && lockedErr != nil && !lockedErr.LockedUntil.IsZero() {
+		return lockedErr.LockedUntil, true
+	}
+	return time.Time{}, false
+}
+
 type Service struct {
 	store       *data.Store
 	userService *userService.Service
@@ -61,7 +84,7 @@ func (s *Service) Login(payload userService.AuthStruct, clientIP, userAgent stri
 	if user.LockedUntil != nil && user.LockedUntil.After(time.Now()) {
 		until := user.LockedUntil.Format(time.RFC3339)
 		s.logLogin(user.Username, user.ID, clientIP, false, "account locked until "+until)
-		return LoginResult{}, ErrAccountLocked
+		return LoginResult{}, &AccountLockedError{LockedUntil: user.LockedUntil.Time}
 	}
 	if user.Status == 0 {
 		s.logLogin(user.Username, user.ID, clientIP, false, "user disabled")
@@ -167,11 +190,27 @@ func (s *Service) handleLoginFailure(user *model.Auth, ip, reason string) {
 		updates["locked_until"] = lockUntil
 		updates["failed_login_count"] = 0
 		reason = fmt.Sprintf("%s; locked %d minutes", reason, cfg.LoginLockoutMinutes)
+		s.logSecurity(user.Username, user.ID, ip, http.StatusTooManyRequests, "account_locked", fmt.Sprintf("账号因连续登录失败被锁定，解锁时间: %s", lockUntil.Format(time.RFC3339)))
 	}
 	if _, err := model.Update(&model.Auth{}, map[string]any{"id =": user.ID}, updates); err != nil {
 		reason += fmt.Sprintf(" (update error: %v)", err)
 	}
 	s.logLogin(user.Username, user.ID, ip, false, reason)
+}
+
+func (s *Service) logSecurity(username string, userID uint, ip string, status int, action string, message string) {
+	entry := model.AuditLog{
+		Category: "security",
+		UserID:   userID,
+		Username: username,
+		IP:       ip,
+		Method:   http.MethodPost,
+		Path:     "/v1/api/login",
+		Status:   status,
+		Action:   action,
+		Message:  message,
+	}
+	go model.CreateAuditLog(entry)
 }
 
 func (s *Service) logLogin(username string, userID uint, ip string, success bool, message string) {

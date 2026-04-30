@@ -2,6 +2,7 @@ package userController
 
 import (
 	"net/http"
+	"strconv"
 
 	userService "gin-web-admin/app/service/v1/user"
 	"gin-web-admin/common"
@@ -103,4 +104,84 @@ func (h *Handler) GetUsers(c *gin.Context) {
 	}
 
 	appG.Response(http.StatusOK, code.SUCCESS, "ok", pg.Result(userArr, total))
+}
+
+func (h *Handler) ResetPassword(c *gin.Context) {
+	appG := common.Gin{C: c}
+	userID, ok := parseUserIDParam(c, appG)
+	if !ok {
+		return
+	}
+
+	var payload userService.ResetPasswordStruct
+	if err := c.ShouldBindJSON(&payload); utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, "参数绑定失败", err) {
+		return
+	}
+	if parameterErrorStr, err := common.CheckBindStructParameter(payload, c); utils.HandleError(c, http.StatusBadRequest, code.InvalidParams, parameterErrorStr, err) {
+		return
+	}
+
+	operator := ""
+	if claimsValue, exists := c.Get("claims"); exists {
+		if claims, ok := claimsValue.(*utils.Claims); ok && claims != nil {
+			operator = claims.Username
+		}
+	}
+
+	if err := h.service.ResetUserPassword(userID, payload.NewPassword, operator, c.ClientIP()); err != nil {
+		appG.Response(http.StatusOK, code.ERROR, err.Error(), nil)
+		return
+	}
+	appG.Response(http.StatusOK, code.SUCCESS, "重置密码成功，用户全部会话已强制下线", nil)
+}
+
+func (h *Handler) UnlockUser(c *gin.Context) {
+	appG := common.Gin{C: c}
+	userID, ok := parseUserIDParam(c, appG)
+	if !ok {
+		return
+	}
+
+	operator := ""
+	if claimsValue, exists := c.Get("claims"); exists {
+		if claims, ok := claimsValue.(*utils.Claims); ok && claims != nil {
+			operator = claims.Username
+		}
+	}
+
+	if err := h.service.UnlockUser(userID, operator, c.ClientIP()); err != nil {
+		appG.Response(http.StatusOK, code.ERROR, err.Error(), nil)
+		return
+	}
+	appG.Response(http.StatusOK, code.SUCCESS, "解锁成功", nil)
+}
+
+func (h *Handler) GetSecurityTimeline(c *gin.Context) {
+	appG := common.Gin{C: c}
+	userID, ok := parseUserIDParam(c, appG)
+	if !ok {
+		return
+	}
+
+	pg, err := utils.GetPagination(c, utils.WithDefaultPageSize(5), utils.WithMaxPageSize(50))
+	if err != nil {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, err.Error(), nil)
+		return
+	}
+
+	events, err := h.service.GetUserSecurityTimeline(userID, pg)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, code.ERROR, err.Error(), nil)
+		return
+	}
+	appG.Response(http.StatusOK, code.SUCCESS, "ok", events)
+}
+
+func parseUserIDParam(c *gin.Context, appG common.Gin) (uint, bool) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil || id == 0 {
+		appG.Response(http.StatusBadRequest, code.InvalidParams, "用户ID错误", nil)
+		return 0, false
+	}
+	return uint(id), true
 }

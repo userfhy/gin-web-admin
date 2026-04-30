@@ -17,5 +17,8 @@ func InitUserRouter(public, protected *gin.RouterGroup, userHandler *userControl
 		user.PUT("/logout", authHandler.UserLogout)              // 登出
 		user.PUT("/change_password", authHandler.ChangePassword) // 修改密码
 		user.GET("/logged_in", authHandler.GetLoggedInUser)      // 当前登录用户信息
+		user.PUT("/:id/reset_password", userHandler.ResetPassword)
+		user.PUT("/:id/unlock", userHandler.UnlockUser)
+		user.GET("/:id/security_timeline", userHandler.GetSecurityTimeline)
 	}
 }
