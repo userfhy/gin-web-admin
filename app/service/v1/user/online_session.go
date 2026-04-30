@@ -23,22 +23,24 @@ const (
 )
 
 type OnlineSession struct {
-	SessionID    string `json:"sessionId"`
-	UserID       uint   `json:"userId"`
-	Username     string `json:"username"`
-	Nickname     string `json:"nickname"`
-	RoleID       uint   `json:"roleId"`
-	RoleName     string `json:"roleName"`
-	RoleKey      string `json:"roleKey"`
-	IsAdmin      bool   `json:"isAdmin"`
-	IP           string `json:"ip"`
-	UserAgent    string `json:"userAgent"`
-	Browser      string `json:"browser"`
-	OS           string `json:"os"`
-	LoginAt      string `json:"loginAt"`
-	LastActiveAt string `json:"lastActiveAt"`
-	ExpiresAt    string `json:"expiresAt"`
-	TokenHash    string `json:"tokenHash"`
+	SessionID             string `json:"sessionId"`
+	UserID                uint   `json:"userId"`
+	Username              string `json:"username"`
+	Nickname              string `json:"nickname"`
+	RoleID                uint   `json:"roleId"`
+	RoleName              string `json:"roleName"`
+	RoleKey               string `json:"roleKey"`
+	IsAdmin               bool   `json:"isAdmin"`
+	IP                    string `json:"ip"`
+	UserAgent             string `json:"userAgent"`
+	Browser               string `json:"browser"`
+	OS                    string `json:"os"`
+	DeviceName            string `json:"deviceName"`
+	LoginAt               string `json:"loginAt"`
+	LastActiveAt          string `json:"lastActiveAt"`
+	ExpiresAt             string `json:"expiresAt"`
+	TokenHash             string `json:"tokenHash"`
+	TokenRemainingSeconds int64  `json:"tokenRemainingSeconds"`
 }
 
 type onlineSessionRecord struct {
@@ -143,6 +145,21 @@ func parseUserAgent(userAgent string) (browser string, os string) {
 	return
 }
 
+func resolveDeviceName(browser, os string) string {
+	browser = strings.TrimSpace(browser)
+	os = strings.TrimSpace(os)
+	switch {
+	case browser != "" && browser != "Unknown" && os != "" && os != "Unknown":
+		return os + " / " + browser
+	case os != "" && os != "Unknown":
+		return os
+	case browser != "" && browser != "Unknown":
+		return browser
+	default:
+		return "Unknown"
+	}
+}
+
 func (s *Service) CreateLoginSession(accessToken, refreshToken string, claims *utils.Claims, ip, userAgent string) error {
 	if claims == nil || claims.UserId == 0 || accessToken == "" || refreshToken == "" || gredis.RedisConn == nil {
 		return nil
@@ -169,6 +186,7 @@ func (s *Service) CreateLoginSession(accessToken, refreshToken string, claims *u
 			UserAgent:    security.SanitizePlainText(userAgent, 300),
 			Browser:      browser,
 			OS:           os,
+			DeviceName:   resolveDeviceName(browser, os),
 			LoginAt:      now.Format(time.RFC3339),
 			LastActiveAt: now.Format(time.RFC3339),
 			ExpiresAt:    expiresAtString(claims, now),
@@ -207,6 +225,7 @@ func (s *Service) RefreshOnlineSessionAccessToken(accessToken, refreshToken stri
 		existing.UserAgent = sanitizedUA
 		existing.Browser = browser
 		existing.OS = os
+		existing.DeviceName = resolveDeviceName(browser, os)
 	}
 	return s.persistOnlineSession(existing, *existing, claims)
 }
@@ -232,6 +251,7 @@ func (s *Service) TouchOnlineSession(accessToken string, claims *utils.Claims, i
 		session.UserAgent = sanitizedUA
 		session.Browser = browser
 		session.OS = os
+		session.DeviceName = resolveDeviceName(browser, os)
 	}
 	session.Token = accessToken
 	session.TokenHash = tokenHash(accessToken)
@@ -276,6 +296,7 @@ func (s *Service) GetActiveOnlineSessionByKey(sessionKey string) (*OnlineSession
 	if err != nil || !active {
 		return nil, err
 	}
+	fillSessionRuntimeFields(&record.OnlineSession)
 	return &record.OnlineSession, nil
 }
 
@@ -405,6 +426,26 @@ func isSessionExpired(expiresAt string) bool {
 		return true
 	}
 	return !expireAtTime.After(time.Now())
+}
+
+func fillSessionRuntimeFields(session *OnlineSession) {
+	if session == nil {
+		return
+	}
+	if strings.TrimSpace(session.DeviceName) == "" {
+		session.DeviceName = resolveDeviceName(session.Browser, session.OS)
+	}
+	expireAtTime, err := time.Parse(time.RFC3339, session.ExpiresAt)
+	if err != nil {
+		session.TokenRemainingSeconds = 0
+		return
+	}
+	remaining := time.Until(expireAtTime)
+	if remaining <= 0 {
+		session.TokenRemainingSeconds = 0
+		return
+	}
+	session.TokenRemainingSeconds = int64(remaining.Seconds())
 }
 
 func (s *Service) blockTokenOnly(jwt string) {

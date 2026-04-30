@@ -4,15 +4,19 @@ import "gin-web-admin/utils/logging"
 
 type AuditLog struct {
 	BaseModel
-	Category string `gorm:"size:20;index" json:"category"`
-	UserID   uint   `gorm:"index" json:"user_id"`
-	Username string `gorm:"size:60" json:"username"`
-	IP       string `gorm:"size:64" json:"ip"`
-	Path     string `gorm:"size:255" json:"path"`
-	Method   string `gorm:"size:10" json:"method"`
-	Status   int    `gorm:"type:int" json:"status"`
-	Action   string `gorm:"size:120" json:"action"`
-	Message  string `gorm:"type:text" json:"message"`
+	Category        string `gorm:"size:20;index" json:"category"`
+	UserID          uint   `gorm:"index" json:"user_id"`
+	Username        string `gorm:"size:60" json:"username"`
+	IP              string `gorm:"size:64" json:"ip"`
+	Path            string `gorm:"size:255" json:"path"`
+	Method          string `gorm:"size:10" json:"method"`
+	Status          int    `gorm:"type:int" json:"status"`
+	Action          string `gorm:"size:120" json:"action"`
+	Message         string `gorm:"type:text" json:"message"`
+	RequestHeaders  string `gorm:"type:text" json:"request_headers"`
+	RequestBody     string `gorm:"type:text" json:"request_body"`
+	ResponseHeaders string `gorm:"type:text" json:"response_headers"`
+	ResponseBody    string `gorm:"type:text" json:"response_body"`
 }
 
 func (AuditLog) TableName() string {

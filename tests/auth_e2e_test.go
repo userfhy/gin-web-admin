@@ -23,7 +23,7 @@ type e2eStubAuthService struct {
 	err    error
 }
 
-func (s *e2eStubAuthService) Login(_ userService.AuthStruct, _ string) (authService.LoginResult, error) {
+func (s *e2eStubAuthService) Login(_ userService.AuthStruct, _, _ string) (authService.LoginResult, error) {
 	return s.result, s.err
 }
 

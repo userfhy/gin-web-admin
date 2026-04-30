@@ -308,6 +308,7 @@ func (h *Handler) buildAuditLogQuery(c *gin.Context, category string) (sysServic
 		Category:   category,
 		Username:   c.Query("username"),
 		Module:     c.Query("module"),
+		IP:         c.Query("ip"),
 		Status:     status,
 		StartTime:  start,
 		EndTime:    end,

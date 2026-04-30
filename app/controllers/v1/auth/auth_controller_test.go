@@ -22,14 +22,14 @@ func init() {
 }
 
 type mockAuthService struct {
-	loginFunc           func(userService.AuthStruct, string) (authService.LoginResult, error)
+	loginFunc           func(userService.AuthStruct, string, string) (authService.LoginResult, error)
 	refreshFunc         func(string, string, string) (map[string]any, error)
 	changePasswordFunc  func(string, userService.ChangePasswordStruct) error
 	buildLoggedUserFunc func(*utils.Claims) map[string]any
 }
 
-func (m *mockAuthService) Login(payload userService.AuthStruct, ip string) (authService.LoginResult, error) {
-	return m.loginFunc(payload, ip)
+func (m *mockAuthService) Login(payload userService.AuthStruct, ip, userAgent string) (authService.LoginResult, error) {
+	return m.loginFunc(payload, ip, userAgent)
 }
 
 func (m *mockAuthService) RefreshAccessToken(token, clientIP, userAgent string) (map[string]any, error) {
@@ -58,7 +58,7 @@ func (m *mockAuthService) BuildLoggedInUserData(claims *utils.Claims) map[string
 func TestHandler_UserLoginSuccess(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockSvc := &mockAuthService{
-		loginFunc: func(userService.AuthStruct, string) (authService.LoginResult, error) {
+		loginFunc: func(userService.AuthStruct, string, string) (authService.LoginResult, error) {
 			return authService.LoginResult{
 				UserID:       1,
 				Username:     "admin",
@@ -93,7 +93,7 @@ func TestHandler_UserLoginSuccess(t *testing.T) {
 func TestHandler_UserLoginInvalidCredentials(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockSvc := &mockAuthService{
-		loginFunc: func(userService.AuthStruct, string) (authService.LoginResult, error) {
+		loginFunc: func(userService.AuthStruct, string, string) (authService.LoginResult, error) {
 			return authService.LoginResult{}, authService.ErrInvalidCredentials
 		},
 	}

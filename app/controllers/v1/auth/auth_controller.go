@@ -17,7 +17,7 @@ import (
 var ExpireTimeFormat = "2006/01/02 15:04:05"
 
 type AuthService interface {
-	Login(payload userService.AuthStruct, clientIP string) (authService.LoginResult, error)
+	Login(payload userService.AuthStruct, clientIP, userAgent string) (authService.LoginResult, error)
 	RefreshAccessToken(refreshToken, clientIP, userAgent string) (map[string]any, error)
 	Logout(userID uint, token string)
 	ChangePassword(username string, payload userService.ChangePasswordStruct) error
@@ -60,7 +60,7 @@ func (h *Handler) UserLogin(c *gin.Context) {
 	}
 
 	clientIP := c.ClientIP()
-	result, err := h.service.Login(userLogin, clientIP)
+	result, err := h.service.Login(userLogin, clientIP, c.GetHeader("User-Agent"))
 	if err != nil {
 		switch {
 		case errors.Is(err, authService.ErrInvalidCredentials):

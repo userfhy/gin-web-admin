@@ -43,7 +43,7 @@ func NewService(store *data.Store, userSvc *userService.Service) *Service {
 	return &Service{store: store, userService: userSvc}
 }
 
-func (s *Service) Login(payload userService.AuthStruct, clientIP string) (LoginResult, error) {
+func (s *Service) Login(payload userService.AuthStruct, clientIP, userAgent string) (LoginResult, error) {
 	if !security.IsIPWhitelisted(clientIP) {
 		s.logLogin(payload.Username, 0, clientIP, false, "IP not allowed")
 		return LoginResult{}, ErrIPNotAllowed
@@ -93,7 +93,7 @@ func (s *Service) Login(payload userService.AuthStruct, clientIP string) (LoginR
 	if err := s.userService.SetLoggedUserInfo(user.ID, refreshToken, clientIP); err != nil {
 		return LoginResult{}, err
 	}
-	if err := s.userService.CreateLoginSession(accessToken, refreshToken, &claims, clientIP, ""); err != nil {
+	if err := s.userService.CreateLoginSession(accessToken, refreshToken, &claims, clientIP, userAgent); err != nil {
 		return LoginResult{}, err
 	}
 

@@ -1,6 +1,7 @@
 package sysService
 
 import (
+	"encoding/json"
 	"fmt"
 	model "gin-web-admin/app/models"
 	"gin-web-admin/utils"
@@ -17,6 +18,7 @@ type AuditLogQuery struct {
 	Category   string
 	Username   string
 	Module     string
+	IP         string
 	Status     *int
 	StartTime  *time.Time
 	EndTime    *time.Time
@@ -137,12 +139,10 @@ func (s *Service) GetSystemLogDetail(id uint) (*SystemLogDetail, error) {
 	row := buildSystemLogRow(&item)
 	return &SystemLogDetail{
 		SystemLogRow:    row,
-		RequestHeaders:  map[string]any{},
-		RequestBody:     map[string]any{},
-		ResponseHeaders: map[string]any{},
-		ResponseBody: map[string]any{
-			"message": item.Message,
-		},
+		RequestHeaders:  parseLogObject(item.RequestHeaders),
+		RequestBody:     parseLogPayload(item.RequestBody),
+		ResponseHeaders: parseLogObject(item.ResponseHeaders),
+		ResponseBody:    parseLogPayloadWithFallback(item.ResponseBody, item.Message),
 	}, nil
 }
 
@@ -185,6 +185,9 @@ func applyAuditLogFilters(db *gorm.DB, query AuditLogQuery) *gorm.DB {
 	}
 	if module := strings.TrimSpace(query.Module); module != "" {
 		db = db.Where("path LIKE ? OR action LIKE ?", "%"+module+"%", "%"+module+"%")
+	}
+	if ip := strings.TrimSpace(query.IP); ip != "" {
+		db = db.Where("ip LIKE ?", "%"+ip+"%")
 	}
 	if query.Status != nil {
 		if *query.Status == 1 {
@@ -269,6 +272,43 @@ func extractLatencyMs(message string) int64 {
 		return 0
 	}
 	return d.Milliseconds()
+}
+
+func parseLogObject(raw string) map[string]any {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return map[string]any{}
+	}
+	var result map[string]any
+	if err := json.Unmarshal([]byte(raw), &result); err == nil && result != nil {
+		return result
+	}
+	return map[string]any{
+		"raw": raw,
+	}
+}
+
+func parseLogPayload(raw string) any {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return map[string]any{}
+	}
+	var result any
+	if err := json.Unmarshal([]byte(raw), &result); err == nil {
+		return result
+	}
+	return raw
+}
+
+func parseLogPayloadWithFallback(raw, fallback string) any {
+	payload := parseLogPayload(raw)
+	if text, ok := payload.(string); ok && strings.TrimSpace(text) == "" {
+		return map[string]any{"message": fallback}
+	}
+	if object, ok := payload.(map[string]any); ok && len(object) == 0 && strings.TrimSpace(fallback) != "" {
+		return map[string]any{"message": fallback}
+	}
+	return payload
 }
 
 func ParseLogStatus(value string) (*int, error) {
